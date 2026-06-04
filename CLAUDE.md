@@ -7,6 +7,7 @@ Modernization of home2host.com (WordPress → Next.js). Read these before any ta
 - @docs/architecture.md — chosen stack and *why*
 - @docs/roadmap.md — stages, status, what's next
 - @docs/conventions.md — code style, naming, commit format
+- @docs/design-system.md — tokens, visual direction, component contract
 
 ## At a glance
 
