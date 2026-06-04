@@ -4,6 +4,7 @@ Reverse chronological. One line per completed task. Dates in YYYY-MM-DD format.
 
 ## 2026-06-04
 
+- docs: reconcile roadmap with actual project state and ADR 0003
 - chore: scaffold Next.js 16 app (TypeScript strict, App Router, src/, ESLint, Tailwind v4) at repo root
 
 ## 2026-06-02

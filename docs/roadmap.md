@@ -7,16 +7,22 @@ Status markers: ✅ done · 🔄 in progress · ⬜ not started
 - ✅ Local environment (Node.js, npm, Git, VS Code)
 - ✅ GitHub repo created and connected locally
 - ✅ Doc structure (CLAUDE.md, docs/) — this pattern
-- ⬜ Backup of the current WordPress site (content + files + database)
-- ⬜ Collect the raw materials — see `docs/content-inventory.md`
+- ✅ Backup of the current WordPress site (created in WordPress admin)
+- 🔄 Collect the raw materials — see `docs/content-inventory.md` (in progress)
 
 ## Stage 1 — Project skeleton ⬜
 
-- ⬜ `create-next-app` with TypeScript and App Router
-- ⬜ Folder structure (`src/app`, `src/components`, `src/lib`, etc.)
+Restructured after ADR 0003 (Tailwind v4) and the design-system doc were added — the original "folder structure" and "design tokens" items have collapsed into a single foundation step, executed before anything else.
+
+- ✅ `create-next-app` with TypeScript and App Router
+- ⬜ Design-system foundation
+  - Initial `@theme` block in `src/app/globals.css` per [design-system.md](design-system.md) and [ADR 0003](decisions/0003-styling-approach.md)
+  - Add `src/components/` when the first real component lands (per ADR 0003); no other folders pre-created
+  - Smoke-test home page that actually exercises the tokens (so we know the pipeline works before going wide)
+- ⬜ Database decision (Neon vs Supabase) — ADR 0002
+- ⬜ Database provisioning + connection
 - ⬜ Payload integration inside the same project
-- ⬜ Database choice and connection (Neon vs Supabase — decided here, documented in a new ADR)
-- ⬜ First deployment to Vercel (empty page, but end-to-end pipeline working)
+- ⬜ First deployment to Vercel (smoke-test page, but end-to-end pipeline working)
 
 ## Stage 2 — Data layer (Payload schema) ⬜
 
@@ -27,8 +33,7 @@ Status markers: ✅ done · 🔄 in progress · ⬜ not started
 
 ## Stage 3 — Design system and shared UI ⬜
 
-- ⬜ Styling approach (Tailwind vs CSS Modules — decided here)
-- ⬜ Design tokens (colors, fonts, spacing) extracted from the current site
+- ⬜ Design tokens — refinement and finalization (initial extraction happens in Stage 1 as part of the design-system foundation; this stage locks the final palette/type scale once real components exist)
 - ⬜ Base components: Layout, Header, Footer, LanguageSwitcher, Button, Card
 
 ## Stage 4 — Pages ⬜
@@ -56,5 +61,4 @@ Order: static pages first, then CMS-driven ones.
 ## Open questions
 
 - Vertical slice in Stage 1? (One page wired end-to-end early, to feel the full flow before going wide.)
-- Postgres provider: Neon vs Supabase — to be decided in Stage 1
-- Styling: Tailwind vs CSS Modules — to be decided in Stage 3
+- Postgres provider: Neon vs Supabase — to be decided in Stage 1 (task 2, ADR 0002)
