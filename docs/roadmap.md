@@ -2,13 +2,13 @@
 
 Status markers: ✅ done · 🔄 in progress · ⬜ not started
 
-## Stage 0 — Preparation and safety 🔄
+## Stage 0 — Preparation and safety ✅
 
 - ✅ Local environment (Node.js, npm, Git, VS Code)
 - ✅ GitHub repo created and connected locally
 - ✅ Doc structure (CLAUDE.md, docs/) — this pattern
 - ✅ Backup of the current WordPress site (created in WordPress admin)
-- 🔄 Collect the raw materials — see `docs/content-inventory.md` (in progress)
+- ✅ Collect the raw materials — closed 2026-06-04 with deferred items parked. See `docs/content-inventory.md` for the deferred-follow-ups table (footer copy, EN translations, full blog bodies, apartment labels, tone-of-voice, vector logo) — none block Stage 1, all pickable on demand.
 
 ## Stage 1 — Project skeleton ⬜
 

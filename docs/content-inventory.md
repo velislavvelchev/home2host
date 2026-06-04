@@ -2,6 +2,8 @@
 
 What we need to gather from the old site before starting Stage 4 (pages). Tick ✅ when each item is collected.
 
+**Status:** Stage 0 closed on 2026-06-04 with several follow-ups deferred — see the "Deferred follow-ups" section at the bottom. They are tracked here, not lost, and can be pulled when the relevant stage needs them.
+
 ## Text
 
 URL slugs reflect the live site (not assumed names). BG copy is captured under `docs/inventory/text/`. EN versions from TranslatePress are still pending — not yet captured.
@@ -49,4 +51,19 @@ All 13 actively-used images + the logo master are now stored in `docs/inventory/
 - Email: info@home2host.com
 - Facebook: home2hosteu
 - Instagram: home2host_
+
+## Deferred follow-ups
+
+These were intentionally **not** pulled when Stage 0 closed on 2026-06-04. Each is parked here with what triggers needing it, so it can be picked up when the relevant stage hits — no rush, no work lost.
+
+| Item | What's currently in the repo | Pull it when | Effort estimate |
+|---|---|---|---|
+| **Footer copy (BG)** | Not extracted. The raw HTML for all pages is in `docs/inventory/raw/`, so the source exists. | Building the Footer component (Stage 3) | ~5 min — one grep + paste |
+| **EN versions of all page copy** | Raw HTML captured in `docs/inventory/raw/en/` (8 files, 1.46 MB). Markdown not extracted. | Setting up next-intl and importing EN strings (Stage 5) | ~30 min — same WebFetch loop we ran for BG |
+| **Full blog post bodies + featured images + tags + authors** | Only titles/dates/excerpts/URLs captured, in `docs/inventory/text/blog.md`. Note: post #1 has a `-copy/` URL — likely a draft duplicate. | Building the Blog page and importing posts to Payload (Stage 4) | ~45 min — 6 posts to fetch + parse |
+| **EN versions of blog posts** | Not checked. | Same as EN page copy (Stage 5) | ~20 min if EN versions exist |
+| **Apartment-label mapping** | 12 Airbnb URLs captured in `docs/inventory/text/apartments.md` with rating/size info. The labels (e.g. "Bansko — Studio A", "Burgas — 2BR by the sea") need to come from the owner. | Building the Apartments page (Stage 4) | Owner input required — Claude can't do this alone |
+| **Tone-of-voice notes** | None captured. | Stage 4 when writing or reworking page copy | Discussion with owner |
+| **Vector logo** | Only PNG (512×512) exists on the WordPress server. No SVG anywhere. | Stage 3 (design system) if a scalable logo is needed | Owner needs to provide; otherwise re-trace the PNG |
+| **Icons audit** | None catalogued — the WordPress site uses Font Awesome, which won't be inherited | Stage 3 only if a question arises about specific icon glyphs | Probably a no-op — the new site picks its own icon set |
 
