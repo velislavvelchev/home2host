@@ -2,6 +2,10 @@
 
 Reverse chronological. One line per completed task. Dates in YYYY-MM-DD format.
 
+## 2026-06-04
+
+- chore: scaffold Next.js 16 app (TypeScript strict, App Router, src/, ESLint, Tailwind v4) at repo root
+
 ## 2026-06-02
 
 - chore: scaffold project context (CLAUDE.md + docs/ structure)
