@@ -15,10 +15,10 @@ Status markers: ✅ done · 🔄 in progress · ⬜ not started
 Restructured after ADR 0003 (Tailwind v4) and the design-system doc were added — the original "folder structure" and "design tokens" items have collapsed into a single foundation step, executed before anything else.
 
 - ✅ `create-next-app` with TypeScript and App Router
-- ⬜ Design-system foundation
-  - Initial `@theme` block in `src/app/globals.css` per [design-system.md](design-system.md) and [ADR 0003](decisions/0003-styling-approach.md)
-  - Add `src/components/` when the first real component lands (per ADR 0003); no other folders pre-created
-  - Smoke-test home page that actually exercises the tokens (so we know the pipeline works before going wide)
+- ✅ Design-system foundation
+  - ✅ Initial `@theme` block in `src/app/globals.css` per [design-system.md](design-system.md) and [ADR 0003](decisions/0003-styling-approach.md) — brand indigo (anchored at brand-800 = #122C69), neutrals, semantic colors, Geist type scale, spacing/radii/shadows/motion, light+dark via CSS-variable swap
+  - ⬜ Add `src/components/` when the first real component lands (per ADR 0003); no other folders pre-created
+  - ✅ Smoke-test home page that actually exercises the tokens — production build green
 - ⬜ Database decision (Neon vs Supabase) — ADR 0002
 - ⬜ Database provisioning + connection
 - ⬜ Payload integration inside the same project

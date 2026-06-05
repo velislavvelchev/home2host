@@ -2,6 +2,10 @@
 
 Reverse chronological. One line per completed task. Dates in YYYY-MM-DD format.
 
+## 2026-06-05
+
+- feat: lay down design-system foundation — @theme tokens (brand indigo anchored at #122C69, neutrals, semantic colors, Geist type scale, spacing/radii/shadows/motion), light+dark via CSS-variable swap, smoke-test home page exercises the tokens
+
 ## 2026-06-04
 
 - docs: close Stage 0 — content-inventory.md now lists deferred follow-ups (footer copy, EN translations, blog post bodies, apartment labels, tone-of-voice, vector logo)

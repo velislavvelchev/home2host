@@ -1,26 +1,142 @@
 @import "tailwindcss";
 
+/*
+  Design tokens — single source of truth.
+  See docs/design-system.md and docs/decisions/0003-styling-approach.md.
+
+  Layout of this file:
+    1. :root          — raw values for tokens that swap between light/dark.
+    2. prefers-color-scheme: dark — overrides for those raw values.
+    3. @theme         — static scales (brand, neutral, type, spacing, radii,
+                        shadow, motion). These generate Tailwind utilities.
+    4. @theme inline  — surface/text tokens registered with Tailwind by
+                        pointing at the swappable :root values from (1).
+*/
+
+/* ---------- 1. Swappable theme values (light) ---------- */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background:        #ffffff;
+  --surface:           #ffffff;
+  --surface-muted:     #f7f8fa;
+  --foreground:        #121620;
+  --foreground-muted:  #6b7484;
+  --border:            #d9dde5;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
+/* ---------- 2. Dark-theme overrides ----------
+   For now we follow the OS preference. When a manual theme switch is
+   introduced (Stage 3), add a `.dark` selector here mirroring this block. */
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background:       #070910;
+    --surface:          #121620;
+    --surface-muted:    #232936;
+    --foreground:       #f7f8fa;
+    --foreground-muted: #8d96a6;
+    --border:           #232936;
   }
+}
+
+/* ---------- 3. Static token scales ---------- */
+@theme {
+  /* Brand — indigo, anchored at brand-800 = #122C69 (the deep indigo
+     currently rendered on home2host.com). Starting palette; Stage 3 may
+     re-anchor without renaming utilities. */
+  --color-brand-50:  #eef2fb;
+  --color-brand-100: #dbe2f4;
+  --color-brand-200: #b7c5e9;
+  --color-brand-300: #91a7dc;
+  --color-brand-400: #6a86cb;
+  --color-brand-500: #4866b3;
+  --color-brand-600: #2f4a92;
+  --color-brand-700: #1e3878;
+  --color-brand-800: #122c69;
+  --color-brand-900: #0a1d4a;
+  --color-brand-950: #06122f;
+
+  /* Neutral — our own scale so the system stays independent of Tailwind's
+     default zinc/slate, and so dark-mode surfaces have predictable steps. */
+  --color-neutral-0:    #ffffff;
+  --color-neutral-50:   #f7f8fa;
+  --color-neutral-100:  #eef0f4;
+  --color-neutral-200:  #d9dde5;
+  --color-neutral-300:  #b8bfcb;
+  --color-neutral-400:  #8d96a6;
+  --color-neutral-500:  #6b7484;
+  --color-neutral-600:  #4f5867;
+  --color-neutral-700:  #3a4250;
+  --color-neutral-800:  #232936;
+  --color-neutral-900:  #121620;
+  --color-neutral-1000: #070910;
+
+  /* Semantic */
+  --color-success: #1f9d6a;
+  --color-warning: #d97706;
+  --color-error:   #d93b3b;
+
+  /* Typography — Geist Sans for body and display per design-direction memo.
+     Mono kept for code/accents. */
+  --font-sans:    var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono:    var(--font-geist-mono), ui-monospace, "SF Mono", monospace;
+  --font-display: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+
+  /* Type scale — values in rem; raw px in trailing comment for reference. */
+  --text-xs:   0.75rem;     /* 12 */
+  --text-sm:   0.875rem;    /* 14 */
+  --text-base: 1rem;        /* 16 */
+  --text-lg:   1.125rem;    /* 18 */
+  --text-xl:   1.25rem;     /* 20 */
+  --text-2xl:  1.5rem;      /* 24 */
+  --text-3xl:  1.875rem;    /* 30 */
+  --text-4xl:  2.25rem;     /* 36 */
+  --text-5xl:  3rem;        /* 48 */
+  --text-6xl:  3.75rem;     /* 60 */
+
+  /* Spacing — 4px base unit. Named tokens for layout-level spacing
+     (p-section, gap-gutter) so page rhythm doesn't drift across pages. */
+  --spacing:         0.25rem;
+  --spacing-gutter:  1rem;
+  --spacing-section: 5rem;
+
+  /* Radii */
+  --radius-xs:   0.125rem;
+  --radius-sm:   0.25rem;
+  --radius-md:   0.5rem;
+  --radius-lg:   0.75rem;
+  --radius-xl:   1rem;
+  --radius-2xl:  1.5rem;
+  --radius-full: 9999px;
+
+  /* Shadows — deliberately subtle. The design-system doc rules out the
+     2018-style drop-shadow card look. */
+  --shadow-1: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+  --shadow-2: 0 4px 12px -2px rgb(15 23 42 / 0.06),
+              0 2px 4px -2px rgb(15 23 42 / 0.04);
+  --shadow-3: 0 12px 32px -8px rgb(15 23 42 / 0.10);
+
+  /* Motion */
+  --duration-fast: 120ms;
+  --duration-base: 200ms;
+  --duration-slow: 320ms;
+  --ease-standard:   cubic-bezier(0.2, 0, 0, 1);
+  --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+}
+
+/* ---------- 4. Swappable tokens registered with Tailwind ----------
+   These point at the :root values so utilities like `bg-background`,
+   `text-foreground`, `border-border` follow the active theme. */
+@theme inline {
+  --color-background:       var(--background);
+  --color-surface:          var(--surface);
+  --color-surface-muted:    var(--surface-muted);
+  --color-foreground:       var(--foreground);
+  --color-foreground-muted: var(--foreground-muted);
+  --color-border:           var(--border);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
 }
