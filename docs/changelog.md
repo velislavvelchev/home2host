@@ -4,6 +4,7 @@ Reverse chronological. One line per completed task. Dates in YYYY-MM-DD format.
 
 ## 2026-06-05
 
+- docs: ADR 0002 — pick Neon as the Postgres provider (Vercel-native, scale-to-zero, per-branch DBs); Supabase rejected as scope-mismatched for a Payload-backed marketing site
 - feat: lay down design-system foundation — @theme tokens (brand indigo anchored at #122C69, neutrals, semantic colors, Geist type scale, spacing/radii/shadows/motion), light+dark via CSS-variable swap, smoke-test home page exercises the tokens
 
 ## 2026-06-04

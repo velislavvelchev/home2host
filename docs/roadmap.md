@@ -19,7 +19,7 @@ Restructured after ADR 0003 (Tailwind v4) and the design-system doc were added �
   - ✅ Initial `@theme` block in `src/app/globals.css` per [design-system.md](design-system.md) and [ADR 0003](decisions/0003-styling-approach.md) — brand indigo (anchored at brand-800 = #122C69), neutrals, semantic colors, Geist type scale, spacing/radii/shadows/motion, light+dark via CSS-variable swap
   - ⬜ Add `src/components/` when the first real component lands (per ADR 0003); no other folders pre-created
   - ✅ Smoke-test home page that actually exercises the tokens — production build green
-- ⬜ Database decision (Neon vs Supabase) — ADR 0002
+- ✅ Database decision — Neon, per [ADR 0002](decisions/0002-database-provider.md). Postgres + scale-to-zero + Vercel-native + per-branch DBs; Payload uses `@payloadcms/db-postgres`.
 - ⬜ Database provisioning + connection
 - ⬜ Payload integration inside the same project
 - ⬜ First deployment to Vercel (smoke-test page, but end-to-end pipeline working)
@@ -61,4 +61,3 @@ Order: static pages first, then CMS-driven ones.
 ## Open questions
 
 - Vertical slice in Stage 1? (One page wired end-to-end early, to feel the full flow before going wide.)
-- Postgres provider: Neon vs Supabase — to be decided in Stage 1 (task 2, ADR 0002)
