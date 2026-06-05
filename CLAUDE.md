@@ -4,8 +4,8 @@
 
 Modernization of home2host.com (WordPress → Next.js). Read these before any task:
 
-- @docs/architecture.md — chosen stack and *why*
-- @docs/roadmap.md — stages, status, what's next
+- @docs/architecture.md — chosen stack and *why* (includes the project layout: parallel `(frontend)` + `(payload)` route groups, and local dev setup)
+- @docs/roadmap.md — stages, status, what's next (and the "Known follow-ups" section for deferred small items)
 - @docs/conventions.md — code style, naming, commit format
 - @docs/design-system.md — tokens, visual direction, component contract
 

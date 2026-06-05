@@ -61,3 +61,13 @@ Order: static pages first, then CMS-driven ones.
 ## Open questions
 
 - Vertical slice in Stage 1? (One page wired end-to-end early, to feel the full flow before going wide.)
+
+## Known follow-ups (don't lose these)
+
+Small items deferred during Stage 1 — none block Stage 2, but each will bite at a specific later moment if forgotten.
+
+- **`PAYLOAD_SECRET` missing from Vercel Preview env.** Production and Development have it; Preview does not (Vercel CLI 54.9.1 wouldn't accept it non-interactively, and we had no PR workflow yet). Add it via Vercel dashboard → Settings → Environment Variables before the first PR-triggered preview deploy, otherwise `/admin` on the preview URL will 500 with "missing secret key".
+- **`pg-connection-string` v3.0 / pg v9 SSL semantics.** The dev log shows a warning that `sslmode=require` currently aliases to `verify-full`, but won't in pg v9. When we upgrade to pg v9, switch the Neon URL to `sslmode=verify-full` explicitly. Until then: no action.
+- **`src/components/` not created yet** (per [ADR 0003](decisions/0003-styling-approach.md)). Create the folder when the first real component lands in Stage 3, not pre-emptively.
+- **Email adapter not wired.** Payload currently writes emails to console. Add Resend or SMTP adapter in Stage 4 or 5, before any production user needs a password reset. Until that exists, **don't lose the admin credentials** — no self-serve recovery.
+- **Neon DB branching not enabled.** Per [ADR 0002](decisions/0002-database-provider.md), enable preview-deploy branching in Stage 5 or 6 once there's real production content worth protecting. Until then dev and prod share the same database.
