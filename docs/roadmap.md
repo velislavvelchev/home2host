@@ -10,7 +10,7 @@ Status markers: ✅ done · 🔄 in progress · ⬜ not started
 - ✅ Backup of the current WordPress site (created in WordPress admin)
 - ✅ Collect the raw materials — closed 2026-06-04 with deferred items parked. See `docs/content-inventory.md` for the deferred-follow-ups table (footer copy, EN translations, full blog bodies, apartment labels, tone-of-voice, vector logo) — none block Stage 1, all pickable on demand.
 
-## Stage 1 — Project skeleton ⬜
+## Stage 1 — Project skeleton ✅
 
 Restructured after ADR 0003 (Tailwind v4) and the design-system doc were added — the original "folder structure" and "design tokens" items have collapsed into a single foundation step, executed before anything else.
 
@@ -20,9 +20,9 @@ Restructured after ADR 0003 (Tailwind v4) and the design-system doc were added �
   - ⬜ Add `src/components/` when the first real component lands (per ADR 0003); no other folders pre-created
   - ✅ Smoke-test home page that actually exercises the tokens — production build green
 - ✅ Database decision — Neon, per [ADR 0002](decisions/0002-database-provider.md). Postgres + scale-to-zero + Vercel-native + per-branch DBs; Payload uses `@payloadcms/db-postgres`.
-- ⬜ Database provisioning + connection
-- ⬜ Payload integration inside the same project
-- ⬜ First deployment to Vercel (smoke-test page, but end-to-end pipeline working)
+- ✅ Database provisioning + connection — Neon Postgres provisioned via Vercel Storage (Frankfurt, free tier). Env vars (`DATABASE_URL`, `POSTGRES_URL`, etc.) auto-injected into Production/Preview/Development environments and pulled locally with `vercel env pull .env.local`.
+- ✅ Payload integration inside the same project — Payload v3.85 mounted as `(payload)` route group; marketing site lives in parallel `(frontend)` route group so each owns its own `<html>/<body>`. Admin reachable at `/admin`, REST at `/api/...`, GraphQL at `/api/graphql`. `--use-swc` flag on `payload generate:*` scripts to sidestep tsx's `require()`-on-ESM issue on Node 24.
+- ✅ First deployment to Vercel — auto-deploys from `main` to `home2host.vercel.app`. Smoke-test page rendered; DNS untouched (WordPress stays on the domain until Stage 6).
 
 ## Stage 2 — Data layer (Payload schema) ⬜
 
