@@ -51,6 +51,46 @@ export default buildConfig({
         },
       ],
     },
+    {
+      slug: "blog-posts",
+      labels: { singular: "Blog post", plural: "Blog posts" },
+      admin: {
+        useAsTitle: "title",
+        defaultColumns: ["title", "publishedAt", "_status"],
+      },
+      access: { read: () => true },
+      versions: { drafts: true },
+      fields: [
+        { name: "title", type: "text", localized: true, required: true },
+        {
+          name: "slug",
+          type: "text",
+          required: true,
+          unique: true,
+          index: true,
+          admin: {
+            description:
+              "URL-safe identifier, shared across locales (e.g. 'welcome-to-bansko').",
+          },
+        },
+        { name: "excerpt", type: "textarea", localized: true },
+        { name: "featuredImage", type: "upload", relationTo: "media" },
+        { name: "body", type: "richText", localized: true, required: true },
+        { name: "author", type: "text" },
+        {
+          name: "tags",
+          type: "array",
+          localized: true,
+          fields: [{ name: "label", type: "text", required: true }],
+        },
+        {
+          name: "publishedAt",
+          type: "date",
+          required: true,
+          admin: { date: { pickerAppearance: "dayOnly" } },
+        },
+      ],
+    },
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
