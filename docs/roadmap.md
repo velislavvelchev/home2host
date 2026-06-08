@@ -43,6 +43,7 @@ Order: static pages first, then CMS-driven ones.
 - ⬜ Home, About, Services, Prices, FAQ, Contacts
 - ⬜ Blog (list + single post)
 - ⬜ Apartments (list of Airbnb embeds)
+- ⬜ Contact-form abuse defenses — **before the form is exposed publicly**: honeypot field (blocks ~80% of naive bots, zero UX cost) and per-IP rate limiting via `@upstash/ratelimit` + `@upstash/redis` (free tier sufficient). Optional Cloudflare Turnstile for residual spam.
 
 ## Stage 5 — i18n, analytics, SEO ⬜
 
@@ -58,6 +59,10 @@ Order: static pages first, then CMS-driven ones.
 - ⬜ DNS switch from Hostinger to Vercel
 - ⬜ WordPress kept as a backup for several weeks post-launch
 - ⬜ Verify GA and Google Search Console after launch
+- ⬜ Security baseline (before/at DNS switch):
+  - ⬜ Put **Cloudflare's free tier** in front of `home2host.com` for L7 DDoS, WAF, rate-limiting rules, bot management, always-on caching. Single biggest security upgrade available; covers ~90% of what Vercel charges for in Pro.
+  - ⬜ Harden Payload admin auth — set `maxLoginAttempts: 5` and `lockTime: 15 * 60 * 1000` on the `users` collection to block brute-force login attempts.
+  - ⬜ Enable **Vercel usage alerts** (Settings → Billing → Usage alerts) at 50% / 80% / 100% — early warning for traffic spikes or runaway crawlers.
 
 ## Open questions
 
