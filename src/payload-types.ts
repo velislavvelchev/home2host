@@ -73,6 +73,7 @@ export interface Config {
     apartments: Apartment;
     faqs: Faq;
     services: Service;
+    'pricing-plans': PricingPlan;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,6 +87,7 @@ export interface Config {
     apartments: ApartmentsSelect<false> | ApartmentsSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
+    'pricing-plans': PricingPlansSelect<false> | PricingPlansSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -307,6 +309,46 @@ export interface Service {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing-plans".
+ */
+export interface PricingPlan {
+  id: number;
+  title: string;
+  /**
+   * Free-form price string (e.g. '20% от приходите' or '€50 / месец'). Kept as text because pricing models vary too much for a numeric field.
+   */
+  priceDisplay: string;
+  /**
+   * Optional secondary line below the price.
+   */
+  priceCaption?: string | null;
+  features?:
+    | {
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Button text. Defaults to a generic CTA if empty.
+   */
+  ctaLabel?: string | null;
+  /**
+   * Where the button goes. Leave empty to point at the contact page.
+   */
+  ctaUrl?: string | null;
+  /**
+   * Visually highlights this plan on the pricing page.
+   */
+  isFeatured?: boolean | null;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -352,6 +394,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'services';
         value: number | Service;
+      } | null)
+    | ({
+        relationTo: 'pricing-plans';
+        value: number | PricingPlan;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -526,6 +572,27 @@ export interface ServicesSelect<T extends boolean = true> {
   summary?: T;
   icon?: T;
   image?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing-plans_select".
+ */
+export interface PricingPlansSelect<T extends boolean = true> {
+  title?: T;
+  priceDisplay?: T;
+  priceCaption?: T;
+  features?:
+    | T
+    | {
+        label?: T;
+        id?: T;
+      };
+  ctaLabel?: T;
+  ctaUrl?: T;
+  isFeatured?: T;
   order?: T;
   updatedAt?: T;
   createdAt?: T;

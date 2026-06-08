@@ -212,6 +212,68 @@ export default buildConfig({
         },
       ],
     },
+    {
+      slug: "pricing-plans",
+      labels: { singular: "Pricing plan", plural: "Pricing plans" },
+      admin: {
+        useAsTitle: "title",
+        defaultColumns: ["title", "priceDisplay", "isFeatured", "order"],
+      },
+      access: { read: () => true },
+      defaultSort: "order",
+      fields: [
+        { name: "title", type: "text", localized: true, required: true },
+        {
+          name: "priceDisplay",
+          type: "text",
+          localized: true,
+          required: true,
+          admin: {
+            description:
+              "Free-form price string (e.g. '20% от приходите' or '€50 / месец'). Kept as text because pricing models vary too much for a numeric field.",
+          },
+        },
+        {
+          name: "priceCaption",
+          type: "text",
+          localized: true,
+          admin: { description: "Optional secondary line below the price." },
+        },
+        {
+          name: "features",
+          type: "array",
+          localized: true,
+          minRows: 1,
+          fields: [{ name: "label", type: "text", required: true }],
+        },
+        {
+          name: "ctaLabel",
+          type: "text",
+          localized: true,
+          admin: { description: "Button text. Defaults to a generic CTA if empty." },
+        },
+        {
+          name: "ctaUrl",
+          type: "text",
+          admin: {
+            description:
+              "Where the button goes. Leave empty to point at the contact page.",
+          },
+        },
+        {
+          name: "isFeatured",
+          type: "checkbox",
+          defaultValue: false,
+          admin: { description: "Visually highlights this plan on the pricing page." },
+        },
+        {
+          name: "order",
+          type: "number",
+          defaultValue: 0,
+          admin: { description: "Lower numbers appear first." },
+        },
+      ],
+    },
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
