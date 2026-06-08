@@ -34,8 +34,11 @@ Restructured after ADR 0003 (Tailwind v4) and the design-system doc were added �
 
 ## Stage 3 — Design system and shared UI ⬜
 
+Mobile-first is the default for every token and component (per [design-system.md](design-system.md), reinforced by Tailwind v4's mobile-first prefix model from [ADR 0003](decisions/0003-styling-approach.md)). Realistic visitor mix is phone-heavy (Airbnb-adjacent traffic, BG audience on mobile-first carriers).
+
 - ⬜ Design tokens — refinement and finalization (initial extraction happens in Stage 1 as part of the design-system foundation; this stage locks the final palette/type scale once real components exist)
-- ⬜ Base components: Layout, Header, Footer, LanguageSwitcher, Button, Card
+- ⬜ **Lock the breakpoint scale** as part of the token work (Tailwind's defaults are a sensible starting point: `sm` 640, `md` 768, `lg` 1024, `xl` 1280, `2xl` 1536 — adjust only if there's a real reason).
+- ⬜ Base components: Layout, Header, Footer, LanguageSwitcher, Button, Card — **every one shipped mobile-first**, with desktop tweaks layered on via `md:` / `lg:` prefixes. Header includes a mobile nav pattern (hamburger or drawer) from day one, not bolted on later.
 
 ## Stage 4 — Pages ⬜
 
@@ -43,6 +46,7 @@ Order: static pages first, then CMS-driven ones.
 - ⬜ Home, About, Services, Prices, FAQ, Contacts
 - ⬜ Blog (list + single post)
 - ⬜ Apartments (list of Airbnb embeds)
+- ⬜ **Each page verified at every breakpoint** before it's marked done — minimum: 360px (small phone), 768px (tablet), 1280px (laptop). Pay extra attention to the Airbnb embeds (their own iframes are notoriously narrow on small screens) and the Header/nav transitions across breakpoints.
 - ⬜ Contact-form abuse defenses — **before the form is exposed publicly**: honeypot field (blocks ~80% of naive bots, zero UX cost) and per-IP rate limiting via `@upstash/ratelimit` + `@upstash/redis` (free tier sufficient). Optional Cloudflare Turnstile for residual spam.
 
 ## Stage 5 — i18n, analytics, SEO ⬜
@@ -59,6 +63,7 @@ Order: static pages first, then CMS-driven ones.
 - ⬜ DNS switch from Hostinger to Vercel
 - ⬜ WordPress kept as a backup for several weeks post-launch
 - ⬜ Verify GA and Google Search Console after launch
+- ⬜ **Real-device mobile pass** — open the Vercel preview URL on an actual Android phone and an actual iPhone (Safari behaves differently from Chrome DevTools' mobile emulation, especially on viewport-height units and tap targets). Catch issues DevTools never shows.
 - ⬜ Security baseline (before/at DNS switch):
   - ⬜ Put **Cloudflare's free tier** in front of `home2host.com` for L7 DDoS, WAF, rate-limiting rules, bot management, always-on caching. Single biggest security upgrade available; covers ~90% of what Vercel charges for in Pro.
   - ⬜ Harden Payload admin auth — set `maxLoginAttempts: 5` and `lockTime: 15 * 60 * 1000` on the `users` collection to block brute-force login attempts.
