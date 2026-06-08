@@ -143,6 +143,36 @@ export default buildConfig({
         },
       ],
     },
+    {
+      slug: "faqs",
+      labels: { singular: "FAQ", plural: "FAQs" },
+      admin: {
+        useAsTitle: "question",
+        defaultColumns: ["question", "category", "order"],
+      },
+      access: { read: () => true },
+      defaultSort: "order",
+      fields: [
+        { name: "question", type: "text", localized: true, required: true },
+        { name: "answer", type: "textarea", localized: true, required: true },
+        {
+          name: "category",
+          type: "select",
+          options: [
+            { label: "For property owners", value: "owners" },
+            { label: "For guests", value: "guests" },
+            { label: "General", value: "general" },
+          ],
+          defaultValue: "general",
+        },
+        {
+          name: "order",
+          type: "number",
+          defaultValue: 0,
+          admin: { description: "Lower numbers appear first within a category." },
+        },
+      ],
+    },
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
