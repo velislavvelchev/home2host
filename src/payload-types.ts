@@ -72,6 +72,7 @@ export interface Config {
     'blog-posts': BlogPost;
     apartments: Apartment;
     faqs: Faq;
+    services: Service;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -84,6 +85,7 @@ export interface Config {
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     apartments: ApartmentsSelect<false> | ApartmentsSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -279,6 +281,31 @@ export interface Faq {
   createdAt: string;
 }
 /**
+ * Services offered to property owners (cleaning, key handover, listing management, etc.).
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  title: string;
+  summary: string;
+  /**
+   * Icon name (e.g. 'sparkles', 'key'). Mapped to an icon component in the frontend; leave empty for no icon.
+   */
+  icon?: string | null;
+  /**
+   * Optional illustration. Use either an icon or an image, not both.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -321,6 +348,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'faqs';
         value: number | Faq;
+      } | null)
+    | ({
+        relationTo: 'services';
+        value: number | Service;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -482,6 +513,19 @@ export interface FaqsSelect<T extends boolean = true> {
   question?: T;
   answer?: T;
   category?: T;
+  order?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  title?: T;
+  summary?: T;
+  icon?: T;
+  image?: T;
   order?: T;
   updatedAt?: T;
   createdAt?: T;

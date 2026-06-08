@@ -173,6 +173,45 @@ export default buildConfig({
         },
       ],
     },
+    {
+      slug: "services",
+      labels: { singular: "Service", plural: "Services" },
+      admin: {
+        useAsTitle: "title",
+        defaultColumns: ["title", "order"],
+        description:
+          "Services offered to property owners (cleaning, key handover, listing management, etc.).",
+      },
+      access: { read: () => true },
+      defaultSort: "order",
+      fields: [
+        { name: "title", type: "text", localized: true, required: true },
+        { name: "summary", type: "textarea", localized: true, required: true },
+        {
+          name: "icon",
+          type: "text",
+          admin: {
+            description:
+              "Icon name (e.g. 'sparkles', 'key'). Mapped to an icon component in the frontend; leave empty for no icon.",
+          },
+        },
+        {
+          name: "image",
+          type: "upload",
+          relationTo: "media",
+          admin: {
+            description:
+              "Optional illustration. Use either an icon or an image, not both.",
+          },
+        },
+        {
+          name: "order",
+          type: "number",
+          defaultValue: 0,
+          admin: { description: "Lower numbers appear first." },
+        },
+      ],
+    },
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
