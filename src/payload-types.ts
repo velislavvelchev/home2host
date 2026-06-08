@@ -70,6 +70,7 @@ export interface Config {
     users: User;
     media: Media;
     'blog-posts': BlogPost;
+    apartments: Apartment;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -80,6 +81,7 @@ export interface Config {
     users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
+    apartments: ApartmentsSelect<false> | ApartmentsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -230,6 +232,35 @@ export interface BlogPost {
   _status?: ('draft' | 'published') | null;
 }
 /**
+ * Airbnb listings shown on the Apartments page. Each apartment is an embed, not a property record.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "apartments".
+ */
+export interface Apartment {
+  id: number;
+  title: string;
+  city: 'bansko' | 'burgas' | 'razlog';
+  /**
+   * Public Airbnb listing URL (https://www.airbnb.com/rooms/...). Used to construct the embed.
+   */
+  airbnbUrl: string;
+  /**
+   * Short blurb shown above the embed.
+   */
+  description?: string | null;
+  /**
+   * Lower numbers appear first.
+   */
+  order?: number | null;
+  /**
+   * Uncheck to hide from the site without deleting.
+   */
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
@@ -264,6 +295,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'blog-posts';
         value: number | BlogPost;
+      } | null)
+    | ({
+        relationTo: 'apartments';
+        value: number | Apartment;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -402,6 +437,20 @@ export interface BlogPostsSelect<T extends boolean = true> {
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "apartments_select".
+ */
+export interface ApartmentsSelect<T extends boolean = true> {
+  title?: T;
+  city?: T;
+  airbnbUrl?: T;
+  description?: T;
+  order?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

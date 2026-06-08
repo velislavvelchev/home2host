@@ -91,6 +91,58 @@ export default buildConfig({
         },
       ],
     },
+    {
+      slug: "apartments",
+      labels: { singular: "Apartment", plural: "Apartments" },
+      admin: {
+        useAsTitle: "title",
+        defaultColumns: ["title", "city", "order", "isActive"],
+        description:
+          "Airbnb listings shown on the Apartments page. Each apartment is an embed, not a property record.",
+      },
+      access: { read: () => true },
+      defaultSort: "order",
+      fields: [
+        { name: "title", type: "text", localized: true, required: true },
+        {
+          name: "city",
+          type: "select",
+          required: true,
+          options: [
+            { label: "Bansko", value: "bansko" },
+            { label: "Burgas", value: "burgas" },
+            { label: "Razlog", value: "razlog" },
+          ],
+        },
+        {
+          name: "airbnbUrl",
+          type: "text",
+          required: true,
+          admin: {
+            description:
+              "Public Airbnb listing URL (https://www.airbnb.com/rooms/...). Used to construct the embed.",
+          },
+        },
+        {
+          name: "description",
+          type: "textarea",
+          localized: true,
+          admin: { description: "Short blurb shown above the embed." },
+        },
+        {
+          name: "order",
+          type: "number",
+          defaultValue: 0,
+          admin: { description: "Lower numbers appear first." },
+        },
+        {
+          name: "isActive",
+          type: "checkbox",
+          defaultValue: true,
+          admin: { description: "Uncheck to hide from the site without deleting." },
+        },
+      ],
+    },
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
