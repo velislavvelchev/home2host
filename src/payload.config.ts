@@ -56,7 +56,7 @@ export default buildConfig({
       labels: { singular: "Blog post", plural: "Blog posts" },
       admin: {
         useAsTitle: "title",
-        defaultColumns: ["title", "publishedAt", "_status"],
+        defaultColumns: ["id", "title", "publishedAt", "_status"],
       },
       access: { read: () => true },
       versions: { drafts: true },
@@ -96,7 +96,7 @@ export default buildConfig({
       labels: { singular: "Apartment", plural: "Apartments" },
       admin: {
         useAsTitle: "title",
-        defaultColumns: ["title", "city", "order", "isActive"],
+        defaultColumns: ["id", "title", "city", "order", "isActive"],
         description:
           "Airbnb listings shown on the Apartments page. Each apartment is an embed, not a property record.",
       },
@@ -148,7 +148,7 @@ export default buildConfig({
       labels: { singular: "FAQ", plural: "FAQs" },
       admin: {
         useAsTitle: "question",
-        defaultColumns: ["question", "category", "order"],
+        defaultColumns: ["id", "question", "category", "order"],
       },
       access: { read: () => true },
       defaultSort: "order",
@@ -178,7 +178,7 @@ export default buildConfig({
       labels: { singular: "Service", plural: "Services" },
       admin: {
         useAsTitle: "title",
-        defaultColumns: ["title", "order"],
+        defaultColumns: ["id", "title", "order"],
         description:
           "Services offered to property owners (cleaning, key handover, listing management, etc.).",
       },
@@ -217,7 +217,7 @@ export default buildConfig({
       labels: { singular: "Pricing plan", plural: "Pricing plans" },
       admin: {
         useAsTitle: "title",
-        defaultColumns: ["title", "priceDisplay", "isFeatured", "order"],
+        defaultColumns: ["id", "title", "priceDisplay", "isFeatured", "order"],
       },
       access: { read: () => true },
       defaultSort: "order",
