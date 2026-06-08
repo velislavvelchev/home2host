@@ -2,6 +2,10 @@
 
 Reverse chronological. One line per completed task. Dates in YYYY-MM-DD format.
 
+## 2026-06-08
+
+- feat: enable BG/EN localization in Payload and add Media collection (bg default, en fallback; alt text localized; thumbnail/card/hero image sizes) — Stage 2 kickoff
+
 ## 2026-06-05
 
 - feat: integrate Payload CMS v3 backed by Neon Postgres — admin at /admin, REST + GraphQL under /api, marketing site moved to (frontend) route group so each owns its own root layout; `--use-swc` workaround for Node 24 + Payload CLI; Stage 1 closed

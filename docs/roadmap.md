@@ -24,11 +24,11 @@ Restructured after ADR 0003 (Tailwind v4) and the design-system doc were added �
 - ✅ Payload integration inside the same project — Payload v3.85 mounted as `(payload)` route group; marketing site lives in parallel `(frontend)` route group so each owns its own `<html>/<body>`. Admin reachable at `/admin`, REST at `/api/...`, GraphQL at `/api/graphql`. `--use-swc` flag on `payload generate:*` scripts to sidestep tsx's `require()`-on-ESM issue on Node 24.
 - ✅ First deployment to Vercel — auto-deploys from `main` to `home2host.vercel.app`. Smoke-test page rendered; DNS untouched (WordPress stays on the domain until Stage 6).
 
-## Stage 2 — Data layer (Payload schema) ⬜
+## Stage 2 — Data layer (Payload schema) 🔄
 
-- ⬜ Collections: BlogPost, Apartment, Service, PricingPlan, FAQ, Media
+- 🔄 Collections: Media ✅ · BlogPost · Apartment · Service · PricingPlan · FAQ
 - ⬜ Globals: Contacts, SocialLinks
-- ⬜ Field-level i18n (BG/EN)
+- 🔄 Field-level i18n (BG/EN) — `localization` block enabled in `payload.config.ts` (bg default, en fallback)
 - ⬜ Sample content through the admin panel
 
 ## Stage 3 — Design system and shared UI ⬜
@@ -70,4 +70,5 @@ Small items deferred during Stage 1 — none block Stage 2, but each will bite a
 - **`pg-connection-string` v3.0 / pg v9 SSL semantics.** The dev log shows a warning that `sslmode=require` currently aliases to `verify-full`, but won't in pg v9. When we upgrade to pg v9, switch the Neon URL to `sslmode=verify-full` explicitly. Until then: no action.
 - **`src/components/` not created yet** (per [ADR 0003](decisions/0003-styling-approach.md)). Create the folder when the first real component lands in Stage 3, not pre-emptively.
 - **Email adapter not wired.** Payload currently writes emails to console. Add Resend or SMTP adapter in Stage 4 or 5, before any production user needs a password reset. Until that exists, **don't lose the admin credentials** — no self-serve recovery.
+- **Media storage adapter not wired.** Payload defaults to local-disk uploads, which won't survive on Vercel's ephemeral filesystem. Pick a storage adapter (Vercel Blob is the natural fit; warrants its own ADR) before the partner uploads any image in production. Until then, do not upload media via the production admin — only via local dev.
 - **Neon DB branching not enabled.** Per [ADR 0002](decisions/0002-database-provider.md), enable preview-deploy branching in Stage 5 or 6 once there's real production content worth protecting. Until then dev and prod share the same database.

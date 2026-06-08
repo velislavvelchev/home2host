@@ -15,12 +15,41 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
+  localization: {
+    locales: [
+      { code: "bg", label: "Български" },
+      { code: "en", label: "English" },
+    ],
+    defaultLocale: "bg",
+    fallback: true,
+  },
   collections: [
     {
       slug: "users",
       auth: true,
       admin: { useAsTitle: "email" },
       fields: [],
+    },
+    {
+      slug: "media",
+      admin: { useAsTitle: "filename" },
+      access: { read: () => true },
+      upload: {
+        mimeTypes: ["image/*"],
+        imageSizes: [
+          { name: "thumbnail", width: 400, height: 300, position: "centre" },
+          { name: "card", width: 768, height: 512, position: "centre" },
+          { name: "hero", width: 1600, height: 900, position: "centre" },
+        ],
+      },
+      fields: [
+        {
+          name: "alt",
+          type: "text",
+          localized: true,
+          required: true,
+        },
+      ],
     },
   ],
   editor: lexicalEditor(),
