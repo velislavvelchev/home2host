@@ -275,6 +275,32 @@ export default buildConfig({
       ],
     },
   ],
+  globals: [
+    {
+      slug: "contacts",
+      label: "Contacts",
+      access: { read: () => true },
+      fields: [
+        { name: "email", type: "email", required: true },
+        { name: "phone", type: "text", required: true },
+        { name: "address", type: "textarea", localized: true },
+        {
+          name: "workingHours",
+          type: "textarea",
+          localized: true,
+          admin: { description: "Free-form text, one line per row." },
+        },
+        {
+          name: "mapEmbedUrl",
+          type: "text",
+          admin: {
+            description:
+              "Google Maps embed URL (the src attribute from the embed iframe). Optional.",
+          },
+        },
+      ],
+    },
+  ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {
