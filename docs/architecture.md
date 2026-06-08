@@ -63,7 +63,9 @@ src/
 - Frontend pages (About, Services, Blog, etc.) → `src/app/(frontend)/<route>/page.tsx`
 - Shared components → `src/components/` (created on first real component, not pre-emptively, per [ADR 0003](decisions/0003-styling-approach.md))
 - Payload collections / globals → added inside `src/payload.config.ts`
-- After any change to `payload.config.ts`: run `npm run generate:types` so `src/payload-types.ts` stays in sync
+- After any change to `payload.config.ts`:
+  - Run `npm run generate:types` so `src/payload-types.ts` stays in sync.
+  - If the change adds or removes a field that uses a custom component (richText/Lexical, custom field UI, etc.), also run `npm run generate:importmap` to refresh `src/app/(payload)/admin/importMap.js`. Skipping this surfaces as `PayloadComponent not found in importMap` errors in the admin (learned the hard way during Stage 2).
 
 ## Local development
 
