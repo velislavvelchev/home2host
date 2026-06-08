@@ -26,10 +26,10 @@ Restructured after ADR 0003 (Tailwind v4) and the design-system doc were added �
 
 ## Stage 2 — Data layer (Payload schema) 🔄
 
-- 🔄 Collections: Media ✅ · BlogPost · Apartment · Service · PricingPlan · FAQ
-- ⬜ Globals: Contacts, SocialLinks
-- 🔄 Field-level i18n (BG/EN) — `localization` block enabled in `payload.config.ts` (bg default, en fallback)
-- ⬜ Sample content through the admin panel
+- ✅ Collections: Media, BlogPost, Apartment, FAQ, Service, PricingPlan
+- ✅ Globals: Contacts, SocialLinks
+- ✅ Field-level i18n (BG/EN) — `localization` block enabled in `payload.config.ts` (bg default, en fallback). Slug fields kept non-localized for now (revisit in Stage 5 with next-intl).
+- ⬜ Sample content through the admin panel — left for the partner to populate; verify field shapes hold up against real content before Stage 3 starts.
 
 ## Stage 3 — Design system and shared UI ⬜
 

@@ -4,6 +4,14 @@ Reverse chronological. One line per completed task. Dates in YYYY-MM-DD format.
 
 ## 2026-06-08
 
+- feat: complete Stage 2 schema — six collections (Media, BlogPost, Apartment, FAQ, Service, PricingPlan) and two globals (Contacts, SocialLinks) with BG/EN field-level localization. Slugs non-localized (revisit in Stage 5). Sample content still to be entered by the partner.
+- feat: add SocialLinks global — array of {platform, url, label}; platform enum drives icon mapping; Airbnb and Booking included as "platforms".
+- feat: add Contacts global — email/phone required; address and workingHours localized; mapEmbedUrl stores only the iframe src.
+- feat: add PricingPlan collection — price as free-form localized text (pricing models vary too much for numeric); features required min 1; isFeatured for the recommended tier.
+- feat: add Service collection — title + summary, optional icon-name string or image; no long body (cards, not articles).
+- feat: add FAQ collection — question + answer with category (owners/guests/general) and manual order; answer plain textarea, upgrade to richText if needed.
+- feat: add Apartment collection — Airbnb embed pointers (title, city select, airbnbUrl, blurb), manual order, isActive toggle; no featuredImage since the embed renders its own preview.
+- feat: add BlogPost collection — title/excerpt/body/tags localized; slug shared across locales; drafts enabled; author plain text; no SEO fields yet (Stage 5).
 - feat: enable BG/EN localization in Payload and add Media collection (bg default, en fallback; alt text localized; thumbnail/card/hero image sizes) — Stage 2 kickoff
 
 ## 2026-06-05
