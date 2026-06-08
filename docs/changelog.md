@@ -4,6 +4,9 @@ Reverse chronological. One line per completed task. Dates in YYYY-MM-DD format.
 
 ## 2026-06-08
 
+- fix: media doc `url` field now stores the direct Blob CDN URL (`disablePayloadAccessControl: true`) instead of Payload's proxy URL — public marketing site loads images straight from Vercel's CDN, no Function invocations per request. Verified end-to-end: 1200x900 upload produces original + 3 sharp size variants in Blob with direct URLs.
+- feat: wire up Vercel Blob storage adapter for the Media collection per [ADR 0004](decisions/0004-media-storage-adapter.md). Stage 2 is now fully shippable.
+- docs: ADR 0004 — pick Vercel Blob as the media storage adapter.
 - feat: complete Stage 2 schema — six collections (Media, BlogPost, Apartment, FAQ, Service, PricingPlan) and two globals (Contacts, SocialLinks) with BG/EN field-level localization. Slugs non-localized (revisit in Stage 5). Sample content still to be entered by the partner.
 - feat: add SocialLinks global — array of {platform, url, label}; platform enum drives icon mapping; Airbnb and Booking included as "platforms".
 - feat: add Contacts global — email/phone required; address and workingHours localized; mapEmbedUrl stores only the iframe src.
