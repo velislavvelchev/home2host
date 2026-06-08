@@ -99,9 +99,11 @@ export interface Config {
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('bg' | 'en') | ('bg' | 'en')[];
   globals: {
     contacts: Contact;
+    'social-links': SocialLink;
   };
   globalsSelect: {
     contacts: ContactsSelect<false> | ContactsSelect<true>;
+    'social-links': SocialLinksSelect<false> | SocialLinksSelect<true>;
   };
   locale: 'bg' | 'en';
   widgets: {
@@ -663,6 +665,26 @@ export interface Contact {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "social-links".
+ */
+export interface SocialLink {
+  id: number;
+  links?:
+    | {
+        platform: 'facebook' | 'instagram' | 'youtube' | 'tiktok' | 'linkedin' | 'airbnb' | 'booking';
+        url: string;
+        /**
+         * Optional accessible label. Falls back to the platform name in the frontend.
+         */
+        label?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contacts_select".
  */
 export interface ContactsSelect<T extends boolean = true> {
@@ -671,6 +693,23 @@ export interface ContactsSelect<T extends boolean = true> {
   address?: T;
   workingHours?: T;
   mapEmbedUrl?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "social-links_select".
+ */
+export interface SocialLinksSelect<T extends boolean = true> {
+  links?:
+    | T
+    | {
+        platform?: T;
+        url?: T;
+        label?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

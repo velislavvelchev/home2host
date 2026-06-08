@@ -300,6 +300,44 @@ export default buildConfig({
         },
       ],
     },
+    {
+      slug: "social-links",
+      label: "Social links",
+      access: { read: () => true },
+      fields: [
+        {
+          name: "links",
+          type: "array",
+          labels: { singular: "Link", plural: "Links" },
+          fields: [
+            {
+              name: "platform",
+              type: "select",
+              required: true,
+              options: [
+                { label: "Facebook", value: "facebook" },
+                { label: "Instagram", value: "instagram" },
+                { label: "YouTube", value: "youtube" },
+                { label: "TikTok", value: "tiktok" },
+                { label: "LinkedIn", value: "linkedin" },
+                { label: "Airbnb", value: "airbnb" },
+                { label: "Booking", value: "booking" },
+              ],
+            },
+            { name: "url", type: "text", required: true },
+            {
+              name: "label",
+              type: "text",
+              localized: true,
+              admin: {
+                description:
+                  "Optional accessible label. Falls back to the platform name in the frontend.",
+              },
+            },
+          ],
+        },
+      ],
+    },
   ],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || "",
