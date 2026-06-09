@@ -1,5 +1,6 @@
 import { buttonStyles } from "@/components/Button";
 import { Card } from "@/components/Card";
+import { AboutSection } from "@/components/sections/AboutSection";
 
 export default function Home() {
   return (
@@ -65,6 +66,8 @@ export default function Home() {
           </Card>
         </div>
       </section>
+
+      <AboutSection />
     </main>
   );
 }
