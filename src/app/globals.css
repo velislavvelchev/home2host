@@ -123,6 +123,12 @@
   --ease-standard:   cubic-bezier(0.2, 0, 0, 1);
   --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
 
+  /* Ambient animations — for decorative elements (glow blobs, slow image
+     zoom). Pair with Tailwind's `motion-safe:` prefix at the call site so
+     users with `prefers-reduced-motion: reduce` get the static version. */
+  --animate-glow: glow 8s ease-in-out infinite;
+  --animate-ken-burns: ken-burns 24s ease-in-out infinite;
+
   /* Breakpoints — Tailwind's default scale, declared explicitly so this file
      is the single source of truth and future codemods can't silently shift
      them. Mobile-first: utilities with no prefix apply everywhere, prefixed
@@ -151,4 +157,15 @@ body {
   color: var(--foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+}
+
+/* Keyframes that back ambient-animation tokens declared in @theme. */
+@keyframes glow {
+  0%, 100% { opacity: 0.55; transform: scale(0.92); }
+  50%      { opacity: 0.95; transform: scale(1.08); }
+}
+
+@keyframes ken-burns {
+  0%, 100% { transform: scale(1.00); }
+  50%      { transform: scale(1.06); }
 }
