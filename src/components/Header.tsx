@@ -43,9 +43,22 @@ export function Header() {
         <Link
           href="/"
           className="inline-flex items-center gap-2 font-display text-lg font-semibold tracking-tight text-foreground"
-          aria-label="Home2Host — home"
+          aria-label="Home2Host — начало"
         >
-          <span className="size-2 rounded-full bg-brand-800 dark:bg-brand-500" />
+          {/* Brand chip — icon-only variant of the logo. The full lockup
+              (icon + wordmark) is too detailed at this size; the wordmark
+              text rendered next to the chip carries that part. SVG has its
+              own white backdrop baked in, so the cut-outs read correctly
+              against any surrounding background. */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo-icon.svg"
+            alt=""
+            aria-hidden="true"
+            width={36}
+            height={36}
+            className="block size-9 overflow-hidden rounded-md"
+          />
           Home2Host
         </Link>
 

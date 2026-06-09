@@ -25,7 +25,15 @@ export function Footer() {
               href="/"
               className="inline-flex items-center gap-2 font-display text-lg font-semibold tracking-tight text-foreground"
             >
-              <span className="size-2 rounded-full bg-brand-800 dark:bg-brand-500" />
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/logo-icon.svg"
+                alt=""
+                aria-hidden="true"
+                width={36}
+                height={36}
+                className="block size-9 overflow-hidden rounded-md"
+              />
               Home2Host
             </Link>
             <p className="mt-3 max-w-sm text-sm text-foreground-muted">
