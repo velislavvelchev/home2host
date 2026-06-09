@@ -56,7 +56,7 @@ Order: static pages first, then CMS-driven ones.
 - 🔄 Home, About, Services, Prices, FAQ, Contacts
   - ✅ Header/Footer nav aligned with live slugs + BG labels; `trailingSlash: true` set so URLs match the WordPress shape exactly.
   - ✅ About section (`src/components/sections/AboutSection.tsx`) — first real section, BG content from inventory, embedded on `/` and standalone at `/about-us/` (canonical to `/`).
-  - ⬜ Hero rebuild — replace the dev placeholder with the live BG copy + a static hero image via `next/image` (priority load) + a subtle CSS-only flourish for "alive" feel. Asset comes from `docs/inventory/images/`.
+  - ✅ Hero rebuild — placeholder replaced with BG title/eyebrow/tagline + mid-century interior photo (`public/hero-home.jpeg`) served via `next/image` with `priority` (preload link in head, srcSet from 384–3840px). Ambient liveliness via two CSS-only gradient blobs (offset 4s for out-of-phase pulsing) + slow Ken Burns zoom on the image (1.00 → 1.06 over 24s). All animations are `motion-safe:` gated so users with `prefers-reduced-motion` get the static version. Polish (more pronounced liveliness) parked as a follow-up.
   - ⬜ Services, Prices, FAQ, Contacts sections — same pattern as About.
   - ⬜ Scroll-triggered fade-up animation on each section (`IntersectionObserver`, ~3KB JS) — added once across all sections, not per-section.
   - ⬜ Scroll-spy: as the user scrolls past sections on `/`, update `window.location.hash` (via `history.replaceState`) and highlight the active nav item. Pure UX, zero SEO impact (Google ignores hash fragments).
