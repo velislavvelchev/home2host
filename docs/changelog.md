@@ -2,6 +2,18 @@
 
 Reverse chronological. One line per completed task. Dates in YYYY-MM-DD format.
 
+## 2026-06-09
+
+- feat: rework home page from centered hero into a real top-of-page section so it sits properly under the new Header (max-w-6xl container, padded with `px-gutter` / `py-section`).
+- feat: wire Header + Footer into `(frontend)/layout.tsx` — every page in the route group now inherits the chrome.
+- feat: add Footer — 3-column grid on `md+`, stacked on mobile (brand+blurb / site map / contacts); contacts intentionally hardcoded as placeholders until the Contacts global is populated via Payload.
+- feat: add Header — sticky, blurred-backdrop top bar; primary nav inline on `md+`, hamburger-toggled slide-in drawer on mobile (ESC + outside-click close, body-scroll lock while open). Drawer rendered as a sibling of `<header>` rather than a child: the header's `backdrop-filter` would otherwise establish a containing block and scope the drawer's `position: fixed` to the header's height (caught during 360px breakpoint testing). Backdrop dim at 70% opacity so the page behind doesn't peek through the drawer's `max-w-[85vw]` strip on narrow viewports.
+- feat: add LanguageSwitcher — pill-style BG/EN toggle, visual-only for now (real locale switching arrives with next-intl in Stage 5).
+- feat: home page consumes Button (via `buttonStyles()`) and Card — first real exercise of the design-system component contract end-to-end; production build green.
+- feat: add Card primitive — `variant: default | muted`, `padding: sm | md | lg`; bordered surface with no drop-shadow per design-system "avoid 2018 card" rule; closed surface (no `className` prop) so layout-level spacing is the parent's job.
+- feat: add Button primitive — `variant: primary | secondary | ghost`, `size: sm | md | lg`; closed surface per design-system contract (no `className` escape hatch); exports `buttonStyles()` helper so anchor tags can opt into the same visual treatment without polymorphism.
+- feat: lock breakpoint scale (`sm`/`md`/`lg`/`xl`/`2xl` = 640/768/1024/1280/1536) explicitly in `globals.css` `@theme` so `globals.css` stays the single source of truth and codemods/upstream changes can't silently shift defaults.
+
 ## 2026-06-08
 
 - fix: media doc `url` field now stores the direct Blob CDN URL (`disablePayloadAccessControl: true`) instead of Payload's proxy URL — public marketing site loads images straight from Vercel's CDN, no Function invocations per request. Verified end-to-end: 1200x900 upload produces original + 3 sharp size variants in Blob with direct URLs.
