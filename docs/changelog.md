@@ -4,6 +4,8 @@ Reverse chronological. One line per completed task. Dates in YYYY-MM-DD format.
 
 ## 2026-06-09
 
+- feat: extend type scale with `text-7xl` (72px) and `text-8xl` (96px), and bump home hero to `text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl` so the headline keeps growing on 1080p+ monitors instead of capping at laptop-friendly 60px. Lower breakpoints unchanged — purely additive on the big-screen end.
+- docs: fill in `design-system.md` Typography section (was TBD) — Geist Sans for display + body + Geist Mono for code, full px scale, and the documented hero responsive pattern.
 - feat: rework home page from centered hero into a real top-of-page section so it sits properly under the new Header (max-w-6xl container, padded with `px-gutter` / `py-section`).
 - feat: wire Header + Footer into `(frontend)/layout.tsx` — every page in the route group now inherits the chrome.
 - feat: add Footer — 3-column grid on `md+`, stacked on mobile (brand+blurb / site map / contacts); contacts intentionally hardcoded as placeholders until the Contacts global is populated via Payload.

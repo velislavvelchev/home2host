@@ -10,7 +10,7 @@ export default function Home() {
           Stage 3 · design system & shared UI
         </span>
 
-        <h1 className="mt-6 max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
+        <h1 className="mt-6 max-w-4xl font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl">
           Property management in{" "}
           <span className="text-brand-800 dark:text-brand-300">
             Bansko & Burgas

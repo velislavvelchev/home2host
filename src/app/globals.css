@@ -91,6 +91,8 @@
   --text-4xl:  2.25rem;     /* 36 */
   --text-5xl:  3rem;        /* 48 */
   --text-6xl:  3.75rem;     /* 60 */
+  --text-7xl:  4.5rem;      /* 72 — hero/display weight on `lg+` screens  */
+  --text-8xl:  6rem;        /* 96 — hero on `xl+` (1280px+), 4K showpiece */
 
   /* Spacing — 4px base unit. Named tokens for layout-level spacing
      (p-section, gap-gutter) so page rhythm doesn't drift across pages. */

@@ -16,7 +16,7 @@
 
 ## Token categories
 - Color: brand, neutral, semantic (success/warning/error), surfaces
-- Typography: font families, scale (xs → 4xl), weights, line heights
+- Typography: font families, scale (xs → 8xl), weights, line heights
 - Spacing: 4px base scale + named tokens (section, gutter)
 - Radii, shadows, motion (duration + easing)
 - Breakpoints
@@ -30,10 +30,21 @@
 - Extract from current site → starting point, not final palette.
 - Final palette decided once visual direction is locked.
 
-## Typography (to be filled in)
-- Display font: TBD
-- Body font: TBD
-- Scale: TBD
+## Typography
+- Display font: **Geist Sans** (also used for body — kept as one family
+  for now to avoid a second webfont download; revisit if a more
+  distinctive display face becomes a design priority).
+- Body font: **Geist Sans**.
+- Mono (code/accents): **Geist Mono**.
+- Scale (px, rem in `globals.css`):
+  - `xs` 12 · `sm` 14 · `base` 16 · `lg` 18 · `xl` 20
+  - `2xl` 24 · `3xl` 30 · `4xl` 36 · `5xl` 48 · `6xl` 60
+  - `7xl` 72 · `8xl` 96 — display-only, hero/marketing use
+- Headline pattern (mobile-first responsive jump):
+  `text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl`
+  Hero text grows on bigger screens; this is what gives the site a
+  modern, confident feel on 1080p+ monitors instead of capping at
+  laptop-friendly 60px forever.
 
 ## Component contract
 - Every reusable component (Button, Card, Input, etc.) must:
