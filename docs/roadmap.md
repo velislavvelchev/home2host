@@ -32,11 +32,11 @@ Restructured after ADR 0003 (Tailwind v4) and the design-system doc were added �
 - ✅ Media storage adapter — Vercel Blob wired per [ADR 0004](decisions/0004-media-storage-adapter.md); doc `url` fields point directly at Blob's CDN (`disablePayloadAccessControl: true`); sharp generates 3 size variants per upload.
 - ⬜ Sample content through the admin panel — left for the partner to populate; verify field shapes hold up against real content before Stage 3 starts.
 
-## Stage 3 — Design system and shared UI 🔄
+## Stage 3 — Design system and shared UI ✅
 
 Mobile-first is the default for every token and component (per [design-system.md](design-system.md), reinforced by Tailwind v4's mobile-first prefix model from [ADR 0003](decisions/0003-styling-approach.md)). Realistic visitor mix is phone-heavy (Airbnb-adjacent traffic, BG audience on mobile-first carriers).
 
-- ⬜ Design tokens — refinement and finalization (initial extraction happens in Stage 1 as part of the design-system foundation; this stage locks the final palette/type scale once real components exist).
+- ✅ Design tokens — refinement pass closed. Palette anchored at `#122C69` brand-800, neutrals + semantic colors locked. Type scale extended to `text-8xl` (96px) so hero text grows on 1080p+ monitors instead of capping at laptop-friendly 60px; full scale documented in [design-system.md](design-system.md). Typeface kept on Geist Sans (display + body) + Geist Mono (code) — single webfont family for now; revisit when a more distinctive display face becomes a design priority.
 - ✅ **Locked the breakpoint scale** — Tailwind's defaults (`sm` 640, `md` 768, `lg` 1024, `xl` 1280, `2xl` 1536) declared explicitly in `globals.css` `@theme` so the file is the single source of truth.
 - ✅ Base components — closed-surface contract per [design-system.md](design-system.md): variants via props, no `className` escape hatch, light+dark via swappable tokens.
   - ✅ Button (`primary` / `secondary` / `ghost` × `sm` / `md` / `lg`; exports `buttonStyles()` for anchors)
