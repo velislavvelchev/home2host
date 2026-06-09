@@ -46,10 +46,20 @@ Mobile-first is the default for every token and component (per [design-system.md
   - ✅ Footer — 3-column grid on `md+`, stacked on mobile; contacts column is a placeholder until the Contacts global is populated via Payload.
   - ✅ LanguageSwitcher — pill-style BG/EN toggle, visual-only for now; real locale switching arrives with next-intl in Stage 5.
 
-## Stage 4 — Pages ⬜
+## Stage 4 — Pages 🔄
+
+**Architecture:** the new site is a multi-page app with a rich home page that carries the **full** content of every section (preserves the live home's existing Google ranking authority). Each section also lives at its own URL — slugs matching the live WordPress site exactly (`/about-us/`, `/services/`, `/prices/`, `/questions/`, `/apartments/`, `/contacts/`, `/blog/`, trailing slashes preserved via `trailingSlash: true` in `next.config.ts`). Standalone section pages set `<link rel="canonical" href="/">` so they don't compete with the home for the same keywords. This is essentially what the live WordPress site already does (most standalone pages repeat home-page content), but made explicit.
+
+Section components live under `src/components/sections/` and are reused 1:1 between the home embed and the standalone route — heading level swaps via a `headingLevel` prop so the document outline stays correct in both contexts.
 
 Order: static pages first, then CMS-driven ones.
-- ⬜ Home, About, Services, Prices, FAQ, Contacts
+- 🔄 Home, About, Services, Prices, FAQ, Contacts
+  - ✅ Header/Footer nav aligned with live slugs + BG labels; `trailingSlash: true` set so URLs match the WordPress shape exactly.
+  - ✅ About section (`src/components/sections/AboutSection.tsx`) — first real section, BG content from inventory, embedded on `/` and standalone at `/about-us/` (canonical to `/`).
+  - ⬜ Hero rebuild — replace the dev placeholder with the live BG copy + a static hero image via `next/image` (priority load) + a subtle CSS-only flourish for "alive" feel. Asset comes from `docs/inventory/images/`.
+  - ⬜ Services, Prices, FAQ, Contacts sections — same pattern as About.
+  - ⬜ Scroll-triggered fade-up animation on each section (`IntersectionObserver`, ~3KB JS) — added once across all sections, not per-section.
+  - ⬜ Scroll-spy: as the user scrolls past sections on `/`, update `window.location.hash` (via `history.replaceState`) and highlight the active nav item. Pure UX, zero SEO impact (Google ignores hash fragments).
 - ⬜ Blog (list + single post)
 - ⬜ Apartments (list of Airbnb embeds)
 - ⬜ **Each page verified at every breakpoint** before it's marked done — minimum: 360px (small phone), 768px (tablet), 1280px (laptop). Pay extra attention to the Airbnb embeds (their own iframes are notoriously narrow on small screens) and the Header/nav transitions across breakpoints.
