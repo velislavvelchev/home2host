@@ -120,6 +120,16 @@
   --duration-slow: 320ms;
   --ease-standard:   cubic-bezier(0.2, 0, 0, 1);
   --ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
+
+  /* Breakpoints — Tailwind's default scale, declared explicitly so this file
+     is the single source of truth and future codemods can't silently shift
+     them. Mobile-first: utilities with no prefix apply everywhere, prefixed
+     ones (sm:, md:, …) kick in at and above the listed min-width. */
+  --breakpoint-sm:  40rem;   /*  640px — large phones, small tablets portrait */
+  --breakpoint-md:  48rem;   /*  768px — tablets portrait                     */
+  --breakpoint-lg:  64rem;   /* 1024px — tablets landscape, small laptops     */
+  --breakpoint-xl:  80rem;   /* 1280px — laptops                              */
+  --breakpoint-2xl: 96rem;   /* 1536px — large desktops                       */
 }
 
 /* ---------- 4. Swappable tokens registered with Tailwind ----------
