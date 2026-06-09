@@ -4,14 +4,18 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
-// Primary nav. Routes don't exist yet — Stage 4 wires the pages. Order /
-// inclusion is a product call the owner can adjust later.
+// Primary nav. Slugs match the live WordPress URLs (with trailing slashes)
+// so existing Google-indexed pages keep resolving 1:1 — see ADR/roadmap
+// Stage 4 notes on SEO preservation. Labels are BG to match the primary
+// content language; EN labels arrive in Stage 5 via next-intl.
 const navItems = [
-  { href: "/about", label: "About" },
-  { href: "/services", label: "Services" },
-  { href: "/apartments", label: "Apartments" },
-  { href: "/blog", label: "Blog" },
-  { href: "/contacts", label: "Contacts" },
+  { href: "/about-us/",   label: "За нас" },
+  { href: "/services/",   label: "Услуги" },
+  { href: "/apartments/", label: "Апартаменти" },
+  { href: "/prices/",     label: "Цени" },
+  { href: "/questions/",  label: "Въпроси" },
+  { href: "/blog/",       label: "Блог" },
+  { href: "/contacts/",   label: "Контакти" },
 ];
 
 export function Header() {
@@ -45,7 +49,7 @@ export function Header() {
           Home2Host
         </Link>
 
-        <nav aria-label="Primary" className="hidden md:block">
+        <nav aria-label="Primary" className="hidden lg:block">
           <ul className="flex items-center gap-1">
             {navItems.map(({ href, label }) => (
               <li key={href}>
@@ -68,7 +72,7 @@ export function Header() {
             aria-label="Open menu"
             aria-controls="mobile-drawer"
             aria-expanded={open}
-            className="inline-flex size-10 items-center justify-center rounded-md text-foreground transition-colors duration-base ease-standard hover:bg-surface-muted md:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+            className="inline-flex size-10 items-center justify-center rounded-md text-foreground transition-colors duration-base ease-standard hover:bg-surface-muted lg:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
           >
             <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true">
               <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
@@ -89,7 +93,7 @@ export function Header() {
         aria-modal="true"
         aria-label="Menu"
         className={
-          "fixed inset-0 z-50 md:hidden " +
+          "fixed inset-0 z-50 lg:hidden " +
           (open ? "pointer-events-auto" : "pointer-events-none")
         }
       >

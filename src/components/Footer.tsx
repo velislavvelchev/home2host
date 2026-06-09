@@ -1,13 +1,16 @@
 import Link from "next/link";
 
+// Slugs match the live WordPress URLs (trailing slashes preserved) so
+// existing Google rankings carry over after the DNS switch in Stage 6.
+// Labels are BG to match the primary content language; EN comes in Stage 5.
 const siteMap = [
-  { href: "/about", label: "About" },
-  { href: "/services", label: "Services" },
-  { href: "/prices", label: "Prices" },
-  { href: "/apartments", label: "Apartments" },
-  { href: "/blog", label: "Blog" },
-  { href: "/faq", label: "FAQ" },
-  { href: "/contacts", label: "Contacts" },
+  { href: "/about-us/",   label: "За нас" },
+  { href: "/services/",   label: "Услуги" },
+  { href: "/prices/",     label: "Цени" },
+  { href: "/apartments/", label: "Апартаменти" },
+  { href: "/blog/",       label: "Блог" },
+  { href: "/questions/",  label: "Въпроси" },
+  { href: "/contacts/",   label: "Контакти" },
 ];
 
 export function Footer() {
@@ -26,13 +29,13 @@ export function Footer() {
               Home2Host
             </Link>
             <p className="mt-3 max-w-sm text-sm text-foreground-muted">
-              Short-term rental management for property owners in Bansko and Burgas.
+              Управление на имоти за краткосрочен наем в Банско и Бургас.
             </p>
           </div>
 
           <div>
             <h2 className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">
-              Site map
+              Карта на сайта
             </h2>
             <ul className="mt-4 grid grid-cols-2 gap-y-2 text-sm">
               {siteMap.map(({ href, label }) => (
@@ -50,25 +53,25 @@ export function Footer() {
 
           <div>
             <h2 className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">
-              Contacts
+              Контакти
             </h2>
             {/* Placeholder until Contacts global is populated via the Payload admin. */}
             <dl className="mt-4 space-y-2 text-sm">
               <div>
-                <dt className="text-foreground-muted">Email</dt>
-                <dd className="text-foreground">hello@home2host.com</dd>
+                <dt className="text-foreground-muted">Имейл</dt>
+                <dd className="text-foreground">info@home2host.com</dd>
               </div>
               <div>
-                <dt className="text-foreground-muted">Areas</dt>
-                <dd className="text-foreground">Bansko · Burgas</dd>
+                <dt className="text-foreground-muted">Райони</dt>
+                <dd className="text-foreground">Банско · Бургас</dd>
               </div>
             </dl>
           </div>
         </div>
 
         <div className="mt-12 flex flex-col gap-2 border-t border-border pt-6 text-xs text-foreground-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>© {year} Home2Host. All rights reserved.</p>
-          <p>Bansko · Burgas, Bulgaria</p>
+          <p>© {year} Home2Host. Всички права запазени.</p>
+          <p>Банско · Бургас, България</p>
         </div>
       </div>
     </footer>
