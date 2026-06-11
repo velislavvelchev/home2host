@@ -133,14 +133,18 @@ export async function submitContact(
     };
   }
 
-  const transporter = nodemailer.createTransport({
-    host: smtpHost,
-    port: smtpPort,
-    secure: smtpPort === 465,
-    auth: { user: smtpUser, pass: smtpPassword },
-  });
-
+  // Wrap BOTH transporter creation and sendMail in the same try — if any
+  // setup step throws (DNS lookup failures, invalid auth config, missing
+  // peer deps, etc.) we surface the friendly inline error instead of
+  // letting the error bubble out of the server action as an HTTP 500
+  // (which would dump the user on Vercel's generic error page).
   try {
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
+      auth: { user: smtpUser, pass: smtpPassword },
+    });
     const email = buildEmail(validated);
     await transporter.sendMail({
       from: `Home2Host сайт <${smtpUser}>`,
