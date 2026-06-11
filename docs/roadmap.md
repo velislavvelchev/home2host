@@ -61,13 +61,13 @@ Order: static pages first, then CMS-driven ones.
   - ✅ Services section (`src/components/sections/ServicesSection.tsx`) — editorial alternating image/text rows (image left/right on `md+`, stacked on mobile), Lucide icon + `NN / 06` indicator per row, six Pexels photos under `public/services/` (placeholder until owner photography). Embedded on `/` and standalone at `/services/` (canonical to `/`).
   - ✅ Prices section (`src/components/sections/PricesSection.tsx`) — three pricing cards (Start Smart / Full Care / Home Refresh) with distinct Lucide icons, split-typography numeric prices, brand-tinted Check icons, cascading RevealOnScroll. Embedded on `/` and standalone at `/prices/` (canonical to `/`).
   - ✅ FAQ section (`src/components/sections/FaqSection.tsx`) — 7 Q&A pairs as a native `<details>/<summary>` accordion with chevron rotation, hairline dividers, single-column reading layout. Embedded on `/` and standalone at `/questions/` (canonical to `/`). "BnB Manager" typo from live site corrected to "Home2Host".
-  - ⬜ Contacts section — same pattern as About.
+  - ✅ Contacts section (`src/components/sections/contacts/`) — two-column layout with service area + phone/email/address/WhatsApp/social on the left and a 4-field form on the right. Form posts via Next.js Server Action through Hostinger SMTP to the existing `info@home2host.com` mailbox; `Reply-To` set to the submitter so owner replies in webmail land directly. Honeypot field included; **Upstash rate limit deferred** (see follow-ups). Embedded on `/` and standalone at `/contacts/` (canonical to `/`).
   - 🔄 Scroll-triggered fade-up animation on each section — reusable `<RevealOnScroll>` (`src/components/RevealOnScroll.tsx`) built and wired into Services rows. Apply to About/Prices/FAQ/Contacts once those sections land.
   - ⬜ Scroll-spy: as the user scrolls past sections on `/`, update `window.location.hash` (via `history.replaceState`) and highlight the active nav item. Pure UX, zero SEO impact (Google ignores hash fragments).
 - ⬜ Blog (list + single post)
 - ⬜ Apartments (list of Airbnb embeds)
 - ⬜ **Each page verified at every breakpoint** before it's marked done — minimum: 360px (small phone), 768px (tablet), 1280px (laptop). Pay extra attention to the Airbnb embeds (their own iframes are notoriously narrow on small screens) and the Header/nav transitions across breakpoints.
-- ⬜ Contact-form abuse defenses — **before the form is exposed publicly**: honeypot field (blocks ~80% of naive bots, zero UX cost) and per-IP rate limiting via `@upstash/ratelimit` + `@upstash/redis` (free tier sufficient). Optional Cloudflare Turnstile for residual spam.
+- 🔄 Contact-form abuse defenses — **honeypot shipped with the form** (offscreen `name="website"` field; server action silently succeeds on fill). **Still to do before public launch**: per-IP rate limiting via `@upstash/ratelimit` + `@upstash/redis` (free tier sufficient). Optional Cloudflare Turnstile for residual spam.
 
 ## Stage 5 — i18n, analytics, SEO ⬜
 
