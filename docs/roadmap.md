@@ -97,6 +97,8 @@ Order: static pages first, then CMS-driven ones.
 
 Small items deferred during Stage 1 — none block Stage 2, but each will bite at a specific later moment if forgotten.
 
+- **Payload `Apartment` collection out of sync with the new card design.** Stage 4's Apartments rebuild (2026-06-11) dropped Airbnb embeds in favour of custom photo cards. The schema still has the embed-era field set (`title`, `city`, `airbnbUrl`, `description`, `order`, `isActive`) — missing `featuredImage` (Media relation) and `rating` (decimal). Admin description still says "Each apartment is an embed, not a property record." Frontend is hardcoded so nothing breaks today; sync the schema (and `npm run generate:types`) before wiring Payload → frontend for Apartments in Stage 5 or later. Or delete the collection if we commit to hardcoded data permanently.
+
 - **`PAYLOAD_SECRET` missing from Vercel Preview env.** Production and Development have it; Preview does not (Vercel CLI 54.9.1 wouldn't accept it non-interactively, and we had no PR workflow yet). Add it via Vercel dashboard → Settings → Environment Variables before the first PR-triggered preview deploy, otherwise `/admin` on the preview URL will 500 with "missing secret key".
 - **`pg-connection-string` v3.0 / pg v9 SSL semantics.** The dev log shows a warning that `sslmode=require` currently aliases to `verify-full`, but won't in pg v9. When we upgrade to pg v9, switch the Neon URL to `sslmode=verify-full` explicitly. Until then: no action.
 - **`src/components/` not created yet** (per [ADR 0003](decisions/0003-styling-approach.md)). Create the folder when the first real component lands in Stage 3, not pre-emptively.
