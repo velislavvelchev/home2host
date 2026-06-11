@@ -3,6 +3,7 @@ import Link from "next/link";
 import { buttonStyles } from "@/components/Button";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
+import { ApartmentsSection } from "@/components/sections/ApartmentsSection";
 import { PricesSection } from "@/components/sections/PricesSection";
 import { FaqSection } from "@/components/sections/FaqSection";
 import { ContactsSection } from "@/components/sections/contacts/ContactsSection";
@@ -80,6 +81,7 @@ export default function Home() {
 
       <AboutSection />
       <ServicesSection />
+      <ApartmentsSection />
       <PricesSection />
       <FaqSection />
       <ContactsSection />
