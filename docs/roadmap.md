@@ -17,7 +17,7 @@ Restructured after ADR 0003 (Tailwind v4) and the design-system doc were added �
 - ✅ `create-next-app` with TypeScript and App Router
 - ✅ Design-system foundation
   - ✅ Initial `@theme` block in `src/app/globals.css` per [design-system.md](design-system.md) and [ADR 0003](decisions/0003-styling-approach.md) — brand indigo (anchored at brand-800 = #122C69), neutrals, semantic colors, Geist type scale, spacing/radii/shadows/motion, light+dark via CSS-variable swap
-  - ⬜ Add `src/components/` when the first real component lands (per ADR 0003); no other folders pre-created
+  - ✅ `src/components/` created when the Button + Card primitives landed in Stage 3; now houses Header/Footer/FloatingCallButton/RevealOnScroll/StructuredData/LanguageSwitcher and the `sections/` + `sections/contacts/` subtrees.
   - ✅ Smoke-test home page that actually exercises the tokens — production build green
 - ✅ Database decision — Neon, per [ADR 0002](decisions/0002-database-provider.md). Postgres + scale-to-zero + Vercel-native + per-branch DBs; Payload uses `@payloadcms/db-postgres`.
 - ✅ Database provisioning + connection — Neon Postgres provisioned via Vercel Storage (Frankfurt, free tier). Env vars (`DATABASE_URL`, `POSTGRES_URL`, etc.) auto-injected into Production/Preview/Development environments and pulled locally with `vercel env pull .env.local`.
@@ -53,7 +53,7 @@ Mobile-first is the default for every token and component (per [design-system.md
 Section components live under `src/components/sections/` and are reused 1:1 between the home embed and the standalone route — heading level swaps via a `headingLevel` prop so the document outline stays correct in both contexts.
 
 Order: static pages first, then CMS-driven ones.
-- 🔄 Home, About, Services, Prices, FAQ, Contacts
+- ✅ Home, About, Services, Prices, FAQ, Contacts — all six sections built, embedded on `/`, and accessible as standalone routes with canonical → `/`.
   - ✅ Header/Footer nav aligned with live slugs + BG labels; `trailingSlash: true` set so URLs match the WordPress shape exactly.
   - ✅ About section (`src/components/sections/AboutSection.tsx`) — first real section, BG content from inventory, embedded on `/` and standalone at `/about-us/` (canonical to `/`).
   - ✅ Hero rebuild — placeholder replaced with BG title/eyebrow/tagline + mid-century interior photo (`public/hero-home.jpeg`) served via `next/image` with `priority` (preload link in head, srcSet from 384–3840px). Ambient liveliness via two CSS-only gradient blobs (offset 4s for out-of-phase pulsing) + slow Ken Burns zoom on the image (1.00 → 1.06 over 24s). All animations are `motion-safe:` gated so users with `prefers-reduced-motion` get the static version. Polish (more pronounced liveliness) parked as a follow-up.
@@ -65,7 +65,7 @@ Order: static pages first, then CMS-driven ones.
   - ✅ Scroll-triggered fade-up animation on each section — reusable `<RevealOnScroll>` wired into every marketing section (About, Services, Apartments, Prices, FAQ, Contacts).
   - ✅ Scroll-spy: `IntersectionObserver` in the `Header` tracks which section is most-visible while scrolling `/`, highlights the matching nav item, and updates `location.hash` via `history.replaceState` (no scroll trigger, no history pollution). Standalone routes fall back to pathname match.
 - ⬜ Blog (list + single post)
-- ✅ Apartments section (`src/components/sections/ApartmentsSection.tsx`) — 12 Airbnb embeds in a 1/2/3-col responsive grid, with a styled placeholder card visible until the Airbnb SDK initializes (and persistent if the SDK is blocked). Embedded on `/` between Services and Prices; standalone at `/apartments/` (canonical to `/`).
+- ✅ Apartments section (`src/components/sections/ApartmentsSection.tsx`) — 10 custom photo cards in a horizontal scroll-snap carousel (auto-advance, pause-on-hover, swipe on mobile, arrow buttons on `md+`). Photos fetched once from each listing's og:image via `scripts/fetch-airbnb-og-images.mjs` and served through `next/image` from `a0.muscache.com`. Titles are each host's real headline (from JSON-LD `name`, `| Home2Host` suffix stripped). Card body `bg-brand-800` so the surface itself signals "clickable". Embedded on `/` between Services and Prices; standalone at `/apartments/` (canonical to `/`). Embed-iframe approach was scrapped 2026-06-11 due to load weight + uncontrollable styling.
 - ⬜ **Each page verified at every breakpoint** before it's marked done — minimum: 360px (small phone), 768px (tablet), 1280px (laptop). Pay extra attention to the Airbnb embeds (their own iframes are notoriously narrow on small screens) and the Header/nav transitions across breakpoints.
 - 🔄 Contact-form abuse defenses — **honeypot shipped with the form** (offscreen `name="website"` field; server action silently succeeds on fill). **Still to do before public launch**: per-IP rate limiting via `@upstash/ratelimit` + `@upstash/redis` (free tier sufficient). Optional Cloudflare Turnstile for residual spam.
 
@@ -104,6 +104,5 @@ Small items deferred during Stage 1 — none block Stage 2, but each will bite a
 
 - **`PAYLOAD_SECRET` missing from Vercel Preview env.** Production and Development have it; Preview does not (Vercel CLI 54.9.1 wouldn't accept it non-interactively, and we had no PR workflow yet). Add it via Vercel dashboard → Settings → Environment Variables before the first PR-triggered preview deploy, otherwise `/admin` on the preview URL will 500 with "missing secret key".
 - **`pg-connection-string` v3.0 / pg v9 SSL semantics.** The dev log shows a warning that `sslmode=require` currently aliases to `verify-full`, but won't in pg v9. When we upgrade to pg v9, switch the Neon URL to `sslmode=verify-full` explicitly. Until then: no action.
-- **`src/components/` not created yet** (per [ADR 0003](decisions/0003-styling-approach.md)). Create the folder when the first real component lands in Stage 3, not pre-emptively.
 - **Email adapter not wired.** Payload currently writes emails to console. Add Resend or SMTP adapter in Stage 4 or 5, before any production user needs a password reset. Until that exists, **don't lose the admin credentials** — no self-serve recovery.
 - **Neon DB branching not enabled.** Per [ADR 0002](decisions/0002-database-provider.md), enable preview-deploy branching in Stage 5 or 6 once there's real production content worth protecting. Until then dev and prod share the same database.
