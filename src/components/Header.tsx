@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
@@ -8,18 +9,50 @@ import { LanguageSwitcher } from "./LanguageSwitcher";
 // so existing Google-indexed pages keep resolving 1:1 — see ADR/roadmap
 // Stage 4 notes on SEO preservation. Labels are BG to match the primary
 // content language; EN labels arrive in Stage 5 via next-intl.
-const navItems = [
-  { href: "/about-us/",   label: "За нас" },
-  { href: "/services/",   label: "Услуги" },
-  { href: "/apartments/", label: "Апартаменти" },
-  { href: "/prices/",     label: "Цени" },
-  { href: "/questions/",  label: "Въпроси" },
-  { href: "/blog/",       label: "Блог" },
-  { href: "/contacts/",   label: "Контакти" },
+//
+// `sectionId` is the matching <section id="..."> in the home-page embed.
+// It's used by the scroll-spy below to decide which nav item is active
+// while the user scrolls through `/`. `/blog/` has no home-page section
+// since the blog is a separate listing, so we omit it from the spy.
+type NavItem = {
+  href: string;
+  label: string;
+  sectionId: string | null;
+};
+
+const navItems: NavItem[] = [
+  { href: "/about-us/",   label: "За нас",        sectionId: "about-us"   },
+  { href: "/services/",   label: "Услуги",        sectionId: "services"   },
+  { href: "/apartments/", label: "Апартаменти",   sectionId: "apartments" },
+  { href: "/prices/",     label: "Цени",          sectionId: "prices"     },
+  { href: "/questions/",  label: "Въпроси",       sectionId: "questions"  },
+  { href: "/blog/",       label: "Блог",          sectionId: null         },
+  { href: "/contacts/",   label: "Контакти",      sectionId: "contacts"   },
 ];
+
+// Active-nav classes for the desktop bar — applied additively over the
+// base classes so the inactive item just uses the muted variant.
+const NAV_LINK_BASE =
+  "rounded-md px-3 py-2 text-sm font-medium transition-colors duration-base ease-standard";
+const NAV_LINK_INACTIVE =
+  "text-foreground-muted hover:bg-surface-muted hover:text-foreground";
+const NAV_LINK_ACTIVE =
+  "bg-surface-muted text-foreground";
+
+// Same idea for the mobile drawer — slightly heavier weight + brand tint
+// so the active row stands out in the tap-target list.
+const MOBILE_LINK_BASE =
+  "block rounded-md px-3 py-3 text-base font-medium transition-colors duration-base ease-standard";
+const MOBILE_LINK_INACTIVE = "text-foreground hover:bg-surface-muted";
+const MOBILE_LINK_ACTIVE =
+  "bg-brand-50 text-brand-800 dark:bg-brand-900 dark:text-brand-200";
 
 export function Header() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
+  // Currently most-visible section while scrolling `/`. null when off-home
+  // (we rely on pathname matching instead).
+  const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
 
   // Lock body scroll + ESC-to-close while the mobile drawer is open.
   useEffect(() => {
@@ -35,6 +68,72 @@ export function Header() {
       window.removeEventListener("keydown", onKey);
     };
   }, [open]);
+
+  // Scroll-spy: only runs on the home page (where all sections are
+  // embedded in one document). On standalone routes the nav highlights
+  // by pathname instead — no observer needed.
+  //
+  // Approach: a single IntersectionObserver watches every section, and a
+  // `rootMargin: "-30% 0px -55% 0px"` viewport band means a section is
+  // "active" when its top edge is between ~30% and ~45% from the top of
+  // the viewport. That feels like "looking at this section" rather than
+  // "barely scrolled into view".
+  useEffect(() => {
+    if (pathname !== "/") {
+      setActiveSectionId(null);
+      return;
+    }
+
+    const sections = navItems
+      .map((item) => item.sectionId)
+      .filter((id): id is string => id !== null)
+      .map((id) => document.getElementById(id))
+      .filter((el): el is HTMLElement => el !== null);
+
+    if (sections.length === 0) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        // Pick the visible section closest to the top of the viewport.
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort(
+            (a, b) =>
+              a.target.getBoundingClientRect().top -
+              b.target.getBoundingClientRect().top,
+          );
+        if (visible.length > 0) {
+          const id = visible[0].target.id;
+          setActiveSectionId(id);
+          // Update the URL hash without scrolling and without polluting
+          // browser history — `replaceState`, not `pushState` or assigning
+          // `location.hash = ...` (which would scroll the page).
+          if (typeof window !== "undefined") {
+            history.replaceState(null, "", `#${id}`);
+          }
+        }
+      },
+      {
+        rootMargin: "-30% 0px -55% 0px",
+        threshold: [0, 0.1, 0.25, 0.5, 0.75, 1],
+      },
+    );
+
+    sections.forEach((s) => observer.observe(s));
+    return () => observer.disconnect();
+  }, [pathname]);
+
+  function isActive(item: NavItem): boolean {
+    // Home page: scroll-spy result wins. Highlight nothing until at
+    // least one section has been seen (initial top-of-page state).
+    if (pathname === "/") {
+      return item.sectionId !== null && item.sectionId === activeSectionId;
+    }
+    // Standalone route: pathname must match the nav href exactly. With
+    // `trailingSlash: true`, Next.js normalizes pathname to also include
+    // the trailing slash, so this is a clean string compare.
+    return pathname === item.href;
+  }
 
   return (
     <>
@@ -64,16 +163,20 @@ export function Header() {
 
         <nav aria-label="Primary" className="hidden lg:block">
           <ul className="flex items-center gap-1">
-            {navItems.map(({ href, label }) => (
-              <li key={href}>
-                <Link
-                  href={href}
-                  className="rounded-md px-3 py-2 text-sm font-medium text-foreground-muted transition-colors duration-base ease-standard hover:bg-surface-muted hover:text-foreground"
-                >
-                  {label}
-                </Link>
-              </li>
-            ))}
+            {navItems.map((item) => {
+              const active = isActive(item);
+              return (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    aria-current={active ? "page" : undefined}
+                    className={`${NAV_LINK_BASE} ${active ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE}`}
+                  >
+                    {item.label}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         </nav>
 
@@ -139,17 +242,21 @@ export function Header() {
           </div>
           <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-gutter py-4">
             <ul className="flex flex-col gap-1">
-              {navItems.map(({ href, label }) => (
-                <li key={href}>
-                  <Link
-                    href={href}
-                    onClick={() => setOpen(false)}
-                    className="block rounded-md px-3 py-3 text-base font-medium text-foreground transition-colors duration-base ease-standard hover:bg-surface-muted"
-                  >
-                    {label}
-                  </Link>
-                </li>
-              ))}
+              {navItems.map((item) => {
+                const active = isActive(item);
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={() => setOpen(false)}
+                      aria-current={active ? "page" : undefined}
+                      className={`${MOBILE_LINK_BASE} ${active ? MOBILE_LINK_ACTIVE : MOBILE_LINK_INACTIVE}`}
+                    >
+                      {item.label}
+                    </Link>
+                  </li>
+                );
+              })}
             </ul>
           </nav>
         </div>

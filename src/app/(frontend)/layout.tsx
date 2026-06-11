@@ -18,6 +18,11 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // Absolute base used to resolve relative URLs in `openGraph.images`,
+  // `icons`, etc. at build time. Without this Next.js falls back to
+  // `http://localhost:3000` and warns on every build. Update to the
+  // real custom domain at Stage 6 (DNS switch).
+  metadataBase: new URL("https://home2host.vercel.app"),
   title: "Home2Host — Управление на имоти в Банско и Бургас",
   description:
     "Професионално управление на имоти за краткосрочен наем в Банско и Бургас. Обяви, комуникация с гости, почистване и поддръжка.",
