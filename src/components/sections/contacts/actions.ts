@@ -1,6 +1,11 @@
 "use server";
 
+// "use server" modules can ONLY export async functions. Types + the initial
+// useActionState state live in formState.ts to keep this file valid. See
+// that file's header for the why.
+
 import nodemailer from "nodemailer";
+import type { ContactFormState } from "./formState";
 
 // Server action invoked by the Contacts form. Validates input, checks the
 // honeypot, sends an email via Hostinger SMTP to the production mailbox
@@ -24,13 +29,6 @@ import nodemailer from "nodemailer";
 //   SMTP_USER           info@home2host.com
 //   SMTP_PASSWORD       mailbox password (from Hostinger panel)
 //   CONTACT_RECIPIENT   info@home2host.com (defaults to SMTP_USER if unset)
-
-export type ContactFormState = {
-  status: "idle" | "success" | "error";
-  message?: string;
-};
-
-export const initialContactFormState: ContactFormState = { status: "idle" };
 
 type ValidatedFields = {
   name: string;
@@ -104,15 +102,21 @@ export async function submitContact(
   _prevState: ContactFormState,
   formData: FormData,
 ): Promise<ContactFormState> {
+  // Diagnostic — surfaces in Vercel Functions logs so we can confirm the
+  // action is being invoked and see how far it gets before failing.
+  console.log("[contact-form] submitContact invoked");
+
   // Honeypot — hidden field that only bots fill in. We silently return
   // "success" so bots get no feedback that the form rejected them.
   const honeypot = String(formData.get("website") ?? "");
   if (honeypot.length > 0) {
+    console.log("[contact-form] honeypot tripped — silently succeeding");
     return { status: "success", message: "Благодарим! Ще се свържем с вас скоро." };
   }
 
   const validated = validate(formData);
   if (typeof validated === "string") {
+    console.log("[contact-form] validation failed:", validated);
     return { status: "error", message: validated };
   }
 
@@ -125,6 +129,12 @@ export async function submitContact(
   if (!smtpHost || !smtpUser || !smtpPassword || !recipient) {
     console.error(
       "[contact-form] SMTP env vars missing — refusing to attempt send.",
+      {
+        hasHost: Boolean(smtpHost),
+        hasUser: Boolean(smtpUser),
+        hasPassword: Boolean(smtpPassword),
+        hasRecipient: Boolean(recipient),
+      },
     );
     return {
       status: "error",
@@ -139,6 +149,11 @@ export async function submitContact(
   // letting the error bubble out of the server action as an HTTP 500
   // (which would dump the user on Vercel's generic error page).
   try {
+    console.log("[contact-form] creating transporter", {
+      host: smtpHost,
+      port: smtpPort,
+      user: smtpUser,
+    });
     const transporter = nodemailer.createTransport({
       host: smtpHost,
       port: smtpPort,
@@ -146,6 +161,7 @@ export async function submitContact(
       auth: { user: smtpUser, pass: smtpPassword },
     });
     const email = buildEmail(validated);
+    console.log("[contact-form] sending mail");
     await transporter.sendMail({
       from: `Home2Host сайт <${smtpUser}>`,
       to: recipient,
@@ -156,6 +172,7 @@ export async function submitContact(
       text: email.text,
       html: email.html,
     });
+    console.log("[contact-form] sendMail succeeded");
     return {
       status: "success",
       message: "Благодарим! Ще се свържем с вас скоро.",

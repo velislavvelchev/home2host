@@ -3,11 +3,11 @@
 import { useActionState, useEffect, useRef } from "react";
 import { Send } from "lucide-react";
 import { buttonStyles } from "@/components/Button";
+import { submitContact } from "./actions";
 import {
   initialContactFormState,
-  submitContact,
   type ContactFormState,
-} from "./actions";
+} from "./formState";
 
 // Client form component — server action handles delivery, this just
 // manages the input UI, the pending state, and the inline status message.
