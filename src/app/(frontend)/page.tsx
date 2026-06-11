@@ -4,6 +4,7 @@ import { buttonStyles } from "@/components/Button";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { PricesSection } from "@/components/sections/PricesSection";
+import { FaqSection } from "@/components/sections/FaqSection";
 
 export default function Home() {
   return (
@@ -79,6 +80,7 @@ export default function Home() {
       <AboutSection />
       <ServicesSection />
       <PricesSection />
+      <FaqSection />
     </main>
   );
 }
