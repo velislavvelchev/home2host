@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FloatingCallButton } from "@/components/FloatingCallButton";
+import { StructuredData } from "@/components/StructuredData";
 
 // Subsets MUST include cyrillic — primary content language is BG and
 // without it we'd fall back to a system font for half the page.
@@ -68,10 +70,22 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        <StructuredData />
         <Header />
         {children}
         <Footer />
         <FloatingCallButton />
+        {/*
+          GA4 only renders when the measurement ID is set in the env. Local
+          dev (no `.env.local` value) and Vercel previews without the var
+          configured render nothing — keeps test pageviews out of the
+          production analytics property.
+        */}
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ? (
+          <GoogleAnalytics
+            gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
+          />
+        ) : null}
       </body>
     </html>
   );

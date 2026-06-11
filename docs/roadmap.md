@@ -69,11 +69,14 @@ Order: static pages first, then CMS-driven ones.
 - ⬜ **Each page verified at every breakpoint** before it's marked done — minimum: 360px (small phone), 768px (tablet), 1280px (laptop). Pay extra attention to the Airbnb embeds (their own iframes are notoriously narrow on small screens) and the Header/nav transitions across breakpoints.
 - 🔄 Contact-form abuse defenses — **honeypot shipped with the form** (offscreen `name="website"` field; server action silently succeeds on fill). **Still to do before public launch**: per-IP rate limiting via `@upstash/ratelimit` + `@upstash/redis` (free tier sufficient). Optional Cloudflare Turnstile for residual spam.
 
-## Stage 5 — i18n, analytics, SEO ⬜
+## Stage 5 — i18n, analytics, SEO 🔄
 
 - ⬜ next-intl setup and migration of English strings from TranslatePress
-- ⬜ GA4 with the same measurement ID as the old site
-- ⬜ Meta tags, sitemap, Open Graph
+- 🔄 GA4 with the same measurement ID as the old site — `@next/third-parties` installed and wired into the frontend layout; needs `NEXT_PUBLIC_GA_MEASUREMENT_ID` env var set on Vercel (owner-supplied, must match the live WP site's GA4 property for analytics continuity).
+- ✅ Sitemap (`/sitemap.xml`) — dynamic, lists every public marketing page.
+- ✅ `robots.txt` — allow public content, disallow `/admin/` + `/api/`, point at the sitemap.
+- ✅ JSON-LD `LocalBusiness` structured data — rendered in the layout body.
+- ⬜ Per-page Open Graph metadata — currently only the root metadata is set; section routes inherit but could specify their own.
 - ⬜ Redirects from old URLs (preserve Google rankings)
 
 ## Stage 6 — Finalization and launch ⬜
