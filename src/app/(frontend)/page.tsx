@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { buttonStyles } from "@/components/Button";
 import { AboutSection } from "@/components/sections/AboutSection";
+import { ServicesSection } from "@/components/sections/ServicesSection";
 
 export default function Home() {
   return (
@@ -75,6 +76,7 @@ export default function Home() {
       </section>
 
       <AboutSection />
+      <ServicesSection />
     </main>
   );
 }
