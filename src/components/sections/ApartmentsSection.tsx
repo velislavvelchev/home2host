@@ -27,6 +27,10 @@ type ApartmentsSectionProps = {
 
 type Listing = {
   id: string;
+  // The host's headline as set on Airbnb (e.g. "Мястото на Джино 1 спалня
+  // | 3 минути до Gondola"), sourced from the listing's JSON-LD `name`
+  // field via scripts/fetch-airbnb-og-images.mjs and with the redundant
+  // "| Home2Host" suffix stripped (our site IS Home2Host).
   label: string;
   city: string;
   url: string;
@@ -38,7 +42,7 @@ type Listing = {
 const listings: Listing[] = [
   {
     id: "1318738434906867843",
-    label: "Кондо в Банско",
+    label: "Модерен двуетажен апартамент с 2 спални | Гледка",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1318738434906867843",
     imageUrl:
@@ -47,7 +51,7 @@ const listings: Listing[] = [
   },
   {
     id: "671609314902059816",
-    label: "Кондо в Бургас",
+    label: "Апартаментът на Еди в центъра",
     city: "Burgas",
     url: "https://www.airbnb.com/rooms/671609314902059816",
     imageUrl:
@@ -56,7 +60,7 @@ const listings: Listing[] = [
   },
   {
     id: "1571758069076515492",
-    label: "Апартамент за наем в Банско",
+    label: "Ски-вход/изход 1 спалня | Страхотна гледка | Паркинг",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1571758069076515492",
     imageUrl:
@@ -65,7 +69,7 @@ const listings: Listing[] = [
   },
   {
     id: "1607996732020225042",
-    label: "Апартамент за наем в Банско",
+    label: "Мястото на Джино 1 спалня | 3 минути до Gondola",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1607996732020225042",
     imageUrl:
@@ -74,7 +78,7 @@ const listings: Listing[] = [
   },
   {
     id: "1607988986183197333",
-    label: "Апартамент за наем в Банско",
+    label: "Мястото на Джино 2 1 спалня | 3 минути до Gondola",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1607988986183197333",
     imageUrl:
@@ -83,7 +87,7 @@ const listings: Listing[] = [
   },
   {
     id: "1582571602551689852",
-    label: "Апартамент за наем в Банско",
+    label: "Панорамно студио | Изглед към гората | Паркинг",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1582571602551689852",
     imageUrl:
@@ -92,7 +96,7 @@ const listings: Listing[] = [
   },
   {
     id: "1536078655698153217",
-    label: "Апартамент за наем в Банско",
+    label: "Алпийски апартамент с 1 спалня близо до кабинков лифт | Паркинг",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1536078655698153217",
     imageUrl:
@@ -101,7 +105,7 @@ const listings: Listing[] = [
   },
   {
     id: "1544251596416809511",
-    label: "Апартамент за наем в Банско",
+    label: "Снежна 1BR Удивителна гледка | Безплатен паркинг",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1544251596416809511",
     imageUrl:
@@ -110,7 +114,7 @@ const listings: Listing[] = [
   },
   {
     id: "1550747815707309469",
-    label: "Апартамент за наем в Банско",
+    label: "Ски 1BR близо до гондола | Безплатен паркинг",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1550747815707309469",
     imageUrl:
@@ -119,7 +123,7 @@ const listings: Listing[] = [
   },
   {
     id: "1614457751120708395",
-    label: "Кондо в Банско",
+    label: "Royal Park 1BR | Страхотна гледка | Паркинг",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1614457751120708395",
     imageUrl:
@@ -214,7 +218,7 @@ export function ApartmentsSection({
                       mode). Same approach as the FAQ section. */}
                   <div className="flex flex-col gap-1 p-5">
                     <div className="flex items-start justify-between gap-3">
-                      <h3 className="font-display text-base font-semibold tracking-tight text-white">
+                      <h3 className="line-clamp-2 font-display text-base font-semibold tracking-tight text-white">
                         {listing.label}
                       </h3>
                       <span
