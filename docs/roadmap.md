@@ -72,7 +72,7 @@ Order: static pages first, then CMS-driven ones.
 ## Stage 5 — i18n, analytics, SEO 🔄
 
 - ⬜ next-intl setup and migration of English strings from TranslatePress
-- 🔄 GA4 with the same measurement ID as the old site — `@next/third-parties` installed and wired into the frontend layout; needs `NEXT_PUBLIC_GA_MEASUREMENT_ID` env var set on Vercel (owner-supplied, must match the live WP site's GA4 property for analytics continuity).
+- ✅ GA4 with the same measurement ID as the old site — `@next/third-parties` installed and wired into the frontend layout. `NEXT_PUBLIC_GA_MEASUREMENT_ID` set on Vercel Production + Preview to `G-5HEDRYZJ93` (the same measurement ID the live WordPress site uses via Site Kit), so analytics continuity is preserved through the Stage 6 DNS switch. Verified in deployed page source 2026-06-11.
 - ✅ Sitemap (`/sitemap.xml`) — dynamic, lists every public marketing page.
 - ✅ `robots.txt` — allow public content, disallow `/admin/` + `/api/`, point at the sitemap.
 - ✅ JSON-LD `LocalBusiness` structured data — rendered in the layout body.

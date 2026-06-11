@@ -4,6 +4,7 @@ Reverse chronological. One line per completed task. Dates in YYYY-MM-DD format.
 
 ## 2026-06-11
 
+- chore: GA4 activated — `NEXT_PUBLIC_GA_MEASUREMENT_ID` set on Vercel Production + Preview to `G-5HEDRYZJ93`, the same measurement ID the live WordPress site uses via Site Kit. Means analytics data from the new site flows into the SAME GA4 property the owner has been collecting against, so historical continuity is preserved when DNS switches at Stage 6 (no break in the metrics timeline). Verified by inspecting page source on the deployed Vercel URL — the `gtag/js?id=G-5HEDRYZJ93` script is loaded.
 - feat: kick off Stage 5 with SEO basics + GA4 wiring. Three small additions in one slice:
   - **Dynamic `sitemap.xml`** (`src/app/(frontend)/sitemap.ts`) — lists every public marketing page with per-page priority + weekly `changeFrequency`. Generated at build time, served at the site root. Static prerender (shows as `/sitemap.xml` in the build output).
   - **`robots.txt`** (`src/app/(frontend)/robots.ts`) — allows all public content, disallows `/admin/` (Payload UI) and `/api/` (Payload REST/GraphQL — no SEO value, risks indexing schema/response shapes). Points at the sitemap so crawlers find it on first visit.
