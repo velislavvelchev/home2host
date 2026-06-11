@@ -65,7 +65,7 @@ Order: static pages first, then CMS-driven ones.
   - 🔄 Scroll-triggered fade-up animation on each section — reusable `<RevealOnScroll>` (`src/components/RevealOnScroll.tsx`) built and wired into Services rows. Apply to About/Prices/FAQ/Contacts once those sections land.
   - ⬜ Scroll-spy: as the user scrolls past sections on `/`, update `window.location.hash` (via `history.replaceState`) and highlight the active nav item. Pure UX, zero SEO impact (Google ignores hash fragments).
 - ⬜ Blog (list + single post)
-- ⬜ Apartments (list of Airbnb embeds)
+- ✅ Apartments section (`src/components/sections/ApartmentsSection.tsx`) — 12 Airbnb embeds in a 1/2/3-col responsive grid, with a styled placeholder card visible until the Airbnb SDK initializes (and persistent if the SDK is blocked). Embedded on `/` between Services and Prices; standalone at `/apartments/` (canonical to `/`).
 - ⬜ **Each page verified at every breakpoint** before it's marked done — minimum: 360px (small phone), 768px (tablet), 1280px (laptop). Pay extra attention to the Airbnb embeds (their own iframes are notoriously narrow on small screens) and the Header/nav transitions across breakpoints.
 - 🔄 Contact-form abuse defenses — **honeypot shipped with the form** (offscreen `name="website"` field; server action silently succeeds on fill). **Still to do before public launch**: per-IP rate limiting via `@upstash/ratelimit` + `@upstash/redis` (free tier sufficient). Optional Cloudflare Turnstile for residual spam.
 
