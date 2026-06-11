@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "../globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
+import { FloatingCallButton } from "@/components/FloatingCallButton";
 
 // Subsets MUST include cyrillic — primary content language is BG and
 // without it we'd fall back to a system font for half the page.
@@ -65,6 +66,7 @@ export default function RootLayout({
         <Header />
         {children}
         <Footer />
+        <FloatingCallButton />
       </body>
     </html>
   );
