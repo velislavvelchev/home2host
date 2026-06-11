@@ -15,6 +15,15 @@ const nextConfig: NextConfig = {
   // form's server action throws an unhandled error at runtime (Vercel
   // shows "This page couldn't load — A server error occurred").
   serverExternalPackages: ["nodemailer"],
+
+  // Allow next/image to load + optimise Airbnb listing photos. Used by
+  // ApartmentsSection — each card's photo URL is the listing's og:image,
+  // baked into the listings array via scripts/fetch-airbnb-og-images.mjs.
+  images: {
+    remotePatterns: [
+      { protocol: "https", hostname: "a0.muscache.com" },
+    ],
+  },
 };
 
 export default withPayload(nextConfig, { devBundleServerPackages: false });

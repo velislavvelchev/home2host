@@ -7,7 +7,7 @@ import { ApartmentsSection } from "@/components/sections/ApartmentsSection";
 export const metadata: Metadata = {
   title: "Апартаменти | Home2Host",
   description:
-    "12 имота за краткосрочен наем в Банско, Бургас и Разлог, управлявани от Home2Host. Разглеждайте и резервирайте директно през Airbnb.",
+    "10 имота за краткосрочен наем в Банско и Бургас, управлявани от Home2Host. Разглеждайте и резервирайте директно през Airbnb.",
   alternates: {
     canonical: "/",
   },

@@ -26,12 +26,17 @@ type RevealOnScrollProps = {
   // Staggers the reveal so a vertical list of siblings cascades instead of
   // popping in together. Pass the index in the list; we convert to ms.
   delayIndex?: number;
+  // Extra Tailwind classes applied to the wrapper <div>. Useful when the
+  // wrapper itself needs to participate in layout (e.g. flex-item sizing
+  // inside a carousel: `snap-start shrink-0 w-[320px]`).
+  className?: string;
 };
 
 export function RevealOnScroll({
   children,
   rootMargin = "0px 0px -80px 0px",
   delayIndex = 0,
+  className = "",
 }: RevealOnScrollProps) {
   const ref = useRef<HTMLDivElement | null>(null);
   const [revealed, setRevealed] = useState(false);
@@ -75,7 +80,7 @@ export function RevealOnScroll({
       style={{ transitionDelay: revealed ? `${delayIndex * 80}ms` : "0ms" }}
       className={`transition-all duration-700 ease-out ${
         revealed ? "translate-y-0 opacity-100" : "translate-y-6 opacity-0"
-      }`}
+      } ${className}`}
     >
       {children}
     </div>

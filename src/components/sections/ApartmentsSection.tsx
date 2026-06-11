@@ -1,22 +1,25 @@
-import Script from "next/script";
-import { ExternalLink } from "lucide-react";
+import Image from "next/image";
+import { Star, ArrowUpRight } from "lucide-react";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
+import { ApartmentsCarousel } from "./ApartmentsCarousel";
 
 // Reusable across the home page (embedded after Services, matching the live
 // WordPress nav order) and the standalone /apartments/ route. Heading level
 // swaps via prop, same contract as the other sections.
 //
-// Per the architecture doc, the "Apartments" section is intentionally NOT
-// a custom property database with filters/search — it's a collection of
-// Airbnb embed widgets. The owner's real listing photos, ratings, and
-// availability live inside Airbnb; mirroring them locally would just go
-// stale. The Airbnb JS SDK replaces each .airbnb-embed-frame div with an
-// iframe at runtime; until that happens (or if the SDK is blocked), the
-// placeholder we render inside reads as a tasteful "view this listing on
-// Airbnb" link card.
+// Rebuilt 2026-06-11: scrapped the Airbnb embed widget approach because
+// (a) 10 cross-origin iframes loaded slowly, (b) we couldn't restyle the
+// embed cards (forced white background), and (c) the SDK's one-shot DOM
+// scan was racing React hydration. Now each card is a fully styled link
+// using the listing's og:image (fetched once via
+// scripts/fetch-airbnb-og-images.mjs, baked in here). Rating is static
+// from the Stage 0 inventory pass — accept that it may drift slightly
+// from Airbnb's live number; re-run the fetcher if needed.
 //
 // Content sourced from docs/inventory/text/apartments.md.
-// 12 listings: 10 in Bansko, 1 in Burgas, 1 in Razlog.
+// 10 listings: 9 in Bansko, 1 in Burgas. Two listings from the original
+// inventory (Razlog id 1576107287888378227 and Bansko id 1615387914155787876)
+// are excluded because their Airbnb pages are no longer available.
 
 type ApartmentsSectionProps = {
   headingLevel?: "h1" | "h2";
@@ -27,6 +30,9 @@ type Listing = {
   label: string;
   city: string;
   url: string;
+  imageUrl: string;
+  // `null` for ★New listings that don't have a numeric rating yet.
+  rating: number | null;
 };
 
 const listings: Listing[] = [
@@ -35,72 +41,90 @@ const listings: Listing[] = [
     label: "Кондо в Банско",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1318738434906867843",
+    imageUrl:
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1318738434906867843/original/1fd5da3e-8516-4e5f-92b9-196d6fb80715.jpeg?im_w=720",
+    rating: 4.85,
   },
   {
     id: "671609314902059816",
     label: "Кондо в Бургас",
     city: "Burgas",
     url: "https://www.airbnb.com/rooms/671609314902059816",
+    imageUrl:
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-671609314902059816/original/25b75729-8079-4880-9660-c833c7f363a6.jpeg?im_w=720",
+    rating: 4.96,
   },
   {
     id: "1571758069076515492",
     label: "Апартамент за наем в Банско",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1571758069076515492",
+    imageUrl:
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1571758069076515492/original/36135164-0845-4de8-94b4-7f02c4023161.jpeg?im_w=720",
+    rating: null,
   },
   {
     id: "1607996732020225042",
     label: "Апартамент за наем в Банско",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1607996732020225042",
+    imageUrl:
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1607996732020225042/original/958bc3be-d464-44d2-ba05-3f1b3d816a3a.jpeg?im_w=720",
+    rating: null,
   },
   {
     id: "1607988986183197333",
     label: "Апартамент за наем в Банско",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1607988986183197333",
+    imageUrl:
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1607988986183197333/original/4b03a4fa-d397-4ec1-8584-20caa05652cf.jpeg?im_w=720",
+    rating: null,
   },
   {
     id: "1582571602551689852",
     label: "Апартамент за наем в Банско",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1582571602551689852",
+    imageUrl:
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1582571602551689852/original/887cf149-729e-4bda-bcb8-01bbeef60cca.jpeg?im_w=720",
+    rating: null,
   },
   {
     id: "1536078655698153217",
     label: "Апартамент за наем в Банско",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1536078655698153217",
+    imageUrl:
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1536078655698153217/original/01ecd934-85ea-4e38-9bd2-110cbea946d2.jpeg?im_w=720",
+    rating: 4.75,
   },
   {
     id: "1544251596416809511",
     label: "Апартамент за наем в Банско",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1544251596416809511",
+    imageUrl:
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1544251596416809511/original/a3af282f-fdfc-4b6f-9d80-be217eb1b0ec.jpeg?im_w=720",
+    rating: 5.0,
   },
   {
     id: "1550747815707309469",
     label: "Апартамент за наем в Банско",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1550747815707309469",
-  },
-  {
-    id: "1576107287888378227",
-    label: "Апартамент за наем в Разлог",
-    city: "Razlog",
-    url: "https://www.airbnb.com/rooms/1576107287888378227",
+    imageUrl:
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1550747815707309469/original/a0c2ddf2-9d3c-4c25-835d-f47a133b77b0.jpeg?im_w=720",
+    rating: 5.0,
   },
   {
     id: "1614457751120708395",
     label: "Кондо в Банско",
     city: "Bansko",
     url: "https://www.airbnb.com/rooms/1614457751120708395",
-  },
-  {
-    id: "1615387914155787876",
-    label: "Кондо в Банско",
-    city: "Bansko",
-    url: "https://www.airbnb.com/rooms/1615387914155787876",
+    imageUrl:
+      "https://a0.muscache.com/im/pictures/hosting/Hosting-1614457751120708395/original/d057b9ba-5329-4477-b3c0-84555e1db6a1.jpeg?im_w=720",
+    rating: null,
   },
 ];
 
@@ -110,7 +134,11 @@ export function ApartmentsSection({
   const Heading = headingLevel;
 
   return (
-    <section id="apartments" aria-labelledby="apartments-heading">
+    <section
+      id="apartments"
+      aria-labelledby="apartments-heading"
+      className="bg-surface-muted"
+    >
       <div className="mx-auto max-w-6xl px-gutter py-section">
         <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-800 dark:bg-brand-900 dark:text-brand-100">
           <span className="size-1.5 rounded-full bg-brand-600" />
@@ -125,72 +153,87 @@ export function ApartmentsSection({
         </Heading>
 
         <p className="mt-6 max-w-prose text-lg leading-relaxed text-foreground-muted">
-          12 имота в Банско, Бургас и Разлог — управлявани от Home2Host.
+          10 имота в Банско и Бургас — управлявани от Home2Host.
           Резервирайте директно през Airbnb.
         </p>
 
-        <ul className="mt-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {listings.map((listing, index) => (
-            // delayIndex modulo 3 so each grid ROW cascades together
-            // (instead of one long cascade across all 12 cards).
-            <RevealOnScroll key={listing.id} delayIndex={index % 3}>
-              <li>
-                {/*
-                  The Airbnb SDK swaps the contents of this div for an
-                  iframe at runtime. The placeholder inside is what shows
-                  during the brief load window and stays visible if the
-                  SDK is blocked by an ad-blocker — so it's styled as a
-                  tasteful "view on Airbnb" card, not a bare hyperlink.
-
-                  `min-h-[28rem]` reserves vertical space so the page
-                  doesn't shift when iframes finish loading.
-                */}
-                <div
-                  className="airbnb-embed-frame relative flex min-h-[28rem] overflow-hidden rounded-2xl border border-foreground-muted bg-surface"
-                  data-id={listing.id}
-                  data-view="home"
-                  style={{ width: "100%" }}
+        <div className="mt-12">
+          <ApartmentsCarousel>
+            {listings.map((listing, index) => (
+              <RevealOnScroll
+                key={listing.id}
+                delayIndex={index % 3}
+                // Mobile dominates the viewport with one card + a peek of
+                // the next; fixed widths from sm up.
+                className="snap-start shrink-0 w-[85vw] sm:w-[320px] md:w-[360px]"
+              >
+                <a
+                  href={listing.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  // Card body bg is `bg-brand-800` — same indigo as
+                  // primary CTA buttons. The colour itself is the click
+                  // affordance, signalling "this is a button-shaped
+                  // surface" before any explicit CTA text reads. Border
+                  // brand-700 (one shade lighter than the bg) provides
+                  // subtle definition without competing.
+                  // Group so child hover effects (arrow, scale) coordinate
+                  // with the parent link. `block` because <a> is inline
+                  // by default and the rounded card needs block layout.
+                  className="group block overflow-hidden rounded-2xl border border-brand-700 bg-brand-800 transition-all duration-300 ease-out hover:-translate-y-1 hover:border-brand-500 hover:shadow-2"
                 >
-                  <a
-                    href={listing.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex flex-1 flex-col items-center justify-center gap-3 p-6 text-center transition-colors hover:bg-surface-muted"
-                  >
-                    <span className="inline-flex size-12 items-center justify-center rounded-xl bg-brand-50 text-brand-800 dark:bg-brand-900 dark:text-brand-200">
-                      <ExternalLink
-                        className="size-5"
-                        strokeWidth={1.75}
+                  {/* Photo with rating badge overlay */}
+                  <div className="relative aspect-[4/3] overflow-hidden">
+                    <Image
+                      src={listing.imageUrl}
+                      alt={listing.label}
+                      fill
+                      sizes="(max-width: 640px) 85vw, 360px"
+                      className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                    />
+                    {/* Rating pill, top-right. Semi-transparent black
+                        backdrop reads on any photo without redesigning
+                        per-image. "Нов" for listings without a numeric
+                        rating (Airbnb's ★New listings). */}
+                    <span className="absolute right-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/70 px-2.5 py-1 text-xs font-medium text-white backdrop-blur-sm">
+                      <Star
+                        className="size-3 fill-current"
+                        strokeWidth={0}
                         aria-hidden="true"
                       />
+                      {listing.rating !== null
+                        ? listing.rating.toFixed(2)
+                        : "Нов"}
                     </span>
-                    <span className="font-display text-base font-semibold tracking-tight text-foreground">
-                      {listing.label}
-                    </span>
-                    <span className="text-xs font-medium uppercase tracking-wider text-foreground-muted">
+                  </div>
+
+                  {/* Card body — text colours locked to on-indigo since
+                      the bg is brand-800 in both light AND dark mode (no
+                      `dark:` variants needed; the foreground tokens that
+                      swap by OS preference would be invisible in one
+                      mode). Same approach as the FAQ section. */}
+                  <div className="flex flex-col gap-1 p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="font-display text-base font-semibold tracking-tight text-white">
+                        {listing.label}
+                      </h3>
+                      <span
+                        aria-hidden="true"
+                        className="mt-0.5 inline-flex shrink-0 text-brand-200 transition-colors group-hover:text-white"
+                      >
+                        <ArrowUpRight className="size-5" strokeWidth={2} />
+                      </span>
+                    </div>
+                    <span className="text-xs font-medium uppercase tracking-wider text-brand-200">
                       {listing.city}
                     </span>
-                    <span className="mt-2 text-sm text-brand-700 underline dark:text-brand-300">
-                      Виж в Airbnb
-                    </span>
-                  </a>
-                </div>
-              </li>
-            </RevealOnScroll>
-          ))}
-        </ul>
+                  </div>
+                </a>
+              </RevealOnScroll>
+            ))}
+          </ApartmentsCarousel>
+        </div>
       </div>
-
-      {/*
-        Airbnb's embed SDK. Loaded once per page; finds every
-        .airbnb-embed-frame div on the page and progressively replaces
-        them with iframes. `afterInteractive` defers until the page is
-        ready so it doesn't compete with our critical render path.
-      */}
-      <Script
-        src="https://www.airbnb.com/embeddable/airbnb_jssdk"
-        strategy="afterInteractive"
-      />
     </section>
   );
 }
