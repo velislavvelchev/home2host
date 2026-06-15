@@ -179,3 +179,76 @@ body {
   0%, 100% { transform: scale(1.00); }
   50%      { transform: scale(1.06); }
 }
+
+/* ---------- Blog post body typography ----------
+   Applied to the container of a rendered Lexical tree on /blog/[slug]/.
+   The Lexical → JSX converter emits plain semantic elements (p, h2, ul,
+   blockquote, a, img, ...) with no class names; we style them via element
+   selectors so post bodies look intentional without polluting other
+   places where the same tags are used. Kept narrow and token-driven —
+   no @tailwindcss/typography dependency for now. */
+.blog-prose {
+  font-size: var(--text-lg);
+  line-height: 1.75;
+  color: var(--foreground);
+}
+.blog-prose > * + * { margin-top: 1.25em; }
+.blog-prose h2 {
+  font-family: var(--font-sans);
+  font-size: var(--text-3xl);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-top: 2em;
+}
+.blog-prose h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin-top: 1.75em;
+}
+.blog-prose h4 {
+  font-size: var(--text-xl);
+  font-weight: 600;
+  margin-top: 1.5em;
+}
+.blog-prose p { color: var(--foreground); }
+.blog-prose a {
+  color: var(--color-brand-700);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.blog-prose a:hover { color: var(--color-brand-800); }
+@media (prefers-color-scheme: dark) {
+  .blog-prose a        { color: var(--color-brand-300); }
+  .blog-prose a:hover  { color: var(--color-brand-200); }
+}
+.blog-prose ul, .blog-prose ol { padding-left: 1.5em; }
+.blog-prose ul { list-style: disc; }
+.blog-prose ol { list-style: decimal; }
+.blog-prose li + li { margin-top: 0.4em; }
+.blog-prose blockquote {
+  border-left: 3px solid var(--color-brand-500);
+  padding-left: 1em;
+  font-style: italic;
+  color: var(--foreground-muted);
+}
+.blog-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.9em;
+  background: var(--surface-muted);
+  padding: 0.15em 0.4em;
+  border-radius: 0.25rem;
+}
+.blog-prose hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 2.5em 0;
+}
+.blog-prose img {
+  border-radius: 0.75rem;
+  max-width: 100%;
+  height: auto;
+}
+.blog-prose strong { font-weight: 600; }

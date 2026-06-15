@@ -1,4 +1,6 @@
 import type { MetadataRoute } from "next";
+import { getPayloadInstance } from "@/lib/payload";
+import type { BlogPost } from "@/payload-types";
 
 // Dynamic sitemap, generated at build time. Lists every public marketing
 // page so search engines have a clean crawl entry point.
@@ -19,21 +21,46 @@ const STATIC_ROUTES = [
   { path: "/prices/", priority: 0.7 },
   { path: "/questions/", priority: 0.6 },
   { path: "/contacts/", priority: 0.6 },
+  { path: "/blog/", priority: 0.7 },
 ];
 
-export default function sitemap(): MetadataRoute.Sitemap {
-  // Hardcoded build-time date because Math.random / Date.now are not
-  // available in some Next.js contexts; ISO timestamp captured at the
-  // moment the slice ships, refreshed by re-generating sitemap on each
-  // deploy.
-  const lastModified = new Date("2026-06-11");
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  // Hardcoded fallback date for static routes — the marketing pages
+  // don't change daily, and we don't have build timestamps available in
+  // this context. Refreshed by re-generating sitemap on each deploy.
+  const lastModified = new Date("2026-06-15");
 
-  return STATIC_ROUTES.map(({ path, priority }) => ({
-    url: `${BASE_URL}${path}`,
-    lastModified,
-    // Weekly cadence — the marketing pages don't change daily, and an
-    // overly-frequent hint can hurt crawl budget.
-    changeFrequency: "weekly" as const,
-    priority,
-  }));
+  const staticEntries: MetadataRoute.Sitemap = STATIC_ROUTES.map(
+    ({ path, priority }) => ({
+      url: `${BASE_URL}${path}`,
+      lastModified,
+      changeFrequency: "weekly" as const,
+      priority,
+    }),
+  );
+
+  // Pull every published blog post and append. Failures here would break
+  // the whole sitemap, which is worse than serving the static portion
+  // alone — so we swallow errors and log instead.
+  let postEntries: MetadataRoute.Sitemap = [];
+  try {
+    const payload = await getPayloadInstance();
+    const { docs } = await payload.find({
+      collection: "blog-posts",
+      where: { _status: { equals: "published" } },
+      limit: 500,
+      locale: "bg",
+      depth: 0,
+    });
+    postEntries = (docs as BlogPost[]).map((post) => ({
+      url: `${BASE_URL}/blog/${post.slug}/`,
+      lastModified: new Date(post.updatedAt ?? post.publishedAt),
+      changeFrequency: "monthly" as const,
+      priority: 0.6,
+    }));
+  } catch (err) {
+    console.error("[sitemap] failed to load blog posts:", err);
+  }
+
+  return [...staticEntries, ...postEntries];
 }

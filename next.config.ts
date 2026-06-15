@@ -16,12 +16,17 @@ const nextConfig: NextConfig = {
   // shows "This page couldn't load — A server error occurred").
   serverExternalPackages: ["nodemailer"],
 
-  // Allow next/image to load + optimise Airbnb listing photos. Used by
-  // ApartmentsSection — each card's photo URL is the listing's og:image,
-  // baked into the listings array via scripts/fetch-airbnb-og-images.mjs.
+  // Hosts next/image is allowed to optimise from.
+  //   - a0.muscache.com — Airbnb's image CDN, used by ApartmentsSection
+  //     (each card's photo URL is the listing's og:image, baked in via
+  //     scripts/fetch-airbnb-og-images.mjs).
+  //   - *.public.blob.vercel-storage.com — Vercel Blob, where Payload
+  //     uploads land (see ADR 0004). Used for blog post featured images
+  //     and any other Media-backed content.
   images: {
     remotePatterns: [
       { protocol: "https", hostname: "a0.muscache.com" },
+      { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
     ],
   },
 };
