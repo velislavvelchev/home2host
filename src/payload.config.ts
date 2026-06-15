@@ -52,6 +52,22 @@ export default buildConfig({
         },
       ],
     },
+    // ──────────────────────────────────────────────────────────────
+    // NOTE: there is intentionally NO `comments` collection on this
+    // site, and the blog detail page renders no comment form.
+    //
+    // The previous WordPress install was constantly receiving spam
+    // submissions via `wp-comments-post.php` (a POST endpoint that
+    // exists whether or not the comment UI is shown). Re-introducing
+    // comments here means re-introducing that attack surface — bots
+    // would find any `/api/comments` endpoint by URL alone.
+    //
+    // If you ever decide to add commenting, route it through a
+    // third-party service (Giscus, Disqus, Cusdis) rather than a
+    // Payload collection: the third party absorbs the spam-handling
+    // and identity problems instead of us shipping a moderation queue
+    // and rate limiter we'd then have to maintain.
+    // ──────────────────────────────────────────────────────────────
     {
       slug: "blog-posts",
       labels: { singular: "Blog post", plural: "Blog posts" },

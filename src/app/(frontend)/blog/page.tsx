@@ -43,9 +43,13 @@ function formatPublishedDate(iso: string): string {
 export default async function BlogIndexPage() {
   const payload = await getPayloadInstance();
 
+  // No `_status` filter — see /blog/[slug]/page.tsx for the full
+  // reasoning. With `versions: { drafts: true }` on the collection,
+  // Payload's default find already excludes draft-only documents,
+  // and the explicit filter was producing 0-match results when
+  // combined with non-ASCII slug values.
   const { docs } = await payload.find({
     collection: "blog-posts",
-    where: { _status: { equals: "published" } },
     sort: "-publishedAt",
     limit: 24,
     locale: "bg",

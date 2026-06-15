@@ -26,12 +26,16 @@ function formatPublishedDate(iso: string): string {
 
 async function findPostBySlug(slug: string): Promise<BlogPost | null> {
   const payload = await getPayloadInstance();
+  // `draft: false` (the default) is sufficient to filter out drafts —
+  // Payload's versioned-collection find already excludes documents whose
+  // latest saved state is a draft. An explicit `_status: { equals:
+  // "published" }` filter on top of that is redundant AND was producing
+  // 0-match results when combined with a non-ASCII slug value (the
+  // Cyrillic Регламент post). Dropping the redundant filter avoids the
+  // collision and is closer to the idiomatic Payload pattern.
   const { docs } = await payload.find({
     collection: "blog-posts",
-    where: {
-      slug: { equals: slug },
-      _status: { equals: "published" },
-    },
+    where: { slug: { equals: slug } },
     limit: 1,
     locale: "bg",
     depth: 1,
@@ -44,9 +48,11 @@ async function findPostBySlug(slug: string): Promise<BlogPost | null> {
 // (true) — no extra config needed.
 export async function generateStaticParams(): Promise<Params[]> {
   const payload = await getPayloadInstance();
+  // No `_status` filter — see findPostBySlug for the reason. With
+  // `versions: { drafts: true }` on the collection, Payload's default
+  // find already excludes draft-only documents.
   const { docs } = await payload.find({
     collection: "blog-posts",
-    where: { _status: { equals: "published" } },
     limit: 100,
     locale: "bg",
     depth: 0,
@@ -109,7 +115,11 @@ export default async function BlogPostPage({
   return (
     <main className="flex-1">
       <article className="bg-background">
-        <div className="mx-auto max-w-3xl px-gutter py-section">
+        {/* `max-w-4xl` (896px) gives the post detail more breathing
+            room than the original `max-w-3xl` (768px) on wide screens
+            without sacrificing readability — ~85-95 chars per line at
+            text-lg, still inside the comfortable 65-95 reading band. */}
+        <div className="mx-auto max-w-4xl px-gutter py-section">
           {/* Back to the blog index — small breadcrumb-style link rather
               than a full breadcrumb component (one hop, no nesting). */}
           <Link
@@ -163,7 +173,7 @@ export default async function BlogPostPage({
                 src={heroUrl}
                 alt={image?.alt ?? post.title}
                 fill
-                sizes="(max-width: 768px) 100vw, 768px"
+                sizes="(max-width: 896px) 100vw, 896px"
                 priority
                 className="object-cover"
               />

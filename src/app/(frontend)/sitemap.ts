@@ -45,9 +45,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   let postEntries: MetadataRoute.Sitemap = [];
   try {
     const payload = await getPayloadInstance();
+    // No `_status` filter — Payload's default find already excludes
+    // draft-only documents when `versions: { drafts: true }` is set.
+    // See blog/page.tsx for the longer reasoning.
     const { docs } = await payload.find({
       collection: "blog-posts",
-      where: { _status: { equals: "published" } },
       limit: 500,
       locale: "bg",
       depth: 0,

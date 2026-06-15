@@ -61,6 +61,19 @@ const nextConfig: NextConfig = {
       { source: "/feed", destination: "/", permanent: true },
       { source: "/feed/:path*", destination: "/", permanent: true },
       { source: "/comments/feed", destination: "/", permanent: true },
+
+      // Blog post slug remap: the original WordPress URL was a
+      // percent-encoded Cyrillic slug ending in `-copy` (the live
+      // post was likely a draft duplicate that never got renamed).
+      // We imported it under a clean ASCII slug for consistency with
+      // the other 5 posts. Redirect the legacy URL → new URL so any
+      // crawler / inbound link that has the old form is preserved.
+      {
+        source:
+          "/blog/%d1%80%d0%b5%d0%b3%d0%bb%d0%b0%d0%bc%d0%b5%d0%bd%d1%82-%d0%b5%d1%81-2024-1028-%d0%ba%d0%b0%d0%ba%d0%b2%d0%be-%d1%82%d1%80%d1%8f%d0%b1%d0%b2%d0%b0-%d0%b4%d0%b0-%d0%b7%d0%bd%d0%b0%d0%b5%d0%bc-copy",
+        destination: "/blog/eu-regulation-2024-1028-what-to-know/",
+        permanent: true,
+      },
     ];
   },
 };
