@@ -76,7 +76,7 @@ Order: static pages first, then CMS-driven ones.
 - ✅ Sitemap (`/sitemap.xml`) — dynamic, lists every public marketing page; appends each published blog post's URL with `lastModified` from `updatedAt`. Payload-read failures are swallowed so a transient DB issue can't blank the static portion.
 - ✅ `robots.txt` — allow public content, disallow `/admin/` + `/api/`, point at the sitemap.
 - ✅ JSON-LD `LocalBusiness` structured data — rendered in the layout body.
-- ⬜ Per-page Open Graph metadata — currently only the root metadata is set; section routes inherit but could specify their own.
+- ✅ Per-page Open Graph metadata — each section route (`/about-us/`, `/services/`, `/apartments/`, `/prices/`, `/questions/`, `/contacts/`) and `/blog/` overrides the root layout's `openGraph.title` + `description` with its own copy. `images` intentionally inherits the root's OG image — making per-section share images is a separate design slice. Per-post OG on `/blog/[slug]/` set via `generateMetadata` (title, description from excerpt, `og:type=article`, image from `featuredImage`).
 - ⬜ Redirects from old URLs (preserve Google rankings)
 
 ## Stage 6 — Finalization and launch ⬜

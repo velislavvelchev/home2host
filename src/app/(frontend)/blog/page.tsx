@@ -8,10 +8,17 @@ import type { BlogPost, Media } from "@/payload-types";
 
 // Unlike the section routes, the blog is a genuinely separate page —
 // no canonical-to-home, no on-home embed. It owns its own URL.
+// Per-page `openGraph` so shares of `/blog/` read for the blog rather
+// than the home; per-post OG is set separately in [slug]/page.tsx.
 export const metadata: Metadata = {
   title: "Блог | Home2Host",
   description:
     "Полезни статии за собственици на имоти за краткосрочен наем: управление, динамично ценообразуване, регулации и съвети от Home2Host.",
+  openGraph: {
+    title: "Блог | Home2Host",
+    description:
+      "Полезни статии за собственици на имоти за краткосрочен наем: управление, динамично ценообразуване, регулации и съвети от Home2Host.",
+  },
 };
 
 // Each post lives in the DB; this page reads fresh on each request.

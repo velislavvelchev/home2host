@@ -5,12 +5,20 @@ import { ServicesSection } from "@/components/sections/ServicesSection";
 // the full content of every section, so standalone section URLs exist to
 // match the live WordPress URL shape and serve deep-links, not to compete
 // with the home for keywords. See src/app/(frontend)/about-us/page.tsx.
+// Per-page `openGraph` overrides the root layout's title/description so
+// social-share previews for this URL read for the section, not the home.
+// See sibling /about-us/page.tsx for the longer reasoning.
 export const metadata: Metadata = {
   title: "Услуги | Home2Host",
   description:
     "Цялостно управление на имоти за краткосрочен наем — професионални обяви, динамично ценообразуване, комуникация с гости, почистване, поддръжка и сигурност.",
   alternates: {
     canonical: "/",
+  },
+  openGraph: {
+    title: "Услуги | Home2Host",
+    description:
+      "Цялостно управление на имоти за краткосрочен наем — професионални обяви, динамично ценообразуване, комуникация с гости, почистване, поддръжка и сигурност.",
   },
 };
 

@@ -7,12 +7,21 @@ import { AboutSection } from "@/components/sections/AboutSection";
 // match the live URL shape and serve direct deep-links, but they
 // should NOT compete with the home for the same keywords — hence
 // the canonical signal.
+// Per-page `openGraph` overrides the root layout's title/description so
+// social-share previews for this URL read for the section, not the home
+// page. `images` is intentionally left to inherit the root's OG image —
+// per-section share images are a separate design slice.
 export const metadata: Metadata = {
   title: "За нас | Home2Host",
   description:
     "Home2Host е компания за професионално управление на имоти за краткосрочен наем в Банско и Бургас.",
   alternates: {
     canonical: "/",
+  },
+  openGraph: {
+    title: "За нас | Home2Host",
+    description:
+      "Home2Host е компания за професионално управление на имоти за краткосрочен наем в Банско и Бургас.",
   },
 };
 
