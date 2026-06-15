@@ -77,7 +77,7 @@ Order: static pages first, then CMS-driven ones.
 - ✅ `robots.txt` — allow public content, disallow `/admin/` + `/api/`, point at the sitemap.
 - ✅ JSON-LD `LocalBusiness` structured data — rendered in the layout body.
 - ✅ Per-page Open Graph metadata — each section route (`/about-us/`, `/services/`, `/apartments/`, `/prices/`, `/questions/`, `/contacts/`) and `/blog/` overrides the root layout's `openGraph.title` + `description` with its own copy. `images` intentionally inherits the root's OG image — making per-section share images is a separate design slice. Per-post OG on `/blog/[slug]/` set via `generateMetadata` (title, description from excerpt, `og:type=article`, image from `featuredImage`).
-- ⬜ Redirects from old URLs (preserve Google rankings)
+- 🔄 Redirects from old URLs (preserve Google rankings) — legacy WordPress system URLs covered (`/wp-admin/*`, `/wp-login.php`, `/author/*`, `/category/*`, `/tag/*`, `/feed`, `/feed/*`, `/comments/feed` → all 308 to `/`). Marketing-page slugs already match the live WP shape thanks to `trailingSlash: true`, so no per-page redirects needed. Blog post redirects also not needed — Strategy A: posts will be imported into Payload with the original WP slugs preserved, so live URLs continue to resolve 1:1 once content lands. Migration source for all 6 posts fetched into `docs/inventory/raw/blog-posts/` via `scripts/fetch-blog-posts.mjs`. **Remaining**: partner uploads the 6 posts into Payload admin (Strategy A keeps slugs verbatim), then this item closes.
 
 ## Stage 6 — Finalization and launch ⬜
 

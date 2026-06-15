@@ -29,6 +29,40 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
     ],
   },
+
+  // Redirects for legacy WordPress URLs that Google still has indexed
+  // from the previous site. The marketing section URLs (`/about-us/`,
+  // `/services/`, etc.) already match the live WP slugs exactly thanks
+  // to `trailingSlash: true` above, so they need no redirect. Blog post
+  // slugs are also imported verbatim from WordPress (Strategy A in the
+  // migration plan) → no per-post redirects either.
+  //
+  // What's left is two safe catch-alls for system URLs that have no
+  // equivalent on the new site:
+  //   - WP admin / login → drop to home (no admin on the new site)
+  //   - Author / category / tag / feed / attachment / `?p=` → drop to
+  //     home (no equivalent taxonomy yet; preserves crawl budget)
+  //
+  // `permanent: true` emits 308 (preserves method) — Google treats this
+  // as a permanent move and transfers ranking signals to the target.
+  async redirects() {
+    return [
+      // WP admin surface — public crawlers occasionally try these from
+      // the old install.
+      { source: "/wp-admin/:path*", destination: "/", permanent: true },
+      { source: "/wp-login.php", destination: "/", permanent: true },
+
+      // Legacy taxonomy / feed URLs Google may have indexed from the
+      // WP install. Send to home rather than 404 so they pass any
+      // accumulated authority back to a live page.
+      { source: "/author/:path*", destination: "/", permanent: true },
+      { source: "/category/:path*", destination: "/", permanent: true },
+      { source: "/tag/:path*", destination: "/", permanent: true },
+      { source: "/feed", destination: "/", permanent: true },
+      { source: "/feed/:path*", destination: "/", permanent: true },
+      { source: "/comments/feed", destination: "/", permanent: true },
+    ];
+  },
 };
 
 export default withPayload(nextConfig, { devBundleServerPackages: false });
