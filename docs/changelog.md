@@ -2,6 +2,10 @@
 
 Reverse chronological. One line per completed task. Dates in YYYY-MM-DD format.
 
+## 2026-06-16
+
+- fix: rename the contact form honeypot field from `website` to `h2h_confirm` and add password-manager opt-out attributes (`data-lpignore`, `data-1p-ignore`, `data-form-type="other"`, `autoComplete="new-password"`). Chrome's autofill heuristics recognise `website`/`url`/`email`/`phone` as personal-info fields and fill them even on offscreen, `aria-hidden`, `autoComplete="off"` inputs — which meant every legitimate Chrome user with autofill enabled was tripping the trap and getting the silent fake-success path (their submission accepted-looking in the UI, no email actually sent). Latent since the form first shipped; surfaced during the rate-limit verification when terminal logs showed `honeypot tripped` on a hand-typed test submission. Server action's honeypot lookup updated to match.
+
 ## 2026-06-15
 
 - fix: drop the explicit `_status: { equals: "published" }` filter from the blog list query, the `findPostBySlug` detail query, the `generateStaticParams` build-time query, and the sitemap query. With `versions: { drafts: true }` enabled on the `blog-posts` collection, Payload's default `find` (i.e. `draft: false`) already excludes documents whose latest version is a draft — so the explicit `_status` filter was redundant. It was also actively buggy: combined with a non-ASCII slug value (the imported Регламент post with a Cyrillic slug), it returned 0 matches even though the row existed in the DB with `_status: 'published'`. Hex-byte comparison of the URL param vs the stored slug confirmed they were identical. Removing the filter resolves the 404 and is closer to the idiomatic Payload pattern.

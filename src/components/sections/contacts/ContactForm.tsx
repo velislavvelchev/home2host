@@ -15,8 +15,12 @@ import {
 // with progressive enhancement (no JS = native HTML form post).
 //
 // Honeypot field: hidden offscreen (NOT `display:none` since some bots
-// skip those), aria-hidden, tabIndex=-1, autoComplete="off". Bots that
-// blindly fill every input get caught; humans never see or focus it.
+// skip those), aria-hidden, tabIndex=-1. Bots that blindly fill every
+// input get caught; humans never see or focus it. The field name is
+// deliberately NOT a common autofill target ("website", "url", "email",
+// "phone") — Chrome and password managers fill those even on hidden
+// fields with autoComplete="off", which would silently reject legitimate
+// submissions. See the input attributes below for the full opt-out set.
 
 const inputClass =
   "block w-full rounded-md border border-border bg-surface px-3 py-2 text-base text-foreground placeholder:text-foreground-muted/70 transition-colors focus:border-brand-600 focus:outline-none focus:ring-2 focus:ring-brand-600/30 disabled:cursor-not-allowed disabled:opacity-60";
@@ -49,15 +53,18 @@ export function ContactForm() {
         aria-hidden="true"
         className="pointer-events-none absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
       >
-        <label htmlFor="contact-website">
+        <label htmlFor="contact-h2h-confirm">
           Не попълвайте това поле — то е за защита от спам.
         </label>
         <input
-          id="contact-website"
-          name="website"
+          id="contact-h2h-confirm"
+          name="h2h_confirm"
           type="text"
           tabIndex={-1}
-          autoComplete="off"
+          autoComplete="new-password"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          data-form-type="other"
         />
       </div>
 

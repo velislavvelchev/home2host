@@ -108,7 +108,10 @@ export async function submitContact(
 
   // Honeypot — hidden field that only bots fill in. We silently return
   // "success" so bots get no feedback that the form rejected them.
-  const honeypot = String(formData.get("website") ?? "");
+  // The field name must NOT be a common autofill target ("website",
+  // "url", "email", "phone") or Chrome and password managers will fill
+  // it for legit users, silently rejecting their submissions.
+  const honeypot = String(formData.get("h2h_confirm") ?? "");
   if (honeypot.length > 0) {
     console.log("[contact-form] honeypot tripped — silently succeeding");
     return { status: "success", message: "Благодарим! Ще се свържем с вас скоро." };
