@@ -87,3 +87,5 @@ npm run dev                           # localhost:3000 (admin at /admin)
 See `docs/decisions/0001-payload-vs-headless-wp.md` for the reasoning behind choosing Payload over headless WordPress.
 See `docs/decisions/0002-database-provider.md` for Neon vs Supabase.
 See `docs/decisions/0003-styling-approach.md` for Tailwind v4 vs CSS Modules vs CSS-in-JS.
+See `docs/decisions/0004-media-storage-adapter.md` for Vercel Blob vs Cloudflare R2 / S3 / UploadThing.
+See `docs/decisions/0005-i18n-url-structure.md` for path prefix (`/en/...`) vs subdomain vs cookie-based switching.
