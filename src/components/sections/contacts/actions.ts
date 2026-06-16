@@ -5,6 +5,7 @@
 // that file's header for the why.
 
 import nodemailer from "nodemailer";
+import { checkContactRateLimit } from "@/lib/rateLimit";
 import type { ContactFormState } from "./formState";
 
 // Server action invoked by the Contacts form. Validates input, checks the
@@ -102,10 +103,6 @@ export async function submitContact(
   _prevState: ContactFormState,
   formData: FormData,
 ): Promise<ContactFormState> {
-  // Diagnostic — surfaces in Vercel Functions logs so we can confirm the
-  // action is being invoked and see how far it gets before failing.
-  console.log("[contact-form] submitContact invoked");
-
   // Honeypot — hidden field that only bots fill in. We silently return
   // "success" so bots get no feedback that the form rejected them.
   // The field name must NOT be a common autofill target ("website",
@@ -113,13 +110,28 @@ export async function submitContact(
   // it for legit users, silently rejecting their submissions.
   const honeypot = String(formData.get("h2h_confirm") ?? "");
   if (honeypot.length > 0) {
+    // Keep this log — it's a low-frequency abuse signal worth seeing in
+    // Vercel logs if the form starts getting hammered.
     console.log("[contact-form] honeypot tripped — silently succeeding");
     return { status: "success", message: "Благодарим! Ще се свържем с вас скоро." };
   }
 
+  // Per-IP rate limit. Runs after the honeypot (cheap, in-process) but
+  // before validation and SMTP so a flood of invalid payloads still gets
+  // throttled. Fails open if Upstash isn't configured — see src/lib/rateLimit.ts.
+  const rateLimit = await checkContactRateLimit();
+  if (!rateLimit.allowed) {
+    // Same rationale as the honeypot log — abuse-frequency signal, not noise.
+    console.log("[contact-form] rate limit exceeded");
+    return {
+      status: "error",
+      message:
+        "Получили сме няколко съобщения от вашия адрес. Моля, опитайте отново след малко или ни пишете директно на info@home2host.com.",
+    };
+  }
+
   const validated = validate(formData);
   if (typeof validated === "string") {
-    console.log("[contact-form] validation failed:", validated);
     return { status: "error", message: validated };
   }
 
@@ -152,11 +164,6 @@ export async function submitContact(
   // letting the error bubble out of the server action as an HTTP 500
   // (which would dump the user on Vercel's generic error page).
   try {
-    console.log("[contact-form] creating transporter", {
-      host: smtpHost,
-      port: smtpPort,
-      user: smtpUser,
-    });
     const transporter = nodemailer.createTransport({
       host: smtpHost,
       port: smtpPort,
@@ -164,7 +171,6 @@ export async function submitContact(
       auth: { user: smtpUser, pass: smtpPassword },
     });
     const email = buildEmail(validated);
-    console.log("[contact-form] sending mail");
     await transporter.sendMail({
       from: `Home2Host сайт <${smtpUser}>`,
       to: recipient,
@@ -175,7 +181,6 @@ export async function submitContact(
       text: email.text,
       html: email.html,
     });
-    console.log("[contact-form] sendMail succeeded");
     return {
       status: "success",
       message: "Благодарим! Ще се свържем с вас скоро.",
