@@ -104,7 +104,12 @@ export function PricesSection({ headingLevel = "h2" }: PricesSectionProps) {
           до пълно управление и интериорно обновяване.
         </p>
 
-        <ul className="mt-16 grid gap-6 md:grid-cols-3 md:gap-8">
+        {/* 3-col grid only kicks in at `lg` (≥1024) — at `md` (768) the
+            cards would be ~225px wide each, cramping the long Bulgarian
+            feature text into narrow ribbons. Stacking at 768 gives each
+            card the full content width to breathe; 1024+ still gets the
+            scannable three-up layout. */}
+        <ul className="mt-16 grid gap-6 lg:grid-cols-3 lg:gap-8">
           {plans.map((plan, index) => {
             const Icon = plan.icon;
             // Numeric prices get the unit treatment (split typography);
