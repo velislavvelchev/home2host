@@ -1,19 +1,19 @@
 {
   "SiteMetadata": {
-    "title": "Home2Host — Управление на имоти в Банско и Бургас",
-    "description": "Професионално управление на имоти за краткосрочен наем в Банско и Бургас. Обяви, комуникация с гости, почистване и поддръжка.",
-    "ogShortDescription": "Професионално управление на имоти за краткосрочен наем в Банско и Бургас.",
-    "ogImageAlt": "Home2Host — управление на имоти в Банско и Бургас",
-    "ogLocale": "bg_BG"
+    "title": "Home2Host — Property management in Bansko and Burgas",
+    "description": "Professional management of short-term rental properties in Bansko and Burgas. Listings, guest communication, cleaning, and maintenance.",
+    "ogShortDescription": "Professional management of short-term rental properties in Bansko and Burgas.",
+    "ogImageAlt": "Home2Host — property management in Bansko and Burgas",
+    "ogLocale": "en_US"
   },
   "StructuredData": {
-    "description": "Професионално управление на имоти за краткосрочен наем в Банско и Бургас. Обяви, комуникация с гости, почистване и поддръжка.",
-    "addressStreet": "ул. Кралев двор 5",
-    "addressLocality": "Банско",
-    "areaServed": ["Банско", "Бургас"]
+    "description": "Professional management of short-term rental properties in Bansko and Burgas. Listings, guest communication, cleaning, and maintenance.",
+    "addressStreet": "ul. Kralev Dvor 5",
+    "addressLocality": "Bansko",
+    "areaServed": ["Bansko", "Burgas"]
   },
   "Header": {
-    "logoAriaLabel": "Home2Host — начало",
+    "logoAriaLabel": "Home2Host — home",
     "openMenu": "Open menu",
     "closeMenu": "Close menu",
     "menuTitle": "Menu",
@@ -21,247 +21,249 @@
     "ariaMobile": "Mobile"
   },
   "Nav": {
-    "aboutUs": "За нас",
-    "services": "Услуги",
-    "apartments": "Апартаменти",
-    "prices": "Цени",
-    "questions": "Въпроси",
-    "blog": "Блог",
-    "contacts": "Контакти"
+    "aboutUs": "About us",
+    "services": "Services",
+    "apartments": "Apartments",
+    "prices": "Pricing",
+    "questions": "FAQ",
+    "blog": "Blog",
+    "contacts": "Contact"
   },
   "Footer": {
-    "tagline": "Управление на имоти за краткосрочен наем в Банско и Бургас.",
-    "sitemapHeading": "Карта на сайта",
-    "contactsHeading": "Контакти",
-    "emailLabel": "Имейл",
-    "regionsLabel": "Райони",
-    "regionsValue": "Банско · Бургас",
-    "rights": "© {year} Home2Host. Всички права запазени.",
-    "location": "Банско · Бургас, България"
+    "tagline": "Short-term rental property management in Bansko and Burgas.",
+    "sitemapHeading": "Sitemap",
+    "contactsHeading": "Contact",
+    "emailLabel": "Email",
+    "regionsLabel": "Regions",
+    "regionsValue": "Bansko · Burgas",
+    "rights": "© {year} Home2Host. All rights reserved.",
+    "location": "Bansko · Burgas, Bulgaria"
   },
   "FloatingCall": {
-    "ariaLabel": "Обадете се: {phone}"
+    "ariaLabel": "Call us: {phone}"
   },
   "Hero": {
-    "eyebrow": "Кратък наем · Банско и Бургас",
-    "title": "Управление на имоти в <highlight>Банско и Бургас</highlight>.",
-    "lead": "Home2Host се грижи за цялостното управление на имота ви за краткосрочен наем — от професионалните обяви и комуникацията с гостите до почистването и поддръжката. Вие получавате доходи, ние се грижим за всичко останало.",
-    "ctaPrimary": "Свържете се с нас",
-    "ctaSecondary": "Виж услугите",
-    "imageAlt": "Светъл хол с панорамни прозорци, дървен таван и басейн зад стъклените врати"
+    "eyebrow": "Short-term rental · Bansko and Burgas",
+    "title": "Property management in <highlight>Bansko and Burgas</highlight>.",
+    "lead": "Home2Host takes care of every part of running your short-term rental — from professional listings and guest communication to cleaning and maintenance. You earn the income; we handle the rest.",
+    "ctaPrimary": "Get in touch",
+    "ctaSecondary": "See our services",
+    "imageAlt": "Bright living room with panoramic windows, a wooden ceiling, and a pool behind the glass doors"
   },
   "About": {
-    "eyebrow": "За нас",
-    "heading": "Кои сме ние?",
-    "paragraph1": "Home2Host е компания, създадена с цел да осигури професионално управление на имоти за краткосрочен наем. Отдаването на имоти за краткосрочен наем чрез платформи като Airbnb, Booking и други, става все по-популярно и предпочитано. Това дава възможност на собствениците не само да получават допълнителен доход от имота си, но и да го използват при нужда.",
-    "paragraph2": "Тази дейност обаче изисква време и усилия – почистване, комуникация с гостите, посрещане, настаняване и регулиране на цените. Home2Host поема всички тези ангажименти и се грижи за цялостното управление на имота ви, като се фокусира върху оптимизацията и максимизирането на доходите ви.",
-    "metaTitle": "За нас | Home2Host",
-    "metaDescription": "Home2Host е компания за професионално управление на имоти за краткосрочен наем в Банско и Бургас."
+    "eyebrow": "About us",
+    "heading": "Who we are",
+    "paragraph1": "Home2Host is a company built to deliver professional management of short-term rental properties. Renting out properties on Airbnb, Booking, and similar platforms keeps getting more popular — it lets owners earn extra income from their home while still being able to use it when they need to.",
+    "paragraph2": "But it takes time and effort: cleaning, guest communication, check-ins, pricing decisions. Home2Host takes all of that off your plate and runs the whole operation for you, with a focus on optimising occupancy and maximising your revenue.",
+    "metaTitle": "About us | Home2Host",
+    "metaDescription": "Home2Host is a company offering professional management of short-term rental properties in Bansko and Burgas."
   },
   "Services": {
-    "eyebrow": "Услуги",
-    "heading": "Какво правим за вас",
-    "lead": "Цялостно управление на имота ви за краткосрочен наем — от обявата до посрещането на гостите.",
-    "closing": "Ние се грижим за гостите, вие се наслаждавайте на останалото.",
+    "eyebrow": "Services",
+    "heading": "What we do for you",
+    "lead": "End-to-end management of your short-term rental — from the listing to welcoming the guests.",
+    "closing": "We take care of the guests, you enjoy the rest.",
     "items": [
       {
-        "title": "Професионално създаване на профил",
-        "body": "Създаваме и поддържаме профила на вашия имот така, че да изпъква сред конкуренцията. Внимаваме във всеки детайл — от описанието до представянето на удобствата — за да привличаме повече резервации. Използваме подбрани професионални снимки, които визуално подчертават силните страни на имота.",
-        "imageAlt": "Стилно подредена стенна композиция с дървени касетки и растения"
+        "title": "Professional listing setup",
+        "body": "We build and maintain your property's listing so it stands out from the competition. We pay attention to every detail — from the copy to the amenity layout — to attract more bookings. We use curated professional photography that visually highlights what makes your place special.",
+        "imageAlt": "A stylish wall arrangement with wooden cubbies and plants"
       },
       {
-        "title": "Динамично ценообразуване",
-        "body": "Изграждаме интелигентна ценова стратегия, която се адаптира към реалните пазарни условия. Алгоритъмът ни следи тенденции, сезонни промени и местни събития, за да предлага най-подходящите цени и условия за престой. Така увеличаваме заетостта и максимизираме приходите ви в Airbnb, Booking и други платформи.",
-        "imageAlt": "Калкулатор, банкноти и монети върху работен бюджетен лист"
+        "title": "Dynamic pricing",
+        "body": "We build an intelligent pricing strategy that adapts to real market conditions. Our algorithm tracks trends, seasonal shifts, and local events to recommend the right price and stay terms. The result: higher occupancy and more revenue across Airbnb, Booking, and other platforms.",
+        "imageAlt": "A calculator, banknotes, and coins on a working budget sheet"
       },
       {
-        "title": "Комуникация и настаняване",
-        "body": "Поемаме цялата комуникация с гостите — преди, по време и след престоя им — с бързи отговори, лично отношение и отлично впечатление. Посрещаме ги в удобно за тях време и им предоставяме персонален гид с препоръки за забележителности, заведения и полезни контакти.",
-        "imageAlt": "Две ръце държат внимателно дървен модел на къща"
+        "title": "Communication and check-in",
+        "body": "We handle all guest communication — before, during, and after the stay — with fast replies, a personal touch, and a great impression every time. We check guests in at a time that works for them and hand them a personalised guide with attractions, restaurants, and useful contacts.",
+        "imageAlt": "Two hands carefully holding a wooden house model"
       },
       {
-        "title": "Поддръжка и почистване",
-        "body": "Имотът ви винаги блести в перфектно състояние. След всеки престой осигуряваме свежо изпрани спално бельо и кърпи, заредени консумативи и безупречна чистота. При възникнал проблем разполагаме с надежден екип техници, които реагират бързо и ефективно.",
-        "imageAlt": "Камериерка подрежда възглавници върху прясно оправено легло"
+        "title": "Maintenance and cleaning",
+        "body": "Your property always looks its best. After every stay we provide freshly laundered linens and towels, restocked supplies, and immaculate cleaning. If something breaks we have a reliable team of technicians who respond quickly and effectively.",
+        "imageAlt": "A housekeeper arranging pillows on a freshly made bed"
       },
       {
-        "title": "Интериорен дизайн",
-        "body": "Наш дизайнер се грижи имотът ви да изглежда не просто подреден, а привлекателен и уютен. Чрез освежаващо боядисване, стилни декорации и внимателно подбрани детайли пространството се превръща в истинско бижу — малките щрихи създават голямата картина и носят по-високи приходи.",
-        "imageAlt": "Мостри от текстил, дървесина и цветова палитра върху работна маса"
+        "title": "Interior design",
+        "body": "Our designer makes sure your property feels not just tidy but inviting and warm. Through a refresh of the paint, considered decoration, and carefully chosen details, the space becomes a genuine little gem — and the small touches add up to a bigger picture, and higher revenue.",
+        "imageAlt": "Fabric, wood, and colour-palette samples on a working table"
       },
       {
-        "title": "Сигурност",
-        "body": "Подбираме гостите внимателно и работим само с проверени профили и високорейтингови потребители. Процесът на настаняване гарантира спокойствие за вас и комфорт за тях — защото безопасността е ключът към безпроблемен престой и повече 5-звездни отзиви.",
-        "imageAlt": "Спокоен диван със скандинавски възглавници и ваза с цветя"
+        "title": "Security",
+        "body": "We screen guests carefully and work only with verified profiles and high-rated travellers. The check-in process gives you peace of mind and them genuine comfort — because safety is the key to a trouble-free stay and more 5-star reviews.",
+        "imageAlt": "A peaceful sofa with Scandinavian pillows and a vase of flowers"
       }
     ],
-    "metaTitle": "Услуги | Home2Host",
-    "metaDescription": "Цялостно управление на имоти за краткосрочен наем — професионални обяви, динамично ценообразуване, комуникация с гости, почистване, поддръжка и сигурност."
+    "metaTitle": "Services | Home2Host",
+    "metaDescription": "End-to-end short-term rental management — professional listings, dynamic pricing, guest communication, cleaning, maintenance, and security."
   },
   "Apartments": {
-    "eyebrow": "Апартаменти",
-    "heading": "Нашите апартаменти",
-    "lead": "10 имота в Банско и Бургас — управлявани от Home2Host. Резервирайте директно през Airbnb.",
-    "ratingNew": "Нов",
+    "eyebrow": "Apartments",
+    "heading": "Our apartments",
+    "lead": "10 properties in Bansko and Burgas — managed by Home2Host. Book directly through Airbnb.",
+    "ratingNew": "New",
     "cities": {
-      "bansko": "Банско",
-      "burgas": "Бургас"
+      "bansko": "Bansko",
+      "burgas": "Burgas"
     },
-    "carouselPrev": "Предишни апартаменти",
-    "carouselNext": "Следващи апартаменти",
-    "metaTitle": "Апартаменти | Home2Host",
-    "metaDescription": "10 имота за краткосрочен наем в Банско и Бургас, управлявани от Home2Host. Разглеждайте и резервирайте директно през Airbnb."
+    "carouselPrev": "Previous apartments",
+    "carouselNext": "Next apartments",
+    "metaTitle": "Apartments | Home2Host",
+    "metaDescription": "10 short-term rental properties in Bansko and Burgas, managed by Home2Host. Browse and book directly through Airbnb."
   },
   "Prices": {
-    "eyebrow": "Цени",
-    "heading": "Изберете подходящия план за вас",
-    "lead": "Три различни оферти за различни нужди — от еднократно стартиране до пълно управление и интериорно обновяване.",
-    "cta": "Свържете се с нас",
+    "eyebrow": "Pricing",
+    "heading": "Pick the plan that fits you",
+    "lead": "Three different offers for different needs — from a one-off launch to full management to an interior refresh.",
+    "cta": "Get in touch",
     "plans": [
       {
         "name": "Start Smart",
-        "cadence": "Еднократна услуга",
+        "cadence": "One-off service",
         "price": "200",
         "priceUnit": "EUR",
         "features": [
-          "Създаване и настройка на профил на имота в Airbnb и Booking.com",
-          "Професионална фотосесия на имота",
-          "Пазарно проучване и ценово таргетиране",
-          "Оглед на имота и интериорна консултация",
-          "Изграждане на система за самонастаняване"
+          "Listing setup on Airbnb and Booking.com",
+          "Professional photoshoot of the property",
+          "Market research and price targeting",
+          "On-site visit and interior consultation",
+          "Self check-in setup"
         ]
       },
       {
         "name": "Full Care",
-        "cadence": "От нетния приход от резервации",
+        "cadence": "Of net booking revenue",
         "price": "25",
         "priceUnit": "%",
         "features": [
-          "Пълен мениджмънт на имота от А до Я",
-          "Оптимизация на обяви, календари и ценообразуване",
-          "Динамична ценова стратегия според търсене, дни и събития",
-          "Организация на професионално почистване с чеклист",
-          "Зареждане с чисто бельо, кърпи и консумативи",
-          "Self check-in и комуникация с гости на български, английски, немски и руски"
+          "End-to-end property management, top to bottom",
+          "Listing, calendar, and pricing optimisation",
+          "Dynamic pricing strategy by demand, day, and events",
+          "Professional cleaning with a checklist",
+          "Fresh linens, towels, and supplies for every guest",
+          "Self check-in and guest communication in Bulgarian, English, German, and Russian"
         ]
       },
       {
         "name": "Home Refresh",
-        "cadence": "Индивидуална оферта според нуждите на имота",
-        "price": "Индивидуална оферта",
+        "cadence": "Custom quote based on the property's needs",
+        "price": "Custom quote",
         "features": [
-          "Декориране и обновяване на интериора след оглед на имота",
-          "Освежаване на стени (боя, тапети, картини)",
-          "Подбор и аранжиране на декоративни елементи (възглавници, вази, сувенири и др.)"
+          "Decoration and interior refresh after an on-site visit",
+          "Wall refresh (paint, wallpaper, art)",
+          "Selection and styling of decorative pieces (pillows, vases, accents, and more)"
         ]
       }
     ],
-    "metaTitle": "Цени | Home2Host",
-    "metaDescription": "Три плана за управление на имоти за краткосрочен наем — Start Smart за стартиране, Full Care за пълен мениджмънт и Home Refresh за интериорно обновяване."
+    "metaTitle": "Pricing | Home2Host",
+    "metaDescription": "Three plans for short-term rental management — Start Smart to launch, Full Care for full management, and Home Refresh for an interior refresh."
   },
   "Faq": {
-    "eyebrow": "Въпроси",
-    "heading": "Често задавани въпроси",
-    "lead": "Отговорите на най-честите въпроси, които получаваме от собственици на имоти. Не намирате своя? Свържете се с нас.",
+    "eyebrow": "FAQ",
+    "heading": "Frequently asked questions",
+    "lead": "Answers to the questions we hear most often from property owners. Can't find yours? Get in touch.",
     "items": [
       {
-        "question": "Кои апартаменти са подходящи за краткосрочни наеми?",
-        "answer": "Най-добре се отдават имоти в центъра или в близост до ключови забележителности, които привличат туристи. Апартаменти със свеж ремонт и модерна декорация изпъкват пред конкуренцията, без да е нужно скъпо обзавеждане. Важно е имотът да е функционален, безопасен и поддържан, тъй като комфортът на гостите е ключът към високи приходи."
+        "question": "Which apartments are a good fit for short-term rental?",
+        "answer": "Properties in the centre or close to key attractions tend to perform best — they draw in tourists. Apartments with a fresh refurbishment and modern decor stand out from the competition without needing expensive furniture. What matters is that the property is functional, safe, and well-maintained, since guest comfort is the key to strong revenue."
       },
       {
-        "question": "Какви са регулациите и данъците?",
-        "answer": "Всеки имот за краткосрочен наем трябва да бъде регистриран в общината като място за настаняване клас В и вписан в Единната система за туристическа информация (ЕСТИ). Собствениците са длъжни да подават данни за туристите и да плащат туристически данък, а в някои случаи и патентен или ДДС. Така се гарантира, че дейността е напълно законна и прозрачна."
+        "question": "What about regulations and taxes?",
+        "answer": "Every short-term rental property has to be registered with the municipality as a Class B accommodation and entered into the Unified System for Tourist Information (ESTI). Owners are required to submit guest data and pay the tourist tax, and in some cases also a patent tax or VAT. This keeps the activity fully legal and transparent."
       },
       {
-        "question": "Може ли Home2Host да ми помогне да определя най-добрата цена за моята обява?",
-        "answer": "Ще направим конкурентно проучване на пазара и ще определим каква е най-добрата цена за вашата обява в Airbnb и Booking. Вярваме в динамичното ценообразуване и работим с алгоритми и инструменти, създадени от експерти, с които се изчислява оптималната цена за даден период, взимайки предвид всички фактори."
+        "question": "Can Home2Host help me set the right price for my listing?",
+        "answer": "We run a competitive market analysis and set the right price for your listing on Airbnb and Booking. We believe in dynamic pricing and use algorithms and tools built by experts that calculate the optimal price for each period, taking every factor into account."
       },
       {
-        "question": "Могат ли съседите да ми забранят да отдавам апартамента си краткосрочно?",
-        "answer": "Не, съседите не могат да ви забранят да отдавате апартамента си краткосрочно. Регистрацията на имота като място за настаняване клас B, съгласно Закона за туризма, не изисква съгласие от съседите. Въпреки това, общото събрание на етажната собственост има право да определи входна такса, която може да бъде от 3 до 5 пъти по-висока за апартамент, отдаван краткосрочно и регистриран за тази дейност."
+        "question": "Can my neighbours stop me from renting my apartment short-term?",
+        "answer": "No, neighbours can't stop you from renting your apartment short-term. Registering the property as Class B accommodation under the Tourism Act doesn't require neighbour approval. That said, the building's general assembly does have the right to set an entrance fee that can be 3 to 5 times higher for an apartment used and registered for short-term rental."
       },
       {
-        "question": "Как се изчислява комисионната на Home2Host?",
-        "answer": "Комисионната за управление от Home2Host е 25% от нетния приход, който сте получили от платформата, след като се приспадне таксата за почистване. Тя се изчислява след приспадане на комисионната на съответната платформа — Airbnb, Booking.com или друга. Това означава, че плащате комисионната единствено върху реално постъпилите средства, като осигуряваме максимална прозрачност и яснота в изчисленията."
+        "question": "How is Home2Host's commission calculated?",
+        "answer": "Home2Host's management commission is 25% of the net revenue you receive from the platform after the cleaning fee is deducted. It's calculated after the platform's own commission (Airbnb, Booking.com, or other) has been taken out. That means you only pay commission on the money that actually lands in your account — full transparency and clarity in the maths."
       },
       {
-        "question": "Какви разходи има по време на отдаването?",
-        "answer": "Разходите за собственика по време на отдаването включват всички битови сметки като ток, вода и интернет, както и входните такси съгласно ЗУЕС. Освен това собственикът е отговорен за плащането на всички данъци, свързани с отдаването под наем — туристически данък, патентен данък и други, както и данъците, възникващи вследствие на получаването на доход."
+        "question": "What costs does the owner have during rental?",
+        "answer": "Owner costs during rental include all utilities — electricity, water, internet — and the building fees under the Bulgarian common-property act. The owner is also responsible for all taxes related to the rental activity (tourist tax, patent tax, and others), as well as income taxes on the rental earnings."
       },
       {
-        "question": "Ще има ли щети по имота ми?",
-        "answer": "Щети и амортизация могат да възникнат при всякакъв вид отдаване. При краткосрочно отдаване те се отстраняват незабавно, за да бъде имотът готов за следващите гости. Home2Host осигурява професионално и своевременно отстраняване на щетите и съдействие за обезщетение чрез Aircover застраховката на Airbnb, ако е приложимо."
+        "question": "Will there be damage to my property?",
+        "answer": "Damage and wear can occur with any kind of rental. With short-term rental, it gets fixed immediately so the property is ready for the next guests. Home2Host arranges professional and timely repairs and supports the compensation process through Airbnb's Aircover insurance, where applicable."
       }
     ],
-    "metaTitle": "Често задавани въпроси | Home2Host",
-    "metaDescription": "Отговори на най-честите въпроси за управлението на имоти за краткосрочен наем — регулации, ценообразуване, комисионна и още."
+    "metaTitle": "Frequently asked questions | Home2Host",
+    "metaDescription": "Answers to the most common questions about short-term rental property management — regulations, pricing, commission, and more."
   },
   "Contacts": {
-    "eyebrow": "Контакти",
-    "heading": "Свържете се с нас",
-    "lead": "Имате имот, който искате да отдавате под наем? Или въпрос за нашите услуги? Пишете ни — отговаряме в рамките на работния ден.",
-    "serviceAreaHeading": "Къде работим?",
-    "serviceAreaBody": "Home2Host управлява имоти на територията на Бургас, Банско и околните региони. Осигуряваме надеждно управление и добра доходност за вашия имот.",
-    "phoneHeading": "Телефон",
-    "emailHeading": "Имейл",
-    "addressHeading": "Адрес",
-    "address": "2770 гр. Банско, ул. Кралев двор №5",
-    "whatsappCta": "Пишете ни в WhatsApp",
-    "whatsappPrefill": "Здравейте, имам въпрос относно управление на имот.",
-    "socialLabel": "Социални мрежи",
-    "formHeading": "Изпратете запитване",
-    "formRequiredNote": "Полетата със звездичка са задължителни.",
-    "metaTitle": "Контакти | Home2Host",
-    "metaDescription": "Свържете се с Home2Host за управление на имота ви за краткосрочен наем в Бургас, Банско и околните региони — телефон, имейл, WhatsApp и форма за запитване."
+    "eyebrow": "Contact",
+    "heading": "Get in touch",
+    "lead": "Have a property you want to rent out? A question about our services? Write to us — we reply within the working day.",
+    "serviceAreaHeading": "Where we work",
+    "serviceAreaBody": "Home2Host manages properties in Burgas, Bansko, and the surrounding regions. We provide reliable management and solid returns on your property.",
+    "phoneHeading": "Phone",
+    "emailHeading": "Email",
+    "addressHeading": "Address",
+    "address": "2770 Bansko, ul. Kralev Dvor 5",
+    "whatsappCta": "Message us on WhatsApp",
+    "whatsappPrefill": "Hello, I have a question about property management.",
+    "socialLabel": "Social",
+    "formHeading": "Send an inquiry",
+    "formRequiredNote": "Fields marked with an asterisk are required.",
+    "metaTitle": "Contact | Home2Host",
+    "metaDescription": "Get in touch with Home2Host about managing your short-term rental property in Burgas, Bansko, and the surrounding regions — phone, email, WhatsApp, and an inquiry form."
   },
   "ContactForm": {
-    "nameLabel": "Име",
-    "emailLabel": "Имейл",
-    "phoneLabel": "Телефон",
-    "phoneOptional": "(по желание)",
-    "messageLabel": "Съобщение",
-    "messagePlaceholder": "Опишете накратко вашето запитване...",
-    "submit": "Изпрати запитване",
-    "submitting": "Изпращане...",
-    "honeypotLabel": "Не попълвайте това поле — то е за защита от спам.",
-    "successMessage": "Благодарим! Ще се свържем с вас скоро.",
+    "nameLabel": "Name",
+    "emailLabel": "Email",
+    "phoneLabel": "Phone",
+    "phoneOptional": "(optional)",
+    "messageLabel": "Message",
+    "messagePlaceholder": "Briefly describe your inquiry...",
+    "submit": "Send inquiry",
+    "submitting": "Sending...",
+    "honeypotLabel": "Don't fill this field — it's a spam protection.",
+    "successMessage": "Thanks! We'll get back to you soon.",
     "errors": {
-      "nameRequired": "Моля, въведете вашето име.",
-      "nameTooLong": "Името е твърде дълго.",
-      "emailRequired": "Моля, въведете вашия имейл адрес.",
-      "emailTooLong": "Имейлът е твърде дълъг.",
-      "emailInvalid": "Моля, въведете валиден имейл адрес.",
-      "phoneTooLong": "Телефонният номер е твърде дълъг.",
-      "messageRequired": "Моля, опишете накратко вашето запитване.",
-      "messageTooLong": "Съобщението е твърде дълго.",
-      "rateLimit": "Получили сме няколко съобщения от вашия адрес. Моля, опитайте отново след малко или ни пишете директно на info@home2host.com.",
-      "smtpMisconfigured": "Формата не е напълно конфигурирана. Моля, свържете се с нас по телефон или имейл.",
-      "sendFailed": "Възникна грешка при изпращането. Моля, опитайте отново или ни пишете на info@home2host.com."
+      "nameRequired": "Please enter your name.",
+      "nameTooLong": "Your name is too long.",
+      "emailRequired": "Please enter your email address.",
+      "emailTooLong": "Your email is too long.",
+      "emailInvalid": "Please enter a valid email address.",
+      "phoneTooLong": "Your phone number is too long.",
+      "messageRequired": "Please briefly describe your inquiry.",
+      "messageTooLong": "Your message is too long.",
+      "rateLimit": "We've received several messages from your address. Please try again in a moment, or write to us directly at info@home2host.com.",
+      "smtpMisconfigured": "The form isn't fully configured. Please contact us by phone or email.",
+      "sendFailed": "Something went wrong while sending. Please try again or write to us at info@home2host.com."
     }
   },
   "Blog": {
-    "eyebrow": "Блог",
-    "heading": "Идеи и практически съвети",
-    "lead": "Какво научаваме от управлението на десетки имоти в Банско и Бургас — регулации, ценообразуване, гости и обзавеждане.",
-    "back": "Всички статии",
-    "byAuthor": "От {author}",
-    "emptyHeading": "Скоро ще публикуваме първите статии.",
-    "emptyBody": "Подготвяме съдържание за собственици на имоти за краткосрочен наем в Банско и Бургас. Върнете се скоро.",
+    "eyebrow": "Blog",
+    "heading": "Ideas and practical advice",
+    "lead": "What we learn from managing dozens of properties in Bansko and Burgas — regulations, pricing, guests, and furnishing.",
+    "back": "All articles",
+    "byAuthor": "By {author}",
+    "emptyHeading": "We'll publish the first articles soon.",
+    "emptyBody": "We're preparing content for owners of short-term rental properties in Bansko and Burgas. Check back soon.",
+    "onlyInBulgarianBadge": "Only in Bulgarian",
+    "onlyInBulgarianNotice": "This article hasn't been translated to English yet — the original Bulgarian text is shown below.",
     "months": [
-      "януари",
-      "февруари",
-      "март",
-      "април",
-      "май",
-      "юни",
-      "юли",
-      "август",
-      "септември",
-      "октомври",
-      "ноември",
-      "декември"
+      "January",
+      "February",
+      "March",
+      "April",
+      "May",
+      "June",
+      "July",
+      "August",
+      "September",
+      "October",
+      "November",
+      "December"
     ],
-    "metaTitle": "Блог | Home2Host",
-    "metaDescription": "Полезни статии за собственици на имоти за краткосрочен наем: управление, динамично ценообразуване, регулации и съвети от Home2Host."
+    "metaTitle": "Blog | Home2Host",
+    "metaDescription": "Useful articles for owners of short-term rental properties: management, dynamic pricing, regulations, and tips from Home2Host."
   }
 }

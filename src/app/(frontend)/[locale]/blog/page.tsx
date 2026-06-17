@@ -1,14 +1,20 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 import { getPayloadInstance } from "@/lib/payload";
+import { routing, type Locale } from "@/i18n/routing";
 import type { BlogPost, Media } from "@/payload-types";
 
 type Params = { locale: string };
+
+// On the EN route, posts whose EN fields haven't been filled show a
+// "Only in Bulgarian" badge. The flag auto-clears as soon as the owner
+// fills the post's EN title in Payload (the next request picks it up).
+type CardPost = BlogPost & { isUntranslated: boolean };
 
 // Unlike the section routes, the blog is a genuinely separate page —
 // no canonical-to-home, no on-home embed. It owns its own URL.
@@ -39,34 +45,71 @@ export default async function BlogIndexPage({
 }: {
   params: Promise<Params>;
 }) {
-  const { locale } = await params;
+  const { locale: rawLocale } = await params;
+  // See [slug]/page.tsx for why we widen here. The layout has already
+  // validated against `routing.locales` via `hasLocale`.
+  const locale = rawLocale as Locale;
   setRequestLocale(locale);
 
   const payload = await getPayloadInstance();
 
+  // Primary fetch: with fallback enabled so untranslated posts fall
+  // back to the BG values and we always have something to render.
+  //
   // No `_status` filter — see /blog/[slug]/page.tsx for the full
   // reasoning. With `versions: { drafts: true }` on the collection,
   // Payload's default find already excludes draft-only documents,
   // and the explicit filter was producing 0-match results when
   // combined with non-ASCII slug values.
-  //
-  // Locale-aware blog field loading lands in slice 3; for now the
-  // posts are fetched in BG regardless of URL locale (matches the
-  // rest of the marketing content in slice 2).
   const { docs } = await payload.find({
     collection: "blog-posts",
     sort: "-publishedAt",
     limit: 24,
-    locale: "bg",
+    locale,
     depth: 1, // populate the featuredImage relation
   });
 
-  const posts = docs as BlogPost[];
+  // Translation-status probe: second pass for the same locale, this
+  // time with fallback disabled, so untranslated fields come back as
+  // null. We use it to flag cards that need the "only in Bulgarian"
+  // badge. Skipped entirely on the default locale — by definition
+  // every post has content in BG.
+  const untranslatedIds = await detectUntranslatedIds(locale, docs as BlogPost[]);
+
+  const posts: CardPost[] = (docs as BlogPost[]).map((p) => ({
+    ...p,
+    isUntranslated: untranslatedIds.has(String(p.id)),
+  }));
 
   return <BlogView posts={posts} />;
 }
 
-function BlogView({ posts }: { posts: BlogPost[] }) {
+async function detectUntranslatedIds(
+  locale: Locale,
+  posts: BlogPost[],
+): Promise<Set<string>> {
+  if (locale === routing.defaultLocale || posts.length === 0) {
+    return new Set();
+  }
+  const payload = await getPayloadInstance();
+  const { docs } = await payload.find({
+    collection: "blog-posts",
+    where: { id: { in: posts.map((p) => p.id) } },
+    limit: posts.length,
+    locale,
+    fallbackLocale: false,
+    depth: 0,
+  });
+  // A null/empty title is the cleanest proxy for "not yet translated"
+  // — owners who localize a post fill the title first.
+  return new Set(
+    (docs as BlogPost[])
+      .filter((d) => !d.title)
+      .map((d) => String(d.id)),
+  );
+}
+
+function BlogView({ posts }: { posts: CardPost[] }) {
   const t = useTranslations("Blog");
 
   return (
@@ -99,7 +142,7 @@ function BlogView({ posts }: { posts: BlogPost[] }) {
   );
 }
 
-function PostGrid({ posts }: { posts: BlogPost[] }) {
+function PostGrid({ posts }: { posts: CardPost[] }) {
   return (
     <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 lg:gap-8">
       {posts.map((post, index) => (
@@ -111,7 +154,7 @@ function PostGrid({ posts }: { posts: BlogPost[] }) {
   );
 }
 
-function PostCard({ post }: { post: BlogPost }) {
+function PostCard({ post }: { post: CardPost }) {
   const t = useTranslations("Blog");
   // featuredImage is either a number (unpopulated) or a Media object
   // (populated via depth: 1 in the find call). Type-guard once.
@@ -150,12 +193,23 @@ function PostCard({ post }: { post: BlogPost }) {
       </div>
 
       <div className="flex flex-1 flex-col gap-3 p-6">
-        <time
-          dateTime={post.publishedAt}
-          className="text-xs font-medium uppercase tracking-wider text-foreground-muted"
-        >
-          {formatPublishedDate(post.publishedAt, t.raw("months") as string[])}
-        </time>
+        <div className="flex items-center justify-between gap-2">
+          <time
+            dateTime={post.publishedAt}
+            className="text-xs font-medium uppercase tracking-wider text-foreground-muted"
+          >
+            {formatPublishedDate(post.publishedAt, t.raw("months") as string[])}
+          </time>
+          {/* Badge only renders on EN routes for posts that haven't
+              been translated yet — the BG copy below is shown as a
+              fallback. Disappears the moment the owner saves an EN
+              title in Payload. */}
+          {post.isUntranslated ? (
+            <span className="rounded-full bg-brand-50 px-2 py-0.5 text-[10px] font-medium uppercase tracking-wider text-brand-800 dark:bg-brand-900 dark:text-brand-200">
+              {t("onlyInBulgarianBadge")}
+            </span>
+          ) : null}
+        </div>
 
         <div className="flex items-start justify-between gap-3">
           <h2 className="line-clamp-2 font-display text-xl font-semibold tracking-tight text-foreground">

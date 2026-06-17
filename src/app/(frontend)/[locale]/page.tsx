@@ -1,7 +1,7 @@
 import Image from "next/image";
-import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { buttonStyles } from "@/components/Button";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";

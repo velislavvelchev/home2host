@@ -1,5 +1,5 @@
-import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 
 // Slugs match the live WordPress URLs (trailing slashes preserved) so
 // existing Google rankings carry over after the DNS switch in Stage 6.

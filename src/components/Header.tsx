@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
+import { Link, usePathname } from "@/i18n/navigation";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 // Primary nav. Slugs match the live WordPress URLs (with trailing slashes)

@@ -1,18 +1,21 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Info } from "lucide-react";
 import { RichText } from "@payloadcms/richtext-lexical/react";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
 import { getTranslations, setRequestLocale } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { getPayloadInstance } from "@/lib/payload";
-import { routing } from "@/i18n/routing";
+import { routing, type Locale } from "@/i18n/routing";
 import type { BlogPost, Media } from "@/payload-types";
 
 type Params = { locale: string; slug: string };
 
-async function findPostBySlug(slug: string): Promise<BlogPost | null> {
+async function findPostBySlug(
+  slug: string,
+  locale: Locale,
+): Promise<BlogPost | null> {
   const payload = await getPayloadInstance();
   // `draft: false` (the default) is sufficient to filter out drafts —
   // Payload's versioned-collection find already excludes documents whose
@@ -21,14 +24,39 @@ async function findPostBySlug(slug: string): Promise<BlogPost | null> {
   // 0-match results when combined with a non-ASCII slug value (the
   // Cyrillic Регламент post). Dropping the redundant filter avoids the
   // collision and is closer to the idiomatic Payload pattern.
+  //
+  // Fallback is left ON (Payload default) so untranslated EN posts
+  // render the BG copy — paired with the inline "only in Bulgarian"
+  // notice in the page below.
   const { docs } = await payload.find({
     collection: "blog-posts",
     where: { slug: { equals: slug } },
     limit: 1,
-    locale: "bg",
+    locale,
     depth: 1,
   });
   return (docs[0] as BlogPost | undefined) ?? null;
+}
+
+// Probes whether the post has been authored in the active locale, with
+// fallback disabled so a missing title comes back as null rather than
+// the BG fallback. Used to decide whether to show the "only in Bulgarian"
+// notice on the detail page. Skipped on the default locale (every post
+// has BG content by definition).
+async function isPostUntranslated(
+  postId: number,
+  locale: Locale,
+): Promise<boolean> {
+  if (locale === routing.defaultLocale) return false;
+  const payload = await getPayloadInstance();
+  const localised = await payload.findByID({
+    collection: "blog-posts",
+    id: postId,
+    locale,
+    fallbackLocale: false,
+    depth: 0,
+  });
+  return !(localised as BlogPost).title;
 }
 
 // Pre-render every published post at build time, once per locale (BG
@@ -56,11 +84,8 @@ export async function generateMetadata({
 }: {
   params: Promise<Params>;
 }): Promise<Metadata> {
-  const { slug } = await params;
-  // Locale-aware blog field loading lands in slice 3 — for now the post
-  // is fetched in BG regardless of URL locale (matches the rest of the
-  // marketing content in slice 2).
-  const post = await findPostBySlug(slug);
+  const { locale: rawLocale, slug } = await params;
+  const post = await findPostBySlug(slug, rawLocale as Locale);
   if (!post) return {};
 
   const image =
@@ -96,10 +121,17 @@ export default async function BlogPostPage({
 }: {
   params: Promise<Params>;
 }) {
-  const { locale, slug } = await params;
+  const { locale: rawLocale, slug } = await params;
+  // The [locale] segment is validated by the layout's `hasLocale` check,
+  // so by the time we reach a page the value is guaranteed to be one of
+  // `routing.locales`. Payload's types narrow `locale` to its configured
+  // union, so we widen-then-narrow at this single boundary.
+  const locale = rawLocale as Locale;
   setRequestLocale(locale);
-  const post = await findPostBySlug(slug);
+  const post = await findPostBySlug(slug, locale);
   if (!post) notFound();
+
+  const untranslated = await isPostUntranslated(post.id, locale);
 
   // Pulling translations on the server (async) instead of via a
   // useTranslations sub-component — `setRequestLocale` has already run
@@ -131,6 +163,25 @@ export default async function BlogPostPage({
             <ChevronLeft className="size-4" strokeWidth={2} aria-hidden="true" />
             {t("back")}
           </Link>
+
+          {/* Untranslated notice — only on non-default locales when the
+              post hasn't been authored in that locale yet. The body
+              below renders the BG fallback content; this banner sets
+              the reader's expectation up front. Disappears the next
+              request after the owner saves a localised title. */}
+          {untranslated ? (
+            <div
+              role="note"
+              className="mt-8 flex items-start gap-3 rounded-2xl border border-brand-200 bg-brand-50/60 p-4 text-sm text-brand-900 dark:border-brand-700 dark:bg-brand-900/40 dark:text-brand-100"
+            >
+              <Info
+                aria-hidden="true"
+                className="mt-0.5 size-4 shrink-0"
+                strokeWidth={2}
+              />
+              <p>{t("onlyInBulgarianNotice")}</p>
+            </div>
+          ) : null}
 
           <header className="mt-8">
             <time

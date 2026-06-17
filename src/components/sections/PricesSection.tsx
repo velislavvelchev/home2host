@@ -1,7 +1,7 @@
-import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { Rocket, House, Wand2, Check } from "lucide-react";
 import { useTranslations } from "next-intl";
+import { Link } from "@/i18n/navigation";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 import { buttonStyles } from "@/components/Button";
 
