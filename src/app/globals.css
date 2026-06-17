@@ -6,12 +6,26 @@
 
   Layout of this file:
     1. :root          — raw values for tokens that swap between light/dark.
-    2. prefers-color-scheme: dark — overrides for those raw values.
+    2. .dark override — manual opt-in dark theme via class on <html>.
     3. @theme         — static scales (brand, neutral, type, spacing, radii,
                         shadow, motion). These generate Tailwind utilities.
     4. @theme inline  — surface/text tokens registered with Tailwind by
                         pointing at the swappable :root values from (1).
+
+  Light is the default for everyone. Dark is opt-in via the ThemeToggle
+  in the Header — clicking it toggles `class="dark"` on <html> and
+  persists the choice in localStorage. The FOUC-prevention script in
+  the layout's <head> applies the class before paint on subsequent
+  visits, so dark-mode users never see a flash of light.
+
+  Why not follow `prefers-color-scheme`?
+  Owner preference (2026-06-17): the light palette is the brand-default
+  presentation. Users who actively want dark can opt in.
 */
+
+/* Tailwind v4 — make `dark:` utilities trigger on the .dark class
+   instead of the default `@media (prefers-color-scheme: dark)`. */
+@custom-variant dark (&:where(.dark, .dark *));
 
 /* ---------- 1. Swappable theme values (light) ---------- */
 :root {
@@ -24,17 +38,15 @@
 }
 
 /* ---------- 2. Dark-theme overrides ----------
-   For now we follow the OS preference. When a manual theme switch is
-   introduced (Stage 3), add a `.dark` selector here mirroring this block. */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background:       #070910;
-    --surface:          #121620;
-    --surface-muted:    #232936;
-    --foreground:       #f7f8fa;
-    --foreground-muted: #8d96a6;
-    --border:           #232936;
-  }
+   Manual opt-in: triggered by `class="dark"` on <html>, set by the
+   ThemeToggle component and persisted in localStorage. */
+:root.dark {
+  --background:       #070910;
+  --surface:          #121620;
+  --surface-muted:    #232936;
+  --foreground:       #f7f8fa;
+  --foreground-muted: #8d96a6;
+  --border:           #232936;
 }
 
 /* ---------- 3. Static token scales ---------- */
@@ -220,10 +232,8 @@ body {
   text-decoration-thickness: 1px;
 }
 .blog-prose a:hover { color: var(--color-brand-800); }
-@media (prefers-color-scheme: dark) {
-  .blog-prose a        { color: var(--color-brand-300); }
-  .blog-prose a:hover  { color: var(--color-brand-200); }
-}
+.dark .blog-prose a        { color: var(--color-brand-300); }
+.dark .blog-prose a:hover  { color: var(--color-brand-200); }
 .blog-prose ul, .blog-prose ol { padding-left: 1.5em; }
 .blog-prose ul { list-style: disc; }
 .blog-prose ol { list-style: decimal; }

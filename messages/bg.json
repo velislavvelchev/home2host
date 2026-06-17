@@ -18,7 +18,8 @@
     "closeMenu": "Close menu",
     "menuTitle": "Menu",
     "ariaPrimary": "Primary",
-    "ariaMobile": "Mobile"
+    "ariaMobile": "Mobile",
+    "toggleTheme": "Превключи темата"
   },
   "Nav": {
     "aboutUs": "За нас",

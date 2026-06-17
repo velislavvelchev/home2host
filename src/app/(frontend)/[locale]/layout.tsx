@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import {
@@ -108,10 +109,21 @@ export default async function RootLayout({
 
   const messages = await getMessages();
 
+  // Read the theme preference from the cookie (set by ThemeToggle).
+  // We render <html class="dark"> directly in the initial SSR output
+  // when the cookie says so — no client-side script needed, no FOUC,
+  // no React 19 / Next.js dev warning about inline <script> tags. The
+  // cookie travels with every request (~10 bytes), which is cheaper
+  // than the localStorage + inline-script alternative.
+  //
+  // Default: no cookie → light (the brand-default for everyone).
+  const themeCookie = (await cookies()).get("theme")?.value;
+  const isDark = themeCookie === "dark";
+
   return (
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased${isDark ? " dark" : ""}`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
         <NextIntlClientProvider messages={messages}>

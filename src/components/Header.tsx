@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { LanguageSwitcher } from "./LanguageSwitcher";
+import { ThemeToggle } from "./ThemeToggle";
 
 // Primary nav. Slugs match the live WordPress URLs (with trailing slashes)
 // so existing Google-indexed pages keep resolving 1:1 — see ADR/roadmap
@@ -184,6 +185,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-2">
+          <ThemeToggle />
           <LanguageSwitcher />
           <button
             type="button"
