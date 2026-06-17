@@ -5,10 +5,12 @@ import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { RichText } from "@payloadcms/richtext-lexical/react";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
+import { setRequestLocale } from "next-intl/server";
 import { getPayloadInstance } from "@/lib/payload";
+import { routing } from "@/i18n/routing";
 import type { BlogPost, Media } from "@/payload-types";
 
-type Params = { slug: string };
+type Params = { locale: string; slug: string };
 
 // Same hardcoded month table as the index page — Vercel's serverless
 // runtime ships a reduced ICU dataset so `bg-BG` locale formatting
@@ -43,9 +45,10 @@ async function findPostBySlug(slug: string): Promise<BlogPost | null> {
   return (docs[0] as BlogPost | undefined) ?? null;
 }
 
-// Pre-render every published post at build time. Posts published later
-// fall back to on-demand rendering thanks to the default dynamicParams
-// (true) — no extra config needed.
+// Pre-render every published post at build time, once per locale (BG
+// is the default — same slugs since blog slugs are non-localized).
+// Posts published later fall back to on-demand rendering thanks to the
+// default dynamicParams (true).
 export async function generateStaticParams(): Promise<Params[]> {
   const payload = await getPayloadInstance();
   // No `_status` filter — see findPostBySlug for the reason. With
@@ -57,7 +60,9 @@ export async function generateStaticParams(): Promise<Params[]> {
     locale: "bg",
     depth: 0,
   });
-  return docs.map((d) => ({ slug: (d as BlogPost).slug }));
+  return routing.locales.flatMap((locale) =>
+    docs.map((d) => ({ locale, slug: (d as BlogPost).slug })),
+  );
 }
 
 export async function generateMetadata({
@@ -66,6 +71,9 @@ export async function generateMetadata({
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { slug } = await params;
+  // Locale-aware blog field loading lands in slice 3 — for now the post
+  // is fetched in BG regardless of URL locale (matches the rest of the
+  // marketing pages, which still render hardcoded BG copy in slice 1).
   const post = await findPostBySlug(slug);
   if (!post) return {};
 
@@ -102,7 +110,8 @@ export default async function BlogPostPage({
 }: {
   params: Promise<Params>;
 }) {
-  const { slug } = await params;
+  const { locale, slug } = await params;
+  setRequestLocale(locale);
   const post = await findPostBySlug(slug);
   if (!post) notFound();
 

@@ -1,5 +1,13 @@
 import { withPayload } from "@payloadcms/next/withPayload";
+import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
+
+// next-intl's build-time plugin. Wires the request config in
+// src/i18n/request.ts into the server runtime so getTranslations /
+// useTranslations can load the right message bundle per request. Path
+// is the plugin's default; passing it explicitly keeps the link
+// visible to anyone reading next.config.ts in isolation.
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 const nextConfig: NextConfig = {
   // Match the live WordPress URL shape (e.g. `/about-us/`, `/services/`)
@@ -78,4 +86,9 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default withPayload(nextConfig, { devBundleServerPackages: false });
+// Compose order: next-intl first (wires the message-bundle plugin into
+// the base config), then Payload (which expects the bundle hooks to
+// already be present). Payload's wrapper is always the outermost.
+export default withPayload(withNextIntl(nextConfig), {
+  devBundleServerPackages: false,
+});

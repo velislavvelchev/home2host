@@ -1,11 +1,15 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "../globals.css";
+import { notFound } from "next/navigation";
+import { hasLocale, NextIntlClientProvider } from "next-intl";
+import { getMessages, setRequestLocale } from "next-intl/server";
+import "../../globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FloatingCallButton } from "@/components/FloatingCallButton";
 import { StructuredData } from "@/components/StructuredData";
+import { routing } from "@/i18n/routing";
 
 // Subsets MUST include cyrillic — primary content language is BG and
 // without it we'd fall back to a system font for half the page.
@@ -59,33 +63,60 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+// Tell Next.js which `[locale]` values to prerender at build time.
+// Without this, the build is dynamic-only for every page in the group.
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export default async function RootLayout({
   children,
+  params,
 }: Readonly<{
   children: React.ReactNode;
+  params: Promise<{ locale: string }>;
 }>) {
+  // `params` is async in Next 15+. Validate against the configured
+  // locale list — a stray path like `/xx/about-us` would otherwise
+  // reach this layout with `locale: 'xx'` and render with no messages.
+  const { locale } = await params;
+  if (!hasLocale(routing.locales, locale)) {
+    notFound();
+  }
+
+  // Required by next-intl when statically rendering server components
+  // that call `useTranslations` / `getTranslations`. Sets the active
+  // locale into the request-scoped context. Must be called in every
+  // entry point (layouts AND pages) that triggers static generation
+  // of translated content — pages will add their own call in slice 2.
+  setRequestLocale(locale);
+
+  const messages = await getMessages();
+
   return (
     <html
-      lang="bg"
+      lang={locale}
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
-        <StructuredData />
-        <Header />
-        {children}
-        <Footer />
-        <FloatingCallButton />
-        {/*
-          GA4 only renders when the measurement ID is set in the env. Local
-          dev (no `.env.local` value) and Vercel previews without the var
-          configured render nothing — keeps test pageviews out of the
-          production analytics property.
-        */}
-        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ? (
-          <GoogleAnalytics
-            gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
-          />
-        ) : null}
+        <NextIntlClientProvider messages={messages}>
+          <StructuredData />
+          <Header />
+          {children}
+          <Footer />
+          <FloatingCallButton />
+          {/*
+            GA4 only renders when the measurement ID is set in the env. Local
+            dev (no `.env.local` value) and Vercel previews without the var
+            configured render nothing — keeps test pageviews out of the
+            production analytics property.
+          */}
+          {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ? (
+            <GoogleAnalytics
+              gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
+            />
+          ) : null}
+        </NextIntlClientProvider>
       </body>
     </html>
   );
