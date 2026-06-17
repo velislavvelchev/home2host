@@ -5,26 +5,12 @@ import { notFound } from "next/navigation";
 import { ChevronLeft } from "lucide-react";
 import { RichText } from "@payloadcms/richtext-lexical/react";
 import type { SerializedEditorState } from "@payloadcms/richtext-lexical/lexical";
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getPayloadInstance } from "@/lib/payload";
 import { routing } from "@/i18n/routing";
 import type { BlogPost, Media } from "@/payload-types";
 
 type Params = { locale: string; slug: string };
-
-// Same hardcoded month table as the index page — Vercel's serverless
-// runtime ships a reduced ICU dataset so `bg-BG` locale formatting
-// silently falls back. Two callers, kept duplicated for now; extract
-// when a third use lands.
-const BG_MONTHS = [
-  "януари", "февруари", "март", "април", "май", "юни",
-  "юли", "август", "септември", "октомври", "ноември", "декември",
-];
-
-function formatPublishedDate(iso: string): string {
-  const d = new Date(iso);
-  return `${d.getDate()} ${BG_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-}
 
 async function findPostBySlug(slug: string): Promise<BlogPost | null> {
   const payload = await getPayloadInstance();
@@ -73,7 +59,7 @@ export async function generateMetadata({
   const { slug } = await params;
   // Locale-aware blog field loading lands in slice 3 — for now the post
   // is fetched in BG regardless of URL locale (matches the rest of the
-  // marketing pages, which still render hardcoded BG copy in slice 1).
+  // marketing content in slice 2).
   const post = await findPostBySlug(slug);
   if (!post) return {};
 
@@ -115,6 +101,13 @@ export default async function BlogPostPage({
   const post = await findPostBySlug(slug);
   if (!post) notFound();
 
+  // Pulling translations on the server (async) instead of via a
+  // useTranslations sub-component — `setRequestLocale` has already run
+  // above so the bundle resolves to the right locale either way; the
+  // async call keeps everything in one render function.
+  const t = await getTranslations("Blog");
+  const months = t.raw("months") as string[];
+
   const image =
     post.featuredImage && typeof post.featuredImage === "object"
       ? (post.featuredImage as Media)
@@ -136,7 +129,7 @@ export default async function BlogPostPage({
             className="inline-flex items-center gap-1 text-sm font-medium text-foreground-muted transition-colors hover:text-foreground"
           >
             <ChevronLeft className="size-4" strokeWidth={2} aria-hidden="true" />
-            Всички статии
+            {t("back")}
           </Link>
 
           <header className="mt-8">
@@ -144,7 +137,7 @@ export default async function BlogPostPage({
               dateTime={post.publishedAt}
               className="text-xs font-medium uppercase tracking-wider text-foreground-muted"
             >
-              {formatPublishedDate(post.publishedAt)}
+              {formatPublishedDate(post.publishedAt, months)}
             </time>
 
             <h1 className="mt-4 font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl">
@@ -159,7 +152,9 @@ export default async function BlogPostPage({
 
             {(post.author || (post.tags && post.tags.length > 0)) && (
               <div className="mt-8 flex flex-wrap items-center gap-x-4 gap-y-2 text-sm text-foreground-muted">
-                {post.author ? <span>От {post.author}</span> : null}
+                {post.author ? (
+                  <span>{t("byAuthor", { author: post.author })}</span>
+                ) : null}
                 {post.tags && post.tags.length > 0 ? (
                   <ul className="flex flex-wrap gap-2">
                     {post.tags.map((tag) => (
@@ -202,4 +197,13 @@ export default async function BlogPostPage({
       </article>
     </main>
   );
+}
+
+// Locale-aware date format. JS's `toLocaleDateString('bg-BG')` works
+// locally but Vercel's serverless runtime ships a reduced ICU dataset
+// that silently falls back to en-US formatting in production. Month
+// names come from the active locale's message bundle instead.
+function formatPublishedDate(iso: string, months: string[]): string {
+  const d = new Date(iso);
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }

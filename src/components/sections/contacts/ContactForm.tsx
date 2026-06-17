@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef } from "react";
 import { Send } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { buttonStyles } from "@/components/Button";
 import { submitContact } from "./actions";
 import {
@@ -34,6 +35,7 @@ export function ContactForm() {
     FormData
   >(submitContact, initialContactFormState);
   const formRef = useRef<HTMLFormElement>(null);
+  const t = useTranslations("ContactForm");
 
   // Reset the form fields after a successful submit so the user can send
   // another message without manually clearing. The status message itself
@@ -53,9 +55,7 @@ export function ContactForm() {
         aria-hidden="true"
         className="pointer-events-none absolute left-[-9999px] top-auto h-px w-px overflow-hidden"
       >
-        <label htmlFor="contact-h2h-confirm">
-          Не попълвайте това поле — то е за защита от спам.
-        </label>
+        <label htmlFor="contact-h2h-confirm">{t("honeypotLabel")}</label>
         <input
           id="contact-h2h-confirm"
           name="h2h_confirm"
@@ -70,7 +70,7 @@ export function ContactForm() {
 
       <div>
         <label htmlFor="contact-name" className={labelClass}>
-          Име <span className="text-error">*</span>
+          {t("nameLabel")} <span className="text-error">*</span>
         </label>
         <input
           id="contact-name"
@@ -86,7 +86,7 @@ export function ContactForm() {
 
       <div>
         <label htmlFor="contact-email" className={labelClass}>
-          Имейл <span className="text-error">*</span>
+          {t("emailLabel")} <span className="text-error">*</span>
         </label>
         <input
           id="contact-email"
@@ -102,7 +102,8 @@ export function ContactForm() {
 
       <div>
         <label htmlFor="contact-phone" className={labelClass}>
-          Телефон <span className="text-foreground-muted">(по желание)</span>
+          {t("phoneLabel")}{" "}
+          <span className="text-foreground-muted">{t("phoneOptional")}</span>
         </label>
         <input
           id="contact-phone"
@@ -117,7 +118,7 @@ export function ContactForm() {
 
       <div>
         <label htmlFor="contact-message" className={labelClass}>
-          Съобщение <span className="text-error">*</span>
+          {t("messageLabel")} <span className="text-error">*</span>
         </label>
         <textarea
           id="contact-message"
@@ -126,7 +127,7 @@ export function ContactForm() {
           rows={5}
           maxLength={5000}
           disabled={isPending}
-          placeholder="Опишете накратко вашето запитване..."
+          placeholder={t("messagePlaceholder")}
           className={`${inputClass} resize-y`}
         />
       </div>
@@ -137,7 +138,7 @@ export function ContactForm() {
         className={`${buttonStyles("primary", "lg")} w-full`}
       >
         <Send className="size-4" strokeWidth={2} aria-hidden="true" />
-        {isPending ? "Изпращане..." : "Изпрати запитване"}
+        {isPending ? t("submitting") : t("submit")}
       </button>
 
       {/* Live-region status message — announced to screen readers when it

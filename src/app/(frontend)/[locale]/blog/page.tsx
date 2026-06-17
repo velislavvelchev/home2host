@@ -2,45 +2,46 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowUpRight } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 import { getPayloadInstance } from "@/lib/payload";
 import type { BlogPost, Media } from "@/payload-types";
+
+type Params = { locale: string };
 
 // Unlike the section routes, the blog is a genuinely separate page —
 // no canonical-to-home, no on-home embed. It owns its own URL.
 // Per-page `openGraph` so shares of `/blog/` read for the blog rather
 // than the home; per-post OG is set separately in [slug]/page.tsx.
-export const metadata: Metadata = {
-  title: "Блог | Home2Host",
-  description:
-    "Полезни статии за собственици на имоти за краткосрочен наем: управление, динамично ценообразуване, регулации и съвети от Home2Host.",
-  openGraph: {
-    title: "Блог | Home2Host",
-    description:
-      "Полезни статии за собственици на имоти за краткосрочен наем: управление, динамично ценообразуване, регулации и съвети от Home2Host.",
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Blog" });
+  const title = t("metaTitle");
+  const description = t("metaDescription");
+  return {
+    title,
+    description,
+    openGraph: { title, description },
+  };
+}
 
 // Each post lives in the DB; this page reads fresh on each request.
 // Could move to ISR later if traffic warrants it.
 export const dynamic = "force-dynamic";
 
-// BG month names — used by formatPublishedDate. JS's toLocaleDateString
-// with `bg-BG` works locally but Vercel's serverless runtime ships a
-// reduced ICU dataset, so non-Latin locales silently fall back to "en"
-// formatting in production. Hardcoding the table is one line and removes
-// the platform dependency.
-const BG_MONTHS = [
-  "януари", "февруари", "март", "април", "май", "юни",
-  "юли", "август", "септември", "октомври", "ноември", "декември",
-];
+export default async function BlogIndexPage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
 
-function formatPublishedDate(iso: string): string {
-  const d = new Date(iso);
-  return `${d.getDate()} ${BG_MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-}
-
-export default async function BlogIndexPage() {
   const payload = await getPayloadInstance();
 
   // No `_status` filter — see /blog/[slug]/page.tsx for the full
@@ -48,6 +49,10 @@ export default async function BlogIndexPage() {
   // Payload's default find already excludes draft-only documents,
   // and the explicit filter was producing 0-match results when
   // combined with non-ASCII slug values.
+  //
+  // Locale-aware blog field loading lands in slice 3; for now the
+  // posts are fetched in BG regardless of URL locale (matches the
+  // rest of the marketing content in slice 2).
   const { docs } = await payload.find({
     collection: "blog-posts",
     sort: "-publishedAt",
@@ -58,6 +63,12 @@ export default async function BlogIndexPage() {
 
   const posts = docs as BlogPost[];
 
+  return <BlogView posts={posts} />;
+}
+
+function BlogView({ posts }: { posts: BlogPost[] }) {
+  const t = useTranslations("Blog");
+
   return (
     <main className="flex-1">
       <section className="bg-surface-muted" aria-labelledby="blog-heading">
@@ -65,18 +76,17 @@ export default async function BlogIndexPage() {
           <RevealOnScroll>
             <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-800 dark:bg-brand-900 dark:text-brand-100">
               <span className="size-1.5 rounded-full bg-brand-600" />
-              Блог
+              {t("eyebrow")}
             </span>
 
             <h1
               id="blog-heading"
               className="mt-6 max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl"
             >
-              Идеи и практически съвети
+              {t("heading")}
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-foreground-muted">
-              Какво научаваме от управлението на десетки имоти в Банско и
-              Бургас — регулации, ценообразуване, гости и обзавеждане.
+              {t("lead")}
             </p>
           </RevealOnScroll>
 
@@ -102,6 +112,7 @@ function PostGrid({ posts }: { posts: BlogPost[] }) {
 }
 
 function PostCard({ post }: { post: BlogPost }) {
+  const t = useTranslations("Blog");
   // featuredImage is either a number (unpopulated) or a Media object
   // (populated via depth: 1 in the find call). Type-guard once.
   const image =
@@ -143,7 +154,7 @@ function PostCard({ post }: { post: BlogPost }) {
           dateTime={post.publishedAt}
           className="text-xs font-medium uppercase tracking-wider text-foreground-muted"
         >
-          {formatPublishedDate(post.publishedAt)}
+          {formatPublishedDate(post.publishedAt, t.raw("months") as string[])}
         </time>
 
         <div className="flex items-start justify-between gap-3">
@@ -169,15 +180,22 @@ function PostCard({ post }: { post: BlogPost }) {
 }
 
 function EmptyState() {
+  const t = useTranslations("Blog");
   return (
     <div className="rounded-2xl border border-dashed border-border bg-background px-6 py-16 text-center">
       <p className="font-display text-xl font-semibold text-foreground">
-        Скоро ще публикуваме първите статии.
+        {t("emptyHeading")}
       </p>
-      <p className="mt-3 text-foreground-muted">
-        Подготвяме съдържание за собственици на имоти за краткосрочен наем
-        в Банско и Бургас. Върнете се скоро.
-      </p>
+      <p className="mt-3 text-foreground-muted">{t("emptyBody")}</p>
     </div>
   );
+}
+
+// Locale-aware date format. JS's `toLocaleDateString('bg-BG')` works
+// locally but Vercel's serverless runtime ships a reduced ICU dataset
+// that silently falls back to en-US formatting in production. The month
+// names come from the active locale's message bundle instead.
+function formatPublishedDate(iso: string, months: string[]): string {
+  const d = new Date(iso);
+  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
 }

@@ -3,31 +3,33 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { LanguageSwitcher } from "./LanguageSwitcher";
 
 // Primary nav. Slugs match the live WordPress URLs (with trailing slashes)
 // so existing Google-indexed pages keep resolving 1:1 — see ADR/roadmap
-// Stage 4 notes on SEO preservation. Labels are BG to match the primary
-// content language; EN labels arrive in Stage 5 via next-intl.
+// Stage 4 notes on SEO preservation.
 //
 // `sectionId` is the matching <section id="..."> in the home-page embed.
 // It's used by the scroll-spy below to decide which nav item is active
 // while the user scrolls through `/`. `/blog/` has no home-page section
 // since the blog is a separate listing, so we omit it from the spy.
+// `labelKey` is resolved against the `Nav` namespace at render time so
+// the nav reads BG on `/...` and EN on `/en/...`.
 type NavItem = {
   href: string;
-  label: string;
+  labelKey: "aboutUs" | "services" | "apartments" | "prices" | "questions" | "blog" | "contacts";
   sectionId: string | null;
 };
 
 const navItems: NavItem[] = [
-  { href: "/about-us/",   label: "За нас",        sectionId: "about-us"   },
-  { href: "/services/",   label: "Услуги",        sectionId: "services"   },
-  { href: "/apartments/", label: "Апартаменти",   sectionId: "apartments" },
-  { href: "/prices/",     label: "Цени",          sectionId: "prices"     },
-  { href: "/questions/",  label: "Въпроси",       sectionId: "questions"  },
-  { href: "/blog/",       label: "Блог",          sectionId: null         },
-  { href: "/contacts/",   label: "Контакти",      sectionId: "contacts"   },
+  { href: "/about-us/",   labelKey: "aboutUs",    sectionId: "about-us"   },
+  { href: "/services/",   labelKey: "services",   sectionId: "services"   },
+  { href: "/apartments/", labelKey: "apartments", sectionId: "apartments" },
+  { href: "/prices/",     labelKey: "prices",     sectionId: "prices"     },
+  { href: "/questions/",  labelKey: "questions",  sectionId: "questions"  },
+  { href: "/blog/",       labelKey: "blog",       sectionId: null         },
+  { href: "/contacts/",   labelKey: "contacts",   sectionId: "contacts"   },
 ];
 
 // Active-nav classes for the desktop bar — applied additively over the
@@ -50,6 +52,8 @@ const MOBILE_LINK_ACTIVE =
 export function Header() {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
+  const tNav = useTranslations("Nav");
+  const tHeader = useTranslations("Header");
   // Currently most-visible section while scrolling `/`. null when off-home
   // (we rely on pathname matching instead).
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
@@ -142,7 +146,7 @@ export function Header() {
         <Link
           href="/"
           className="inline-flex items-center gap-2 font-display text-lg font-semibold tracking-tight text-foreground"
-          aria-label="Home2Host — начало"
+          aria-label={tHeader("logoAriaLabel")}
         >
           {/* Brand chip — icon-only variant of the logo. The full lockup
               (icon + wordmark) is too detailed at this size; the wordmark
@@ -161,7 +165,7 @@ export function Header() {
           Home2Host
         </Link>
 
-        <nav aria-label="Primary" className="hidden lg:block">
+        <nav aria-label={tHeader("ariaPrimary")} className="hidden lg:block">
           <ul className="flex items-center gap-1">
             {navItems.map((item) => {
               const active = isActive(item);
@@ -172,7 +176,7 @@ export function Header() {
                     aria-current={active ? "page" : undefined}
                     className={`${NAV_LINK_BASE} ${active ? NAV_LINK_ACTIVE : NAV_LINK_INACTIVE}`}
                   >
-                    {item.label}
+                    {tNav(item.labelKey)}
                   </Link>
                 </li>
               );
@@ -185,7 +189,7 @@ export function Header() {
           <button
             type="button"
             onClick={() => setOpen(true)}
-            aria-label="Open menu"
+            aria-label={tHeader("openMenu")}
             aria-controls="mobile-drawer"
             aria-expanded={open}
             className="inline-flex size-10 items-center justify-center rounded-md text-foreground transition-colors duration-base ease-standard hover:bg-surface-muted lg:hidden focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
@@ -207,7 +211,7 @@ export function Header() {
         id="mobile-drawer"
         role="dialog"
         aria-modal="true"
-        aria-label="Menu"
+        aria-label={tHeader("menuTitle")}
         className={
           "fixed inset-0 z-50 lg:hidden " +
           (open ? "pointer-events-auto" : "pointer-events-none")
@@ -228,11 +232,11 @@ export function Header() {
           }
         >
           <div className="flex h-16 items-center justify-between border-b border-border px-gutter">
-            <span className="font-display text-base font-semibold">Menu</span>
+            <span className="font-display text-base font-semibold">{tHeader("menuTitle")}</span>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              aria-label="Close menu"
+              aria-label={tHeader("closeMenu")}
               className="inline-flex size-10 items-center justify-center rounded-md text-foreground transition-colors duration-base ease-standard hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
             >
               <svg viewBox="0 0 24 24" fill="none" className="size-5" aria-hidden="true">
@@ -240,7 +244,7 @@ export function Header() {
               </svg>
             </button>
           </div>
-          <nav aria-label="Mobile" className="flex-1 overflow-y-auto px-gutter py-4">
+          <nav aria-label={tHeader("ariaMobile")} className="flex-1 overflow-y-auto px-gutter py-4">
             <ul className="flex flex-col gap-1">
               {navItems.map((item) => {
                 const active = isActive(item);
@@ -252,7 +256,7 @@ export function Header() {
                       aria-current={active ? "page" : undefined}
                       className={`${MOBILE_LINK_BASE} ${active ? MOBILE_LINK_ACTIVE : MOBILE_LINK_INACTIVE}`}
                     >
-                      {item.label}
+                      {tNav(item.labelKey)}
                     </Link>
                   </li>
                 );

@@ -1,28 +1,37 @@
 import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ServicesSection } from "@/components/sections/ServicesSection";
+
+type Params = { locale: string };
 
 // Canonical → `/` for the same reason as /about-us/: the home page carries
 // the full content of every section, so standalone section URLs exist to
 // match the live WordPress URL shape and serve deep-links, not to compete
-// with the home for keywords. See src/app/(frontend)/about-us/page.tsx.
-// Per-page `openGraph` overrides the root layout's title/description so
-// social-share previews for this URL read for the section, not the home.
-// See sibling /about-us/page.tsx for the longer reasoning.
-export const metadata: Metadata = {
-  title: "Услуги | Home2Host",
-  description:
-    "Цялостно управление на имоти за краткосрочен наем — професионални обяви, динамично ценообразуване, комуникация с гости, почистване, поддръжка и сигурност.",
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: "Услуги | Home2Host",
-    description:
-      "Цялостно управление на имоти за краткосрочен наем — професионални обяви, динамично ценообразуване, комуникация с гости, почистване, поддръжка и сигурност.",
-  },
-};
+// with the home for keywords. See src/app/(frontend)/[locale]/about-us/page.tsx.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Services" });
+  const title = t("metaTitle");
+  const description = t("metaDescription");
+  return {
+    title,
+    description,
+    alternates: { canonical: "/" },
+    openGraph: { title, description },
+  };
+}
 
-export default function ServicesPage() {
+export default async function ServicesPage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <main className="flex-1">
       <ServicesSection headingLevel="h1" />

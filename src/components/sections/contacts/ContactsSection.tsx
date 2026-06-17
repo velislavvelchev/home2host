@@ -1,5 +1,6 @@
 import type { SVGProps } from "react";
 import { MapPin, Phone, Mail, MessageCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 import { ContactForm } from "./ContactForm";
 
@@ -46,7 +47,8 @@ function InstagramIcon(props: SVGProps<SVGSVGElement>) {
 // Section bg is `bg-surface-muted` so the page rhythm goes ... -> FAQ
 // (solid brand-800) -> Contacts (back to muted) -> end.
 //
-// Content sourced from docs/inventory/text/contacts.md.
+// Translated copy lives in messages/<locale>.json under `Contacts`.
+// Phone numbers, email, social URLs are factual data and stay hardcoded.
 
 type ContactsSectionProps = {
   headingLevel?: "h1" | "h2";
@@ -60,16 +62,7 @@ const PHONES = [
 ] as const;
 
 const EMAIL = "info@home2host.com";
-const ADDRESS = "2770 гр. Банско, ул. Кралев двор №5";
 const ADDRESS_MAPS = "https://www.google.com/maps/search/?api=1&query=2770+%D0%B3%D1%80.+%D0%91%D0%B0%D0%BD%D1%81%D0%BA%D0%BE%2C+%D1%83%D0%BB.+%D0%9A%D1%80%D0%B0%D0%BB%D0%B5%D0%B2+%D0%B4%D0%B2%D0%BE%D1%80+5";
-
-// Prefilled BG message for WhatsApp. Encoded once at module scope.
-const WHATSAPP_LINK = `https://wa.me/${PHONES[0].dial.replace(
-  "+",
-  "",
-)}?text=${encodeURIComponent(
-  "Здравейте, имам въпрос относно управление на имот.",
-)}`;
 
 const SOCIAL = [
   {
@@ -93,6 +86,16 @@ export function ContactsSection({
   headingLevel = "h2",
 }: ContactsSectionProps) {
   const Heading = headingLevel;
+  const t = useTranslations("Contacts");
+
+  // Build the WhatsApp link inside the component so the prefill message
+  // resolves against the current locale. encodeURIComponent runs on every
+  // render but that's negligible — the section renders at most twice per
+  // request (home embed + standalone route).
+  const whatsappLink = `https://wa.me/${PHONES[0].dial.replace(
+    "+",
+    "",
+  )}?text=${encodeURIComponent(t("whatsappPrefill"))}`;
 
   return (
     <section
@@ -103,19 +106,18 @@ export function ContactsSection({
       <div className="mx-auto max-w-6xl px-gutter py-section">
         <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-800 dark:bg-brand-900 dark:text-brand-100">
           <span className="size-1.5 rounded-full bg-brand-600" />
-          Контакти
+          {t("eyebrow")}
         </span>
 
         <Heading
           id="contacts-heading"
           className="mt-6 max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl"
         >
-          Свържете се с нас
+          {t("heading")}
         </Heading>
 
         <p className="mt-6 max-w-prose text-lg leading-relaxed text-foreground-muted">
-          Имате имот, който искате да отдавате под наем? Или въпрос за
-          нашите услуги? Пишете ни — отговаряме в рамките на работния ден.
+          {t("lead")}
         </p>
 
         <div className="mt-12 grid gap-8 md:grid-cols-2 md:gap-10">
@@ -129,12 +131,10 @@ export function ContactsSection({
                 </span>
                 <div>
                   <h3 className="font-display text-base font-semibold tracking-tight">
-                    Къде работим?
+                    {t("serviceAreaHeading")}
                   </h3>
                   <p className="mt-1 text-sm leading-relaxed text-foreground-muted">
-                    Home2Host управлява имоти на територията на Бургас,
-                    Банско и околните региони. Осигуряваме надеждно
-                    управление и добра доходност за вашия имот.
+                    {t("serviceAreaBody")}
                   </p>
                 </div>
               </div>
@@ -148,7 +148,7 @@ export function ContactsSection({
                 </span>
                 <div>
                   <h3 className="font-display text-base font-semibold tracking-tight">
-                    Телефон
+                    {t("phoneHeading")}
                   </h3>
                   <ul className="mt-1 flex flex-col gap-0.5">
                     {PHONES.map((p) => (
@@ -172,7 +172,7 @@ export function ContactsSection({
                 </span>
                 <div>
                   <h3 className="font-display text-base font-semibold tracking-tight">
-                    Имейл
+                    {t("emailHeading")}
                   </h3>
                   <a
                     href={`mailto:${EMAIL}`}
@@ -190,7 +190,7 @@ export function ContactsSection({
                 </span>
                 <div>
                   <h3 className="font-display text-base font-semibold tracking-tight">
-                    Адрес
+                    {t("addressHeading")}
                   </h3>
                   <a
                     href={ADDRESS_MAPS}
@@ -198,7 +198,7 @@ export function ContactsSection({
                     rel="noopener noreferrer"
                     className="mt-1 inline-block text-sm text-foreground-muted transition-colors hover:text-brand-800 dark:hover:text-brand-200"
                   >
-                    {ADDRESS}
+                    {t("address")}
                   </a>
                 </div>
               </div>
@@ -208,7 +208,7 @@ export function ContactsSection({
               {/* WhatsApp CTA + social links */}
               <div className="flex flex-col gap-4">
                 <a
-                  href={WHATSAPP_LINK}
+                  href={whatsappLink}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex h-11 items-center justify-center gap-2 rounded-md border border-brand-800 px-5 text-sm font-medium text-brand-800 transition-colors hover:bg-brand-50 dark:border-brand-300 dark:text-brand-200 dark:hover:bg-brand-900/40"
@@ -218,12 +218,12 @@ export function ContactsSection({
                     strokeWidth={2}
                     aria-hidden="true"
                   />
-                  Пишете ни в WhatsApp
+                  {t("whatsappCta")}
                 </a>
 
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-medium uppercase tracking-wider text-foreground-muted">
-                    Социални мрежи
+                    {t("socialLabel")}
                   </span>
                   <ul className="flex items-center gap-2">
                     {SOCIAL.map(({ label, href, Icon }) => (
@@ -249,10 +249,10 @@ export function ContactsSection({
           <RevealOnScroll delayIndex={1}>
             <div className="rounded-2xl border border-border bg-surface p-6 md:p-8">
               <h3 className="font-display text-xl font-semibold tracking-tight">
-                Изпратете запитване
+                {t("formHeading")}
               </h3>
               <p className="mt-1 text-sm leading-relaxed text-foreground-muted">
-                Полетата със звездичка са задължителни.
+                {t("formRequiredNote")}
               </p>
               <div className="mt-6">
                 <ContactForm />

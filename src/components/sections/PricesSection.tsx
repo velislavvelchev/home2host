@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { Rocket, House, Wand2, Check } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 import { buttonStyles } from "@/components/Button";
 
@@ -10,7 +11,8 @@ import { buttonStyles } from "@/components/Button";
 //
 // Three equal-weight pricing cards (Start Smart, Full Care, Home Refresh) —
 // not three tiers of the same product, three different offerings, so no
-// "Recommended" highlight. Content sourced from docs/inventory/text/prices.md.
+// "Recommended" highlight. Plan text lives in messages/<locale>.json under
+// `Prices.plans`; icons stay in code and are paired by index.
 //
 // Design notes vs the live WordPress version:
 // - Different Lucide icon per card instead of the same house thrice — signals
@@ -25,60 +27,20 @@ type PricesSectionProps = {
   headingLevel?: "h1" | "h2";
 };
 
-type Plan = {
+type PlanText = {
   name: string;
   cadence: string;
   price: string;
   priceUnit?: string;
   features: string[];
-  icon: LucideIcon;
 };
 
-const plans: Plan[] = [
-  {
-    name: "Start Smart",
-    cadence: "Еднократна услуга",
-    price: "200",
-    priceUnit: "EUR",
-    features: [
-      "Създаване и настройка на профил на имота в Airbnb и Booking.com",
-      "Професионална фотосесия на имота",
-      "Пазарно проучване и ценово таргетиране",
-      "Оглед на имота и интериорна консултация",
-      "Изграждане на система за самонастаняване",
-    ],
-    icon: Rocket,
-  },
-  {
-    name: "Full Care",
-    cadence: "От нетния приход от резервации",
-    price: "25",
-    priceUnit: "%",
-    features: [
-      "Пълен мениджмънт на имота от А до Я",
-      "Оптимизация на обяви, календари и ценообразуване",
-      "Динамична ценова стратегия според търсене, дни и събития",
-      "Организация на професионално почистване с чеклист",
-      "Зареждане с чисто бельо, кърпи и консумативи",
-      "Self check-in и комуникация с гости на български, английски, немски и руски",
-    ],
-    icon: House,
-  },
-  {
-    name: "Home Refresh",
-    cadence: "Индивидуална оферта според нуждите на имота",
-    price: "Индивидуална оферта",
-    features: [
-      "Декориране и обновяване на интериора след оглед на имота",
-      "Освежаване на стени (боя, тапети, картини)",
-      "Подбор и аранжиране на декоративни елементи (възглавници, вази, сувенири и др.)",
-    ],
-    icon: Wand2,
-  },
-];
+const planIcons: LucideIcon[] = [Rocket, House, Wand2];
 
 export function PricesSection({ headingLevel = "h2" }: PricesSectionProps) {
   const Heading = headingLevel;
+  const t = useTranslations("Prices");
+  const plans = t.raw("plans") as PlanText[];
 
   return (
     <section
@@ -89,19 +51,18 @@ export function PricesSection({ headingLevel = "h2" }: PricesSectionProps) {
       <div className="mx-auto max-w-6xl px-gutter py-section">
         <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-800 dark:bg-brand-900 dark:text-brand-100">
           <span className="size-1.5 rounded-full bg-brand-600" />
-          Цени
+          {t("eyebrow")}
         </span>
 
         <Heading
           id="prices-heading"
           className="mt-6 max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl"
         >
-          Изберете подходящия план за вас
+          {t("heading")}
         </Heading>
 
         <p className="mt-6 max-w-prose text-lg leading-relaxed text-foreground-muted">
-          Три различни оферти за различни нужди — от еднократно стартиране
-          до пълно управление и интериорно обновяване.
+          {t("lead")}
         </p>
 
         {/* 3-col grid only kicks in at `lg` (≥1024) — at `md` (768) the
@@ -111,7 +72,7 @@ export function PricesSection({ headingLevel = "h2" }: PricesSectionProps) {
             scannable three-up layout. */}
         <ul className="mt-16 grid gap-6 lg:grid-cols-3 lg:gap-8">
           {plans.map((plan, index) => {
-            const Icon = plan.icon;
+            const Icon = planIcons[index];
             // Numeric prices get the unit treatment (split typography);
             // the "Индивидуална оферта" plan needs the whole string at a
             // smaller display size since it's a phrase, not a number.
@@ -180,7 +141,7 @@ export function PricesSection({ headingLevel = "h2" }: PricesSectionProps) {
                     href="/contacts/"
                     className={`${buttonStyles("primary", "md")} mt-8 w-full justify-center`}
                   >
-                    Свържете се с нас
+                    {t("cta")}
                   </Link>
                 </li>
               </RevealOnScroll>

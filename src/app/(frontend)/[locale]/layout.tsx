@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
-import { getMessages, setRequestLocale } from "next-intl/server";
+import {
+  getMessages,
+  getTranslations,
+  setRequestLocale,
+} from "next-intl/server";
 import "../../globals.css";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import { Header } from "@/components/Header";
@@ -23,45 +27,56 @@ const geistMono = Geist_Mono({
   subsets: ["latin", "cyrillic"],
 });
 
-export const metadata: Metadata = {
-  // Absolute base used to resolve relative URLs in `openGraph.images`,
-  // `icons`, etc. at build time. Without this Next.js falls back to
-  // `http://localhost:3000` and warns on every build. Update to the
-  // real custom domain at Stage 6 (DNS switch).
-  metadataBase: new URL("https://home2host.vercel.app"),
-  title: "Home2Host — Управление на имоти в Банско и Бургас",
-  description:
-    "Професионално управление на имоти за краткосрочен наем в Банско и Бургас. Обяви, комуникация с гости, почистване и поддръжка.",
-  // Favicons + Apple touch icon. Icon-only SVG variant is the primary
-  // tab icon — the wordmark in the full lockup is unreadable at 16-32px
-  // and the icon-only version stays recognizable. Self-backed (white
-  // backdrop baked into the SVG) so it reads correctly against dark
-  // browser tabs. PNG fallbacks for older clients and Android home-
-  // screen install.
-  icons: {
-    icon: [
-      { url: "/logo-icon.svg", type: "image/svg+xml" },
-      { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
-      { url: "/favicon-192.png", sizes: "192x192", type: "image/png" },
-    ],
-    apple: "/favicon-180.png",
-  },
-  openGraph: {
-    title: "Home2Host — Управление на имоти в Банско и Бургас",
-    description:
-      "Професионално управление на имоти за краткосрочен наем в Банско и Бургас.",
-    locale: "bg_BG",
-    type: "website",
-    images: [
-      {
-        url: "/og-image.jpg",
-        width: 1536,
-        height: 1024,
-        alt: "Home2Host — управление на имоти в Банско и Бургас",
-      },
-    ],
-  },
-};
+// Per-locale root metadata. Title / description / OG copy resolve from
+// the `SiteMetadata` namespace; everything else (icons, metadataBase, OG
+// image dimensions) is locale-independent and stays static.
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "SiteMetadata" });
+  const title = t("title");
+  const description = t("description");
+  return {
+    // Absolute base used to resolve relative URLs in `openGraph.images`,
+    // `icons`, etc. at build time. Without this Next.js falls back to
+    // `http://localhost:3000` and warns on every build. Update to the
+    // real custom domain at Stage 6 (DNS switch).
+    metadataBase: new URL("https://home2host.vercel.app"),
+    title,
+    description,
+    // Favicons + Apple touch icon. Icon-only SVG variant is the primary
+    // tab icon — the wordmark in the full lockup is unreadable at 16-32px
+    // and the icon-only version stays recognizable. Self-backed (white
+    // backdrop baked into the SVG) so it reads correctly against dark
+    // browser tabs. PNG fallbacks for older clients and Android home-
+    // screen install.
+    icons: {
+      icon: [
+        { url: "/logo-icon.svg", type: "image/svg+xml" },
+        { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+        { url: "/favicon-192.png", sizes: "192x192", type: "image/png" },
+      ],
+      apple: "/favicon-180.png",
+    },
+    openGraph: {
+      title,
+      description: t("ogShortDescription"),
+      locale: t("ogLocale"),
+      type: "website",
+      images: [
+        {
+          url: "/og-image.jpg",
+          width: 1536,
+          height: 1024,
+          alt: t("ogImageAlt"),
+        },
+      ],
+    },
+  };
+}
 
 // Tell Next.js which `[locale]` values to prerender at build time.
 // Without this, the build is dynamic-only for every page in the group.

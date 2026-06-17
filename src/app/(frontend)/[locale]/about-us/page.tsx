@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AboutSection } from "@/components/sections/AboutSection";
+
+type Params = { locale: string };
 
 // Canonical points at `/` because the home page carries the full
 // content of every section (preserving the SEO authority the live
@@ -11,21 +14,30 @@ import { AboutSection } from "@/components/sections/AboutSection";
 // social-share previews for this URL read for the section, not the home
 // page. `images` is intentionally left to inherit the root's OG image —
 // per-section share images are a separate design slice.
-export const metadata: Metadata = {
-  title: "За нас | Home2Host",
-  description:
-    "Home2Host е компания за професионално управление на имоти за краткосрочен наем в Банско и Бургас.",
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: "За нас | Home2Host",
-    description:
-      "Home2Host е компания за професионално управление на имоти за краткосрочен наем в Банско и Бургас.",
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "About" });
+  const title = t("metaTitle");
+  const description = t("metaDescription");
+  return {
+    title,
+    description,
+    alternates: { canonical: "/" },
+    openGraph: { title, description },
+  };
+}
 
-export default function AboutUsPage() {
+export default async function AboutUsPage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <main className="flex-1">
       <AboutSection headingLevel="h1" />

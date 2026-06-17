@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 // Horizontal scroll-snap carousel for the Apartments section. Mobile users
 // swipe naturally; desktop gets chevron arrow buttons that scroll one card
@@ -33,6 +34,7 @@ export function ApartmentsCarousel({ children }: ApartmentsCarouselProps) {
   const [canScrollRight, setCanScrollRight] = useState(true);
   const [isPaused, setIsPaused] = useState(false);
   const pauseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const t = useTranslations("Apartments");
 
   // --- Edge detection: update arrow can-scroll state ---
   useEffect(() => {
@@ -144,7 +146,7 @@ export function ApartmentsCarousel({ children }: ApartmentsCarouselProps) {
           auto-advance. */}
       <button
         type="button"
-        aria-label="Предишни апартаменти"
+        aria-label={t("carouselPrev")}
         onClick={() => scrollByOne(-1)}
         disabled={!canScrollLeft}
         className="absolute left-0 top-1/2 hidden size-11 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-surface text-foreground shadow-2 transition-opacity hover:bg-surface-muted disabled:pointer-events-none disabled:opacity-0 md:inline-flex"
@@ -153,7 +155,7 @@ export function ApartmentsCarousel({ children }: ApartmentsCarouselProps) {
       </button>
       <button
         type="button"
-        aria-label="Следващи апартаменти"
+        aria-label={t("carouselNext")}
         onClick={() => scrollByOne(1)}
         disabled={!canScrollRight}
         className="absolute right-0 top-1/2 hidden size-11 translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full border border-border bg-surface text-foreground shadow-2 transition-opacity hover:bg-surface-muted disabled:pointer-events-none disabled:opacity-0 md:inline-flex"

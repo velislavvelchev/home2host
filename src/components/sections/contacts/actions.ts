@@ -5,12 +5,20 @@
 // that file's header for the why.
 
 import nodemailer from "nodemailer";
+import { getTranslations } from "next-intl/server";
 import { checkContactRateLimit } from "@/lib/rateLimit";
 import type { ContactFormState } from "./formState";
 
 // Server action invoked by the Contacts form. Validates input, checks the
 // honeypot, sends an email via Hostinger SMTP to the production mailbox
 // (info@home2host.com). Returns a serializable result for useActionState.
+//
+// Locale strategy: messages shown to the SUBMITTER (success / validation
+// errors / rate-limit / generic failure) are pulled from next-intl in
+// the submitter's locale. Email body / subject sent to the OWNER stays
+// hardcoded BG — the owner reads every inquiry, and switching the email
+// language based on which version of the site the submitter used would
+// just be noise for them. Submitter-facing locale, owner-facing fixed.
 //
 // Why server action vs API route:
 // - Tighter coupling with the form (no fetch boilerplate, FormData passed
@@ -38,28 +46,34 @@ type ValidatedFields = {
   messageBody: string;
 };
 
+type ErrorTranslator = (key: string) => string;
+
 // Manual validation — only 4 fields, not worth adding a schema dep (zod et
-// al.) for this. Returns the cleaned values or a user-facing error string.
-function validate(formData: FormData): ValidatedFields | string {
+// al.) for this. Returns the cleaned values or a translated error string.
+function validate(
+  formData: FormData,
+  tError: ErrorTranslator,
+): ValidatedFields | string {
   const name = String(formData.get("name") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
   const messageBody = String(formData.get("message") ?? "").trim();
 
-  if (!name) return "Моля, въведете вашето име.";
-  if (name.length > 200) return "Името е твърде дълго.";
-  if (!email) return "Моля, въведете вашия имейл адрес.";
-  if (email.length > 200) return "Имейлът е твърде дълъг.";
+  if (!name) return tError("nameRequired");
+  if (name.length > 200) return tError("nameTooLong");
+  if (!email) return tError("emailRequired");
+  if (email.length > 200) return tError("emailTooLong");
   // Pragmatic email check — RFC-strict regex is overkill for a contact form.
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
-    return "Моля, въведете валиден имейл адрес.";
-  if (phone.length > 50) return "Телефонният номер е твърде дълъг.";
-  if (!messageBody) return "Моля, опишете накратко вашето запитване.";
-  if (messageBody.length > 5000) return "Съобщението е твърде дълго.";
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return tError("emailInvalid");
+  if (phone.length > 50) return tError("phoneTooLong");
+  if (!messageBody) return tError("messageRequired");
+  if (messageBody.length > 5000) return tError("messageTooLong");
 
   return { name, email, phone, messageBody };
 }
 
+// Email body assembly — always BG, since the owner is the only reader.
+// See module header for the rationale.
 function buildEmail(fields: ValidatedFields) {
   const subject = `[Запитване от сайта] ${fields.name}`;
   const text = [
@@ -103,6 +117,11 @@ export async function submitContact(
   _prevState: ContactFormState,
   formData: FormData,
 ): Promise<ContactFormState> {
+  // Resolve the submitter-facing strings in their locale up front. Both
+  // namespaces resolve from the same JSON file so this is a single load.
+  const tForm = await getTranslations("ContactForm");
+  const tError = (key: string) => tForm(`errors.${key}`);
+
   // Honeypot — hidden field that only bots fill in. We silently return
   // "success" so bots get no feedback that the form rejected them.
   // The field name must NOT be a common autofill target ("website",
@@ -113,7 +132,7 @@ export async function submitContact(
     // Keep this log — it's a low-frequency abuse signal worth seeing in
     // Vercel logs if the form starts getting hammered.
     console.log("[contact-form] honeypot tripped — silently succeeding");
-    return { status: "success", message: "Благодарим! Ще се свържем с вас скоро." };
+    return { status: "success", message: tForm("successMessage") };
   }
 
   // Per-IP rate limit. Runs after the honeypot (cheap, in-process) but
@@ -123,14 +142,10 @@ export async function submitContact(
   if (!rateLimit.allowed) {
     // Same rationale as the honeypot log — abuse-frequency signal, not noise.
     console.log("[contact-form] rate limit exceeded");
-    return {
-      status: "error",
-      message:
-        "Получили сме няколко съобщения от вашия адрес. Моля, опитайте отново след малко или ни пишете директно на info@home2host.com.",
-    };
+    return { status: "error", message: tError("rateLimit") };
   }
 
-  const validated = validate(formData);
+  const validated = validate(formData, tError);
   if (typeof validated === "string") {
     return { status: "error", message: validated };
   }
@@ -151,11 +166,7 @@ export async function submitContact(
         hasRecipient: Boolean(recipient),
       },
     );
-    return {
-      status: "error",
-      message:
-        "Формата не е напълно конфигурирана. Моля, свържете се с нас по телефон или имейл.",
-    };
+    return { status: "error", message: tError("smtpMisconfigured") };
   }
 
   // Wrap BOTH transporter creation and sendMail in the same try — if any
@@ -181,18 +192,11 @@ export async function submitContact(
       text: email.text,
       html: email.html,
     });
-    return {
-      status: "success",
-      message: "Благодарим! Ще се свържем с вас скоро.",
-    };
+    return { status: "success", message: tForm("successMessage") };
   } catch (error) {
     // Log the underlying error server-side for debugging in Vercel logs,
     // but don't expose details to the user — keep the message generic.
     console.error("[contact-form] sendMail failed", error);
-    return {
-      status: "error",
-      message:
-        "Възникна грешка при изпращането. Моля, опитайте отново или ни пишете на info@home2host.com.",
-    };
+    return { status: "error", message: tError("sendFailed") };
   }
 }

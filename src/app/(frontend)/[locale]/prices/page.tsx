@@ -1,27 +1,36 @@
 import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { PricesSection } from "@/components/sections/PricesSection";
+
+type Params = { locale: string };
 
 // Canonical → `/` for the same reason as /about-us/ and /services/: the home
 // page carries the full content of every section. See the sibling routes for
 // the longer reasoning.
-// Per-page `openGraph` overrides the root layout's title/description so
-// social-share previews for this URL read for the section, not the home.
-// See sibling /about-us/page.tsx for the longer reasoning.
-export const metadata: Metadata = {
-  title: "Цени | Home2Host",
-  description:
-    "Три плана за управление на имоти за краткосрочен наем — Start Smart за стартиране, Full Care за пълен мениджмънт и Home Refresh за интериорно обновяване.",
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    title: "Цени | Home2Host",
-    description:
-      "Три плана за управление на имоти за краткосрочен наем — Start Smart за стартиране, Full Care за пълен мениджмънт и Home Refresh за интериорно обновяване.",
-  },
-};
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<Params>;
+}): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "Prices" });
+  const title = t("metaTitle");
+  const description = t("metaDescription");
+  return {
+    title,
+    description,
+    alternates: { canonical: "/" },
+    openGraph: { title, description },
+  };
+}
 
-export default function PricesPage() {
+export default async function PricesPage({
+  params,
+}: {
+  params: Promise<Params>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
   return (
     <main className="flex-1">
       <PricesSection headingLevel="h1" />

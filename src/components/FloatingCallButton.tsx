@@ -1,4 +1,5 @@
 import { Phone } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 // Persistent floating "call us" CTA. Lives at the layout level so it appears
 // on every (frontend) page. Pure server component — no state, no JS.
@@ -23,10 +24,12 @@ const PHONE_DISPLAY = "+359 88 514 6191";
 const PHONE_DIAL = "+359885146191";
 
 export function FloatingCallButton() {
+  const t = useTranslations("FloatingCall");
+
   return (
     <a
       href={`tel:${PHONE_DIAL}`}
-      aria-label={`Обадете се: ${PHONE_DISPLAY}`}
+      aria-label={t("ariaLabel", { phone: PHONE_DISPLAY })}
       className="fixed bottom-6 right-6 z-50 inline-flex h-14 w-14 items-center justify-center gap-3 rounded-full bg-brand-700 text-neutral-0 shadow-2 transition-all duration-300 ease-out hover:bg-brand-600 hover:shadow-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400 motion-safe:hover:scale-105 md:w-auto md:px-5"
     >
       <Phone className="size-6 shrink-0" strokeWidth={2} aria-hidden="true" />

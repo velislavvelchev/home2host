@@ -1,5 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { setRequestLocale } from "next-intl/server";
 import { buttonStyles } from "@/components/Button";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
@@ -8,7 +10,23 @@ import { PricesSection } from "@/components/sections/PricesSection";
 import { FaqSection } from "@/components/sections/FaqSection";
 import { ContactsSection } from "@/components/sections/contacts/ContactsSection";
 
-export default function Home() {
+// `params.locale` is read so the page can opt into static rendering of
+// translated content (setRequestLocale). All translated strings come
+// from the `Hero` namespace via useTranslations — same hook works in
+// both server and client components under next-intl.
+export default async function Home({
+  params,
+}: {
+  params: Promise<{ locale: string }>;
+}) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  return <HomeView />;
+}
+
+function HomeView() {
+  const t = useTranslations("Hero");
+
   return (
     <main className="flex-1">
       <section className="relative overflow-hidden">
@@ -34,30 +52,29 @@ export default function Home() {
 
               <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-800 dark:bg-brand-900 dark:text-brand-100">
                 <span className="size-1.5 rounded-full bg-brand-600" />
-                Кратък наем · Банско и Бургас
+                {t("eyebrow")}
               </span>
 
               <h1 className="mt-6 font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
-                Управление на имоти в{" "}
-                <span className="text-brand-800 dark:text-brand-300">
-                  Банско и Бургас
-                </span>
-                .
+                {t.rich("title", {
+                  highlight: (chunks) => (
+                    <span className="text-brand-800 dark:text-brand-300">
+                      {chunks}
+                    </span>
+                  ),
+                })}
               </h1>
 
               <p className="mt-6 max-w-prose text-lg leading-relaxed text-foreground-muted">
-                Home2Host се грижи за цялостното управление на имота ви за
-                краткосрочен наем — от професионалните обяви и комуникацията
-                с гостите до почистването и поддръжката. Вие получавате
-                доходи, ние се грижим за всичко останало.
+                {t("lead")}
               </p>
 
               <div className="mt-8 flex flex-wrap items-center gap-3">
                 <Link href="/contacts/" className={buttonStyles("primary", "lg")}>
-                  Свържете се с нас
+                  {t("ctaPrimary")}
                 </Link>
                 <Link href="/services/" className={buttonStyles("secondary", "lg")}>
-                  Виж услугите
+                  {t("ctaSecondary")}
                 </Link>
               </div>
             </div>
@@ -66,7 +83,7 @@ export default function Home() {
               <div className="relative aspect-[3/2] overflow-hidden rounded-xl shadow-2">
                 <Image
                   src="/hero-home.jpeg"
-                  alt="Светъл хол с панорамни прозорци, дървен таван и басейн зад стъклените врати"
+                  alt={t("imageAlt")}
                   width={1600}
                   height={1069}
                   priority

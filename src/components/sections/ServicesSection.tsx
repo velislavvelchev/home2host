@@ -8,6 +8,7 @@ import {
   Palette,
   ShieldCheck,
 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 
 // Reusable across the home page (embedded after About) and the standalone
@@ -24,72 +25,32 @@ import { RevealOnScroll } from "@/components/RevealOnScroll";
 // Images live in `public/services/` and were sourced from the Stage 0
 // content inventory (same Pexels stock the live WordPress site uses).
 // Replace with owned photography in a later slice when the owner has it.
+//
+// Service text (title + body + imageAlt) lives in messages/<locale>.json
+// under `Services.items`. The visuals (icon + image path) stay in code
+// and are paired with the translated text by index — the order MUST
+// match between `visuals` and `Services.items`.
 
 type ServicesSectionProps = {
   headingLevel?: "h1" | "h2";
 };
 
-type Service = {
-  title: string;
-  body: string;
-  icon: LucideIcon;
-  image: string;
-  imageAlt: string;
-};
+type ServiceVisual = { icon: LucideIcon; image: string };
+type ServiceText = { title: string; body: string; imageAlt: string };
 
-const services: Service[] = [
-  {
-    title: "Професионално създаване на профил",
-    body:
-      "Създаваме и поддържаме профила на вашия имот така, че да изпъква сред конкуренцията. Внимаваме във всеки детайл — от описанието до представянето на удобствата — за да привличаме повече резервации. Използваме подбрани професионални снимки, които визуално подчертават силните страни на имота.",
-    icon: Sparkles,
-    image: "/services/profile.jpg",
-    imageAlt: "Стилно подредена стенна композиция с дървени касетки и растения",
-  },
-  {
-    title: "Динамично ценообразуване",
-    body:
-      "Изграждаме интелигентна ценова стратегия, която се адаптира към реалните пазарни условия. Алгоритъмът ни следи тенденции, сезонни промени и местни събития, за да предлага най-подходящите цени и условия за престой. Така увеличаваме заетостта и максимизираме приходите ви в Airbnb, Booking и други платформи.",
-    icon: LineChart,
-    image: "/services/pricing.jpg",
-    imageAlt: "Калкулатор, банкноти и монети върху работен бюджетен лист",
-  },
-  {
-    title: "Комуникация и настаняване",
-    body:
-      "Поемаме цялата комуникация с гостите — преди, по време и след престоя им — с бързи отговори, лично отношение и отлично впечатление. Посрещаме ги в удобно за тях време и им предоставяме персонален гид с препоръки за забележителности, заведения и полезни контакти.",
-    icon: MessagesSquare,
-    image: "/services/communication.jpg",
-    imageAlt: "Две ръце държат внимателно дървен модел на къща",
-  },
-  {
-    title: "Поддръжка и почистване",
-    body:
-      "Имотът ви винаги блести в перфектно състояние. След всеки престой осигуряваме свежо изпрани спално бельо и кърпи, заредени консумативи и безупречна чистота. При възникнал проблем разполагаме с надежден екип техници, които реагират бързо и ефективно.",
-    icon: Brush,
-    image: "/services/cleaning.jpg",
-    imageAlt: "Камериерка подрежда възглавници върху прясно оправено легло",
-  },
-  {
-    title: "Интериорен дизайн",
-    body:
-      "Наш дизайнер се грижи имотът ви да изглежда не просто подреден, а привлекателен и уютен. Чрез освежаващо боядисване, стилни декорации и внимателно подбрани детайли пространството се превръща в истинско бижу — малките щрихи създават голямата картина и носят по-високи приходи.",
-    icon: Palette,
-    image: "/services/interior.jpg",
-    imageAlt: "Мостри от текстил, дървесина и цветова палитра върху работна маса",
-  },
-  {
-    title: "Сигурност",
-    body:
-      "Подбираме гостите внимателно и работим само с проверени профили и високорейтингови потребители. Процесът на настаняване гарантира спокойствие за вас и комфорт за тях — защото безопасността е ключът към безпроблемен престой и повече 5-звездни отзиви.",
-    icon: ShieldCheck,
-    image: "/services/security.jpg",
-    imageAlt: "Спокоен диван със скандинавски възглавници и ваза с цветя",
-  },
+const visuals: ServiceVisual[] = [
+  { icon: Sparkles,      image: "/services/profile.jpg"      },
+  { icon: LineChart,     image: "/services/pricing.jpg"      },
+  { icon: MessagesSquare, image: "/services/communication.jpg" },
+  { icon: Brush,         image: "/services/cleaning.jpg"     },
+  { icon: Palette,       image: "/services/interior.jpg"     },
+  { icon: ShieldCheck,   image: "/services/security.jpg"     },
 ];
 
 export function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
   const Heading = headingLevel;
+  const t = useTranslations("Services");
+  const items = t.raw("items") as ServiceText[];
 
   return (
     <section
@@ -100,19 +61,18 @@ export function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
       <div className="mx-auto max-w-6xl px-gutter py-section">
         <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-800 dark:bg-brand-900 dark:text-brand-100">
           <span className="size-1.5 rounded-full bg-brand-600" />
-          Услуги
+          {t("eyebrow")}
         </span>
 
         <Heading
           id="services-heading"
           className="mt-6 max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl"
         >
-          Какво правим за вас
+          {t("heading")}
         </Heading>
 
         <p className="mt-6 max-w-prose text-lg leading-relaxed text-foreground-muted">
-          Цялостно управление на имота ви за краткосрочен наем — от
-          обявата до посрещането на гостите.
+          {t("lead")}
         </p>
 
         {/*
@@ -125,8 +85,8 @@ export function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
           `prefers-reduced-motion` in `globals.css`.
         */}
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {services.map((service, index) => {
-            const Icon = service.icon;
+          {items.map((service, index) => {
+            const Icon = visuals[index].icon;
             return (
               <li key={`overview-${service.title}`}>
                 <a
@@ -153,8 +113,8 @@ export function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
         </ul>
 
         <ol className="mt-20 flex flex-col gap-8 md:gap-10">
-          {services.map((service, index) => {
-            const Icon = service.icon;
+          {items.map((service, index) => {
+            const { icon: Icon, image } = visuals[index];
             const isImageRight = index % 2 === 1;
             return (
               <RevealOnScroll key={service.title}>
@@ -182,7 +142,7 @@ export function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
                   >
                     <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
                       <Image
-                        src={service.image}
+                        src={image}
                         alt={service.imageAlt}
                         fill
                         sizes="(max-width: 768px) 100vw, 45vw"
@@ -226,7 +186,7 @@ export function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
         </ol>
 
         <p className="mt-20 max-w-prose font-display text-2xl font-medium tracking-tight sm:text-3xl">
-          Ние се грижим за гостите, вие се наслаждавайте на останалото.
+          {t("closing")}
         </p>
       </div>
     </section>
