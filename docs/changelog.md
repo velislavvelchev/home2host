@@ -2,6 +2,11 @@
 
 Reverse chronological. One line per completed task. Dates in YYYY-MM-DD format.
 
+## 2026-06-18
+
+- feat: wire FAQ section to its Payload collection (Priority A follow-up from the marketing-content-from-JSON triage). `FaqSection` is now an async server component that does `payload.find({ collection: 'faqs', locale, sort: 'order' })` on every request instead of reading `t.raw('Faq.items')` from the i18n bundle. Seeded the collection with the 7 existing Q&As (BG + EN) by upserting each as `category='owners'` with `order` in 10-step increments (room to slot new items between existing ones without renumbering). Owner can now self-serve FAQ edits in `/admin` — BG tab → EN tab → save — same loop as blog posts; no developer round-trip for content changes. **Seeding approach:** first tried a standalone `tsx`/`@swc-node` script; both runners tripped Payload's bundled `bin/loadEnv.js` (which `import { loadEnvConfig } from '@next/env'` in a way that depends on the `--use-swc` flag the Payload CLI passes to its own children). Pivoted to a temporary `GET /api/seed-faqs` route handler placed inside `(payload)/api/` (Next.js routes the explicit path ahead of the `[...slug]` catch-all sibling) — Next.js already loads `payload.config.ts` cleanly, so the loader fight evaporates. Endpoint deleted after running. Build went from 9 prerendered routes to 7: `/[locale]` and `/[locale]/questions` flipped from static to dynamic because the per-request DB read happens in `FaqSection`. Acceptable cost for current traffic; if it ever matters, `unstable_cache` around the find call can put them back on static + short revalidation. `Faq.items` keys removed from `messages/bg.json` + `messages/en.json` — only `eyebrow`/`heading`/`lead`/`metaTitle`/`metaDescription` remain as section chrome.
+- docs: drop the logo-chip polish follow-up from the Stage 4 Hero rebuild bullet — owner reviewed and prefers the current chip rendering as-is.
+
 ## 2026-06-17
 
 - fix: hero eyebrow on BG now reads "Краткосрочен наем" instead of "Кратък наем" — the original phrasing sounded unnatural in Bulgarian. Owner-flagged during post-launch review of the i18n migration. EN ("Short-term rental") was already idiomatic and stays.

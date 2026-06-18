@@ -1,6 +1,8 @@
 import { ChevronDown } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
+import { getPayloadInstance } from "@/lib/payload";
+import type { Locale } from "@/i18n/routing";
 
 // Reusable across the home page (embedded after Prices) and the standalone
 // /questions/ route. `headingLevel` swaps h1/h2 so the document outline
@@ -13,20 +15,35 @@ import { RevealOnScroll } from "@/components/RevealOnScroll";
 // yet), so we accept instant open/close and let the chevron carry the
 // visual feedback. Modern minimal.
 //
-// Q&A pairs live in `messages/<locale>.json` under `Faq.items`. The live
-// site's "BnB Manager" typo in the last answer is corrected to
-// "Home2Host" in the BG copy — see content-inventory-findings memory.
+// Q&A pairs are read from the Payload `faqs` collection on every request.
+// The owner manages them in /admin (BG tab → EN tab → save) like blog
+// posts — no developer round-trip for content edits. With localization
+// enabled on the collection, passing `locale` selects the right language
+// and untranslated EN fields fall back to BG via `defaultLocale` config.
+//
+// Eyebrow / heading / lead stay in messages/<locale>.json because they're
+// section chrome (Q&A list framing), not editorial content the owner
+// would want to churn on.
 
 type FaqSectionProps = {
   headingLevel?: "h1" | "h2";
 };
 
-type QA = { question: string; answer: string };
-
-export function FaqSection({ headingLevel = "h2" }: FaqSectionProps) {
+export async function FaqSection({ headingLevel = "h2" }: FaqSectionProps) {
   const Heading = headingLevel;
-  const t = useTranslations("Faq");
-  const items = t.raw("items") as QA[];
+  const locale = (await getLocale()) as Locale;
+  const t = await getTranslations("Faq");
+
+  const payload = await getPayloadInstance();
+  const { docs } = await payload.find({
+    collection: "faqs",
+    locale,
+    sort: "order",
+    // Higher than we'd ever expect — keeps a single round trip even if
+    // the owner adds dozens of Q&As over time.
+    limit: 100,
+    depth: 0,
+  });
 
   return (
     <section
@@ -59,8 +76,8 @@ export function FaqSection({ headingLevel = "h2" }: FaqSectionProps) {
         </p>
 
         <ul className="mt-12 max-w-3xl divide-y divide-white/15">
-          {items.map((qa, index) => (
-            <RevealOnScroll key={qa.question} delayIndex={index}>
+          {docs.map((qa, index) => (
+            <RevealOnScroll key={qa.id} delayIndex={index}>
               <li>
                 <details className="group py-5">
                   {/*

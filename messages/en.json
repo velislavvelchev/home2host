@@ -164,36 +164,6 @@
     "eyebrow": "FAQ",
     "heading": "Frequently asked questions",
     "lead": "Answers to the questions we hear most often from property owners. Can't find yours? Get in touch.",
-    "items": [
-      {
-        "question": "Which apartments are a good fit for short-term rental?",
-        "answer": "Properties in the centre or close to key attractions tend to perform best — they draw in tourists. Apartments with a fresh refurbishment and modern decor stand out from the competition without needing expensive furniture. What matters is that the property is functional, safe, and well-maintained, since guest comfort is the key to strong revenue."
-      },
-      {
-        "question": "What about regulations and taxes?",
-        "answer": "Every short-term rental property has to be registered with the municipality as a Class B accommodation and entered into the Unified System for Tourist Information (ESTI). Owners are required to submit guest data and pay the tourist tax, and in some cases also a patent tax or VAT. This keeps the activity fully legal and transparent."
-      },
-      {
-        "question": "Can Home2Host help me set the right price for my listing?",
-        "answer": "We run a competitive market analysis and set the right price for your listing on Airbnb and Booking. We believe in dynamic pricing and use algorithms and tools built by experts that calculate the optimal price for each period, taking every factor into account."
-      },
-      {
-        "question": "Can my neighbours stop me from renting my apartment short-term?",
-        "answer": "No, neighbours can't stop you from renting your apartment short-term. Registering the property as Class B accommodation under the Tourism Act doesn't require neighbour approval. That said, the building's general assembly does have the right to set an entrance fee that can be 3 to 5 times higher for an apartment used and registered for short-term rental."
-      },
-      {
-        "question": "How is Home2Host's commission calculated?",
-        "answer": "Home2Host's management commission is 25% of the net revenue you receive from the platform after the cleaning fee is deducted. It's calculated after the platform's own commission (Airbnb, Booking.com, or other) has been taken out. That means you only pay commission on the money that actually lands in your account — full transparency and clarity in the maths."
-      },
-      {
-        "question": "What costs does the owner have during rental?",
-        "answer": "Owner costs during rental include all utilities — electricity, water, internet — and the building fees under the Bulgarian common-property act. The owner is also responsible for all taxes related to the rental activity (tourist tax, patent tax, and others), as well as income taxes on the rental earnings."
-      },
-      {
-        "question": "Will there be damage to my property?",
-        "answer": "Damage and wear can occur with any kind of rental. With short-term rental, it gets fixed immediately so the property is ready for the next guests. Home2Host arranges professional and timely repairs and supports the compensation process through Airbnb's Aircover insurance, where applicable."
-      }
-    ],
     "metaTitle": "Frequently asked questions | Home2Host",
     "metaDescription": "Answers to the most common questions about short-term rental property management — regulations, pricing, commission, and more."
   },
