@@ -244,23 +244,27 @@ export interface BlogPost {
   _status?: ('draft' | 'published') | null;
 }
 /**
- * Airbnb listings shown on the Apartments page. Each apartment is an embed, not a property record.
+ * Airbnb listings shown on the Apartments carousel. Paste the Airbnb URL and use 'Fetch from Airbnb' to auto-fill the title and cover photo, or fill them manually.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "apartments".
  */
 export interface Apartment {
   id: number;
-  title: string;
-  city: 'bansko' | 'burgas' | 'razlog';
   /**
-   * Public Airbnb listing URL (https://www.airbnb.com/rooms/...). Used to construct the embed.
+   * Public Airbnb listing URL (https://www.airbnb.com/rooms/...). The card on the site links here when a visitor clicks the apartment.
    */
   airbnbUrl: string;
+  title: string;
   /**
-   * Short blurb shown above the embed.
+   * Cover photo shown on the card. Auto-uploaded when you use 'Fetch from Airbnb', or upload manually.
    */
-  description?: string | null;
+  featuredImage: number | Media;
+  /**
+   * Star rating shown on the card (e.g. 4.85). Auto-filled by 'Fetch from Airbnb'; click the refresh icon below to pull just the latest number from Airbnb without overwriting title or photo. Leave empty to hide the rating pill (use for ★New listings).
+   */
+  rating?: number | null;
+  city: 'bansko' | 'burgas' | 'razlog';
   /**
    * Lower numbers appear first.
    */
@@ -548,10 +552,11 @@ export interface BlogPostsSelect<T extends boolean = true> {
  * via the `definition` "apartments_select".
  */
 export interface ApartmentsSelect<T extends boolean = true> {
-  title?: T;
-  city?: T;
   airbnbUrl?: T;
-  description?: T;
+  title?: T;
+  featuredImage?: T;
+  rating?: T;
+  city?: T;
   order?: T;
   isActive?: T;
   updatedAt?: T;

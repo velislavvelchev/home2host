@@ -115,12 +115,71 @@ export default buildConfig({
         useAsTitle: "title",
         defaultColumns: ["id", "title", "city", "order", "isActive"],
         description:
-          "Airbnb listings shown on the Apartments page. Each apartment is an embed, not a property record.",
+          "Airbnb listings shown on the Apartments carousel. Paste the Airbnb URL and use 'Fetch from Airbnb' to auto-fill the title and cover photo, or fill them manually.",
       },
       access: { read: () => true },
       defaultSort: "order",
       fields: [
+        {
+          name: "airbnbUrl",
+          type: "text",
+          required: true,
+          admin: {
+            description:
+              "Public Airbnb listing URL — any locale form works (https://www.airbnb.com/rooms/..., https://bg.airbnb.com/rooms/..., https://www.airbnb.co.uk/rooms/..., etc.). The card on the site links to whichever form you paste.",
+          },
+        },
+        {
+          // UI-only field (no DB column) — renders the "Fetch from
+          // Airbnb" button. Sits directly under airbnbUrl so the action
+          // is colocated with the input it reads from. Path is resolved
+          // against the admin.importMap.baseDir (src/), then refreshed
+          // via `npm run generate:importmap` after any change.
+          name: "fetchFromAirbnb",
+          type: "ui",
+          admin: {
+            components: {
+              Field:
+                "/components/admin/FetchFromAirbnbField#FetchFromAirbnbField",
+            },
+          },
+        },
         { name: "title", type: "text", localized: true, required: true },
+        {
+          name: "featuredImage",
+          type: "upload",
+          relationTo: "media",
+          required: true,
+          admin: {
+            description:
+              "Cover photo shown on the card. Auto-uploaded when you use 'Fetch from Airbnb', or upload manually.",
+          },
+        },
+        {
+          name: "rating",
+          type: "number",
+          min: 0,
+          max: 5,
+          admin: {
+            description:
+              "Star rating shown on the card (e.g. 4.85). Auto-filled by 'Fetch from Airbnb'; click the refresh icon below to pull just the latest number from Airbnb without overwriting title or photo. Leave empty to hide the rating pill (use for ★New listings).",
+            step: 0.01,
+          },
+        },
+        {
+          // UI-only field — small refresh icon button that re-fetches
+          // just the rating from Airbnb. Lets the owner bump a number
+          // they care about (most volatile field) without overwriting
+          // the title or featured image they may have curated.
+          name: "refreshRatingButton",
+          type: "ui",
+          admin: {
+            components: {
+              Field:
+                "/components/admin/RefreshAirbnbRatingField#RefreshAirbnbRatingField",
+            },
+          },
+        },
         {
           name: "city",
           type: "select",
@@ -130,21 +189,6 @@ export default buildConfig({
             { label: "Burgas", value: "burgas" },
             { label: "Razlog", value: "razlog" },
           ],
-        },
-        {
-          name: "airbnbUrl",
-          type: "text",
-          required: true,
-          admin: {
-            description:
-              "Public Airbnb listing URL (https://www.airbnb.com/rooms/...). Used to construct the embed.",
-          },
-        },
-        {
-          name: "description",
-          type: "textarea",
-          localized: true,
-          admin: { description: "Short blurb shown above the embed." },
         },
         {
           name: "order",

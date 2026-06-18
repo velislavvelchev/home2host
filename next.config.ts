@@ -25,15 +25,11 @@ const nextConfig: NextConfig = {
   serverExternalPackages: ["nodemailer"],
 
   // Hosts next/image is allowed to optimise from.
-  //   - a0.muscache.com — Airbnb's image CDN, used by ApartmentsSection
-  //     (each card's photo URL is the listing's og:image, baked in via
-  //     scripts/fetch-airbnb-og-images.mjs).
   //   - *.public.blob.vercel-storage.com — Vercel Blob, where Payload
-  //     uploads land (see ADR 0004). Used for blog post featured images
-  //     and any other Media-backed content.
+  //     uploads land (see ADR 0004). Used for blog post featured images,
+  //     apartment cover photos, and any other Media-backed content.
   images: {
     remotePatterns: [
-      { protocol: "https", hostname: "a0.muscache.com" },
       { protocol: "https", hostname: "*.public.blob.vercel-storage.com" },
     ],
   },
