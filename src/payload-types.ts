@@ -72,8 +72,6 @@ export interface Config {
     'blog-posts': BlogPost;
     apartments: Apartment;
     faqs: Faq;
-    services: Service;
-    'pricing-plans': PricingPlan;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -86,8 +84,6 @@ export interface Config {
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     apartments: ApartmentsSelect<false> | ApartmentsSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
-    services: ServicesSelect<false> | ServicesSelect<true>;
-    'pricing-plans': PricingPlansSelect<false> | PricingPlansSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -98,10 +94,16 @@ export interface Config {
   };
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('bg' | 'en') | ('bg' | 'en')[];
   globals: {
+    about: About;
+    services: Service;
+    'pricing-plans': PricingPlan;
     contacts: Contact;
     'social-links': SocialLink;
   };
   globalsSelect: {
+    about: AboutSelect<false> | AboutSelect<true>;
+    services: ServicesSelect<false> | ServicesSelect<true>;
+    'pricing-plans': PricingPlansSelect<false> | PricingPlansSelect<true>;
     contacts: ContactsSelect<false> | ContactsSelect<true>;
     'social-links': SocialLinksSelect<false> | SocialLinksSelect<true>;
   };
@@ -252,7 +254,7 @@ export interface BlogPost {
 export interface Apartment {
   id: number;
   /**
-   * Public Airbnb listing URL (https://www.airbnb.com/rooms/...). The card on the site links here when a visitor clicks the apartment.
+   * Public Airbnb listing URL — any locale form works (https://www.airbnb.com/rooms/..., https://bg.airbnb.com/rooms/..., https://www.airbnb.co.uk/rooms/..., etc.). The card on the site links to whichever form you paste.
    */
   airbnbUrl: string;
   title: string;
@@ -287,71 +289,6 @@ export interface Faq {
   category?: ('owners' | 'guests' | 'general') | null;
   /**
    * Lower numbers appear first within a category.
-   */
-  order?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * Services offered to property owners (cleaning, key handover, listing management, etc.).
- *
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services".
- */
-export interface Service {
-  id: number;
-  title: string;
-  summary: string;
-  /**
-   * Icon name (e.g. 'sparkles', 'key'). Mapped to an icon component in the frontend; leave empty for no icon.
-   */
-  icon?: string | null;
-  /**
-   * Optional illustration. Use either an icon or an image, not both.
-   */
-  image?: (number | null) | Media;
-  /**
-   * Lower numbers appear first.
-   */
-  order?: number | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pricing-plans".
- */
-export interface PricingPlan {
-  id: number;
-  title: string;
-  /**
-   * Free-form price string (e.g. '20% от приходите' or '€50 / месец'). Kept as text because pricing models vary too much for a numeric field.
-   */
-  priceDisplay: string;
-  /**
-   * Optional secondary line below the price.
-   */
-  priceCaption?: string | null;
-  features?:
-    | {
-        label: string;
-        id?: string | null;
-      }[]
-    | null;
-  /**
-   * Button text. Defaults to a generic CTA if empty.
-   */
-  ctaLabel?: string | null;
-  /**
-   * Where the button goes. Leave empty to point at the contact page.
-   */
-  ctaUrl?: string | null;
-  /**
-   * Visually highlights this plan on the pricing page.
-   */
-  isFeatured?: boolean | null;
-  /**
-   * Lower numbers appear first.
    */
   order?: number | null;
   updatedAt: string;
@@ -400,14 +337,6 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'faqs';
         value: number | Faq;
-      } | null)
-    | ({
-        relationTo: 'services';
-        value: number | Service;
-      } | null)
-    | ({
-        relationTo: 'pricing-plans';
-        value: number | PricingPlan;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -576,40 +505,6 @@ export interface FaqsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "services_select".
- */
-export interface ServicesSelect<T extends boolean = true> {
-  title?: T;
-  summary?: T;
-  icon?: T;
-  image?: T;
-  order?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pricing-plans_select".
- */
-export interface PricingPlansSelect<T extends boolean = true> {
-  title?: T;
-  priceDisplay?: T;
-  priceCaption?: T;
-  features?:
-    | T
-    | {
-        label?: T;
-        id?: T;
-      };
-  ctaLabel?: T;
-  ctaUrl?: T;
-  isFeatured?: T;
-  order?: T;
-  updatedAt?: T;
-  createdAt?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv_select".
  */
 export interface PayloadKvSelect<T extends boolean = true> {
@@ -647,6 +542,128 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * Editable copy for the 'About us' section (embedded on the home page and shown at /about-us/). Two paragraphs sit side-by-side on desktop and stack on mobile.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about".
+ */
+export interface About {
+  id: number;
+  eyebrow: string;
+  heading: string;
+  paragraph1: string;
+  paragraph2: string;
+  /**
+   * Browser tab + Google result title for /about-us/.
+   */
+  metaTitle?: string | null;
+  /**
+   * Google result snippet + social-share description.
+   */
+  metaDescription?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Editable copy for the 'Services' section. Exactly 6 items — the layout is built for that count (6-up overview grid + 6 alternating editorial rows). Use the 'Key' select on each item to pick which icon and fallback photo show; reordering the array reorders the cards visually.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services".
+ */
+export interface Service {
+  id: number;
+  eyebrow: string;
+  heading: string;
+  lead: string;
+  closing: string;
+  /**
+   * Exactly 6 items. Don't add or remove rows — edit in place.
+   */
+  items?:
+    | {
+        /**
+         * Pick the visual identity for this row. Drives the icon and the fallback photo (used if no custom Image is uploaded). Each key should appear exactly once.
+         */
+        key: 'profile' | 'pricing' | 'communication' | 'cleaning' | 'interior' | 'security';
+        title: string;
+        body: string;
+        imageAlt: string;
+        /**
+         * Optional custom photo for this row. Leave empty to use the built-in fallback for the chosen Key.
+         */
+        image?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Browser tab + Google result title for /services/.
+   */
+  metaTitle?: string | null;
+  /**
+   * Google result snippet + social-share description.
+   */
+  metaDescription?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * Editable copy for the 'Pricing' section. Exactly 3 plans — the 3-up grid is built for that count and would wrap awkwardly with a 4th card. Use the 'Icon' select on each plan to pick which icon shows.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing-plans".
+ */
+export interface PricingPlan {
+  id: number;
+  eyebrow: string;
+  heading: string;
+  lead: string;
+  /**
+   * Button label on every plan card.
+   */
+  cta: string;
+  /**
+   * Exactly 3 plans. Don't add or remove cards — edit in place.
+   */
+  plans?:
+    | {
+        /**
+         * Icon shown on the card header. Each icon should appear exactly once.
+         */
+        icon: 'rocket' | 'house' | 'wand';
+        name: string;
+        /**
+         * Short line under the plan name (e.g. 'One-off service').
+         */
+        cadence: string;
+        /**
+         * The price as text — either a number ('200', '25') or a phrase ('Custom quote'). Phrases skip the unit treatment.
+         */
+        price: string;
+        /**
+         * Unit shown next to a numeric price (e.g. 'EUR', '%'). Leave empty for phrase-style prices.
+         */
+        priceUnit?: string | null;
+        features?:
+          | {
+              label: string;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Browser tab + Google result title for /prices/.
+   */
+  metaTitle?: string | null;
+  /**
+   * Google result snippet + social-share description.
+   */
+  metaDescription?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -687,6 +704,77 @@ export interface SocialLink {
     | null;
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about_select".
+ */
+export interface AboutSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  paragraph1?: T;
+  paragraph2?: T;
+  metaTitle?: T;
+  metaDescription?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "services_select".
+ */
+export interface ServicesSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  lead?: T;
+  closing?: T;
+  items?:
+    | T
+    | {
+        key?: T;
+        title?: T;
+        body?: T;
+        imageAlt?: T;
+        image?: T;
+        id?: T;
+      };
+  metaTitle?: T;
+  metaDescription?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pricing-plans_select".
+ */
+export interface PricingPlansSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  lead?: T;
+  cta?: T;
+  plans?:
+    | T
+    | {
+        icon?: T;
+        name?: T;
+        cadence?: T;
+        price?: T;
+        priceUnit?: T;
+        features?:
+          | T
+          | {
+              label?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  metaTitle?: T;
+  metaDescription?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

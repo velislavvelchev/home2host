@@ -10,7 +10,10 @@
     "description": "Professional management of short-term rental properties in Bansko and Burgas. Listings, guest communication, cleaning, and maintenance.",
     "addressStreet": "ul. Kralev Dvor 5",
     "addressLocality": "Bansko",
-    "areaServed": ["Bansko", "Burgas"]
+    "areaServed": [
+      "Bansko",
+      "Burgas"
+    ]
   },
   "Header": {
     "logoAriaLabel": "Home2Host — home",
@@ -51,54 +54,6 @@
     "ctaSecondary": "See our services",
     "imageAlt": "Bright living room with panoramic windows, a wooden ceiling, and a pool behind the glass doors"
   },
-  "About": {
-    "eyebrow": "About us",
-    "heading": "Who we are",
-    "paragraph1": "Home2Host is a company built to deliver professional management of short-term rental properties. Renting out properties on Airbnb, Booking, and similar platforms keeps getting more popular — it lets owners earn extra income from their home while still being able to use it when they need to.",
-    "paragraph2": "But it takes time and effort: cleaning, guest communication, check-ins, pricing decisions. Home2Host takes all of that off your plate and runs the whole operation for you, with a focus on optimising occupancy and maximising your revenue.",
-    "metaTitle": "About us | Home2Host",
-    "metaDescription": "Home2Host is a company offering professional management of short-term rental properties in Bansko and Burgas."
-  },
-  "Services": {
-    "eyebrow": "Services",
-    "heading": "What we do for you",
-    "lead": "End-to-end management of your short-term rental — from the listing to welcoming the guests.",
-    "closing": "We take care of the guests, you enjoy the rest.",
-    "items": [
-      {
-        "title": "Professional listing setup",
-        "body": "We build and maintain your property's listing so it stands out from the competition. We pay attention to every detail — from the copy to the amenity layout — to attract more bookings. We use curated professional photography that visually highlights what makes your place special.",
-        "imageAlt": "A stylish wall arrangement with wooden cubbies and plants"
-      },
-      {
-        "title": "Dynamic pricing",
-        "body": "We build an intelligent pricing strategy that adapts to real market conditions. Our algorithm tracks trends, seasonal shifts, and local events to recommend the right price and stay terms. The result: higher occupancy and more revenue across Airbnb, Booking, and other platforms.",
-        "imageAlt": "A calculator, banknotes, and coins on a working budget sheet"
-      },
-      {
-        "title": "Communication and check-in",
-        "body": "We handle all guest communication — before, during, and after the stay — with fast replies, a personal touch, and a great impression every time. We check guests in at a time that works for them and hand them a personalised guide with attractions, restaurants, and useful contacts.",
-        "imageAlt": "Two hands carefully holding a wooden house model"
-      },
-      {
-        "title": "Maintenance and cleaning",
-        "body": "Your property always looks its best. After every stay we provide freshly laundered linens and towels, restocked supplies, and immaculate cleaning. If something breaks we have a reliable team of technicians who respond quickly and effectively.",
-        "imageAlt": "A housekeeper arranging pillows on a freshly made bed"
-      },
-      {
-        "title": "Interior design",
-        "body": "Our designer makes sure your property feels not just tidy but inviting and warm. Through a refresh of the paint, considered decoration, and carefully chosen details, the space becomes a genuine little gem — and the small touches add up to a bigger picture, and higher revenue.",
-        "imageAlt": "Fabric, wood, and colour-palette samples on a working table"
-      },
-      {
-        "title": "Security",
-        "body": "We screen guests carefully and work only with verified profiles and high-rated travellers. The check-in process gives you peace of mind and them genuine comfort — because safety is the key to a trouble-free stay and more 5-star reviews.",
-        "imageAlt": "A peaceful sofa with Scandinavian pillows and a vase of flowers"
-      }
-    ],
-    "metaTitle": "Services | Home2Host",
-    "metaDescription": "End-to-end short-term rental management — professional listings, dynamic pricing, guest communication, cleaning, maintenance, and security."
-  },
   "Apartments": {
     "eyebrow": "Apartments",
     "heading": "Our apartments",
@@ -111,53 +66,6 @@
     "carouselNext": "Next apartments",
     "metaTitle": "Apartments | Home2Host",
     "metaDescription": "10 short-term rental properties in Bansko and Burgas, managed by Home2Host. Browse and book directly through Airbnb."
-  },
-  "Prices": {
-    "eyebrow": "Pricing",
-    "heading": "Pick the plan that fits you",
-    "lead": "Three different offers for different needs — from a one-off launch to full management to an interior refresh.",
-    "cta": "Get in touch",
-    "plans": [
-      {
-        "name": "Start Smart",
-        "cadence": "One-off service",
-        "price": "200",
-        "priceUnit": "EUR",
-        "features": [
-          "Listing setup on Airbnb and Booking.com",
-          "Professional photoshoot of the property",
-          "Market research and price targeting",
-          "On-site visit and interior consultation",
-          "Self check-in setup"
-        ]
-      },
-      {
-        "name": "Full Care",
-        "cadence": "Of net booking revenue",
-        "price": "25",
-        "priceUnit": "%",
-        "features": [
-          "End-to-end property management, top to bottom",
-          "Listing, calendar, and pricing optimisation",
-          "Dynamic pricing strategy by demand, day, and events",
-          "Professional cleaning with a checklist",
-          "Fresh linens, towels, and supplies for every guest",
-          "Self check-in and guest communication in Bulgarian, English, German, and Russian"
-        ]
-      },
-      {
-        "name": "Home Refresh",
-        "cadence": "Custom quote based on the property's needs",
-        "price": "Custom quote",
-        "features": [
-          "Decoration and interior refresh after an on-site visit",
-          "Wall refresh (paint, wallpaper, art)",
-          "Selection and styling of decorative pieces (pillows, vases, accents, and more)"
-        ]
-      }
-    ],
-    "metaTitle": "Pricing | Home2Host",
-    "metaDescription": "Three plans for short-term rental management — Start Smart to launch, Full Care for full management, and Home Refresh for an interior refresh."
   },
   "Faq": {
     "eyebrow": "FAQ",

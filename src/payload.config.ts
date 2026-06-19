@@ -234,109 +234,203 @@ export default buildConfig({
         },
       ],
     },
+    // ──────────────────────────────────────────────────────────────
+    // NOTE: Services and PricingPlans intentionally live as Globals
+    // (see below), not Collections. The design is built around a
+    // fixed count — 6 alternating service rows, 3 pricing cards —
+    // and a Collection implicitly promises the owner they can add a
+    // 7th service or 4th plan, which the layout doesn't accept
+    // gracefully. Globals + capped arrays match the visual contract.
+    // ──────────────────────────────────────────────────────────────
+  ],
+  globals: [
     {
-      slug: "services",
-      labels: { singular: "Service", plural: "Services" },
+      slug: "about",
+      label: "About section",
       admin: {
-        useAsTitle: "title",
-        defaultColumns: ["id", "title", "order"],
         description:
-          "Services offered to property owners (cleaning, key handover, listing management, etc.).",
+          "Editable copy for the 'About us' section (embedded on the home page and shown at /about-us/). Two paragraphs sit side-by-side on desktop and stack on mobile.",
       },
       access: { read: () => true },
-      defaultSort: "order",
       fields: [
-        { name: "title", type: "text", localized: true, required: true },
-        { name: "summary", type: "textarea", localized: true, required: true },
+        { name: "eyebrow", type: "text", localized: true, required: true },
+        { name: "heading", type: "text", localized: true, required: true },
+        { name: "paragraph1", type: "textarea", localized: true, required: true },
+        { name: "paragraph2", type: "textarea", localized: true, required: true },
         {
-          name: "icon",
+          name: "metaTitle",
           type: "text",
-          admin: {
-            description:
-              "Icon name (e.g. 'sparkles', 'key'). Mapped to an icon component in the frontend; leave empty for no icon.",
-          },
+          localized: true,
+          admin: { description: "Browser tab + Google result title for /about-us/." },
         },
         {
-          name: "image",
-          type: "upload",
-          relationTo: "media",
+          name: "metaDescription",
+          type: "textarea",
+          localized: true,
+          admin: { description: "Google result snippet + social-share description." },
+        },
+      ],
+    },
+    {
+      slug: "services",
+      label: "Services section",
+      admin: {
+        description:
+          "Editable copy for the 'Services' section. Exactly 6 items — the layout is built for that count (6-up overview grid + 6 alternating editorial rows). Use the 'Key' select on each item to pick which icon and fallback photo show; reordering the array reorders the cards visually.",
+      },
+      access: { read: () => true },
+      fields: [
+        { name: "eyebrow", type: "text", localized: true, required: true },
+        { name: "heading", type: "text", localized: true, required: true },
+        { name: "lead", type: "textarea", localized: true, required: true },
+        { name: "closing", type: "text", localized: true, required: true },
+        {
+          name: "items",
+          type: "array",
+          minRows: 6,
+          maxRows: 6,
           admin: {
             description:
-              "Optional illustration. Use either an icon or an image, not both.",
+              "Exactly 6 items. Don't add or remove rows — edit in place.",
           },
+          fields: [
+            {
+              name: "key",
+              type: "select",
+              required: true,
+              options: [
+                { label: "Profile (sparkles icon)", value: "profile" },
+                { label: "Pricing (line chart icon)", value: "pricing" },
+                { label: "Communication (messages icon)", value: "communication" },
+                { label: "Cleaning (brush icon)", value: "cleaning" },
+                { label: "Interior (palette icon)", value: "interior" },
+                { label: "Security (shield icon)", value: "security" },
+              ],
+              admin: {
+                description:
+                  "Pick the visual identity for this row. Drives the icon and the fallback photo (used if no custom Image is uploaded). Each key should appear exactly once.",
+              },
+            },
+            { name: "title", type: "text", localized: true, required: true },
+            { name: "body", type: "textarea", localized: true, required: true },
+            { name: "imageAlt", type: "text", localized: true, required: true },
+            {
+              name: "image",
+              type: "upload",
+              relationTo: "media",
+              admin: {
+                description:
+                  "Optional custom photo for this row. Leave empty to use the built-in fallback for the chosen Key.",
+              },
+            },
+          ],
         },
         {
-          name: "order",
-          type: "number",
-          defaultValue: 0,
-          admin: { description: "Lower numbers appear first." },
+          name: "metaTitle",
+          type: "text",
+          localized: true,
+          admin: { description: "Browser tab + Google result title for /services/." },
+        },
+        {
+          name: "metaDescription",
+          type: "textarea",
+          localized: true,
+          admin: { description: "Google result snippet + social-share description." },
         },
       ],
     },
     {
       slug: "pricing-plans",
-      labels: { singular: "Pricing plan", plural: "Pricing plans" },
+      label: "Pricing section",
       admin: {
-        useAsTitle: "title",
-        defaultColumns: ["id", "title", "priceDisplay", "isFeatured", "order"],
+        description:
+          "Editable copy for the 'Pricing' section. Exactly 3 plans — the 3-up grid is built for that count and would wrap awkwardly with a 4th card. Use the 'Icon' select on each plan to pick which icon shows.",
       },
       access: { read: () => true },
-      defaultSort: "order",
       fields: [
-        { name: "title", type: "text", localized: true, required: true },
+        { name: "eyebrow", type: "text", localized: true, required: true },
+        { name: "heading", type: "text", localized: true, required: true },
+        { name: "lead", type: "textarea", localized: true, required: true },
         {
-          name: "priceDisplay",
+          name: "cta",
           type: "text",
           localized: true,
           required: true,
-          admin: {
-            description:
-              "Free-form price string (e.g. '20% от приходите' or '€50 / месец'). Kept as text because pricing models vary too much for a numeric field.",
-          },
+          admin: { description: "Button label on every plan card." },
         },
         {
-          name: "priceCaption",
-          type: "text",
-          localized: true,
-          admin: { description: "Optional secondary line below the price." },
-        },
-        {
-          name: "features",
+          name: "plans",
           type: "array",
-          localized: true,
-          minRows: 1,
-          fields: [{ name: "label", type: "text", required: true }],
-        },
-        {
-          name: "ctaLabel",
-          type: "text",
-          localized: true,
-          admin: { description: "Button text. Defaults to a generic CTA if empty." },
-        },
-        {
-          name: "ctaUrl",
-          type: "text",
+          minRows: 3,
+          maxRows: 3,
           admin: {
             description:
-              "Where the button goes. Leave empty to point at the contact page.",
+              "Exactly 3 plans. Don't add or remove cards — edit in place.",
           },
+          fields: [
+            {
+              name: "icon",
+              type: "select",
+              required: true,
+              options: [
+                { label: "Rocket (Start Smart)", value: "rocket" },
+                { label: "House (Full Care)", value: "house" },
+                { label: "Wand (Home Refresh)", value: "wand" },
+              ],
+              admin: {
+                description: "Icon shown on the card header. Each icon should appear exactly once.",
+              },
+            },
+            { name: "name", type: "text", localized: true, required: true },
+            {
+              name: "cadence",
+              type: "text",
+              localized: true,
+              required: true,
+              admin: { description: "Short line under the plan name (e.g. 'One-off service')." },
+            },
+            {
+              name: "price",
+              type: "text",
+              localized: true,
+              required: true,
+              admin: {
+                description:
+                  "The price as text — either a number ('200', '25') or a phrase ('Custom quote'). Phrases skip the unit treatment.",
+              },
+            },
+            {
+              name: "priceUnit",
+              type: "text",
+              localized: true,
+              admin: {
+                description:
+                  "Unit shown next to a numeric price (e.g. 'EUR', '%'). Leave empty for phrase-style prices.",
+              },
+            },
+            {
+              name: "features",
+              type: "array",
+              localized: true,
+              minRows: 1,
+              fields: [{ name: "label", type: "text", required: true }],
+            },
+          ],
         },
         {
-          name: "isFeatured",
-          type: "checkbox",
-          defaultValue: false,
-          admin: { description: "Visually highlights this plan on the pricing page." },
+          name: "metaTitle",
+          type: "text",
+          localized: true,
+          admin: { description: "Browser tab + Google result title for /prices/." },
         },
         {
-          name: "order",
-          type: "number",
-          defaultValue: 0,
-          admin: { description: "Lower numbers appear first." },
+          name: "metaDescription",
+          type: "textarea",
+          localized: true,
+          admin: { description: "Google result snippet + social-share description." },
         },
       ],
     },
-  ],
-  globals: [
     {
       slug: "contacts",
       label: "Contacts",

@@ -8,8 +8,11 @@ import {
   Palette,
   ShieldCheck,
 } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { getLocale } from "next-intl/server";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
+import { getPayloadInstance } from "@/lib/payload";
+import type { Locale } from "@/i18n/routing";
+import type { Media } from "@/payload-types";
 
 // Reusable across the home page (embedded after About) and the standalone
 // /services/ route. `headingLevel` swaps h1/h2 so the document outline
@@ -22,35 +25,55 @@ import { RevealOnScroll } from "@/components/RevealOnScroll";
 // "what we do" pass, not the live site's two-pass icon-grid-then-text
 // repetition.
 //
-// Images live in `public/services/` and were sourced from the Stage 0
-// content inventory (same Pexels stock the live WordPress site uses).
-// Replace with owned photography in a later slice when the owner has it.
+// Section copy is read from the Payload `services` Global on every
+// request. Globally fixed at exactly 6 items (the layout is designed
+// around that count), so the admin shows 6 in-place editable rows — no
+// add/remove. Each row's `key` picks one of 6 visual identities
+// (icon + fallback photo) defined in `visuals` below; the owner can
+// reorder rows by reordering the array in admin, and the matching icon
+// rides along because it's keyed, not indexed.
 //
-// Service text (title + body + imageAlt) lives in messages/<locale>.json
-// under `Services.items`. The visuals (icon + image path) stay in code
-// and are paired with the translated text by index — the order MUST
-// match between `visuals` and `Services.items`.
+// Fallback photos under `public/services/` are the same Pexels stock the
+// live WordPress site uses. If the owner uploads a custom Image for a
+// row in admin, that takes precedence; otherwise we render the fallback.
 
 type ServicesSectionProps = {
   headingLevel?: "h1" | "h2";
 };
 
-type ServiceVisual = { icon: LucideIcon; image: string };
-type ServiceText = { title: string; body: string; imageAlt: string };
+type ServiceKey =
+  | "profile"
+  | "pricing"
+  | "communication"
+  | "cleaning"
+  | "interior"
+  | "security";
 
-const visuals: ServiceVisual[] = [
-  { icon: Sparkles,      image: "/services/profile.jpg"      },
-  { icon: LineChart,     image: "/services/pricing.jpg"      },
-  { icon: MessagesSquare, image: "/services/communication.jpg" },
-  { icon: Brush,         image: "/services/cleaning.jpg"     },
-  { icon: Palette,       image: "/services/interior.jpg"     },
-  { icon: ShieldCheck,   image: "/services/security.jpg"     },
-];
+type ServiceVisual = { icon: LucideIcon; fallbackImage: string };
 
-export function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
+const visuals: Record<ServiceKey, ServiceVisual> = {
+  profile:       { icon: Sparkles,       fallbackImage: "/services/profile.jpg"      },
+  pricing:       { icon: LineChart,      fallbackImage: "/services/pricing.jpg"      },
+  communication: { icon: MessagesSquare, fallbackImage: "/services/communication.jpg" },
+  cleaning:      { icon: Brush,          fallbackImage: "/services/cleaning.jpg"     },
+  interior:      { icon: Palette,        fallbackImage: "/services/interior.jpg"     },
+  security:      { icon: ShieldCheck,    fallbackImage: "/services/security.jpg"     },
+};
+
+export async function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
   const Heading = headingLevel;
-  const t = useTranslations("Services");
-  const items = t.raw("items") as ServiceText[];
+  const locale = (await getLocale()) as Locale;
+
+  const payload = await getPayloadInstance();
+  const services = await payload.findGlobal({
+    slug: "services",
+    locale,
+    // depth: 1 populates the per-row optional `image` upload so we get
+    // sizes/url directly without a second round trip.
+    depth: 1,
+  });
+
+  const items = services.items ?? [];
 
   return (
     <section
@@ -61,18 +84,18 @@ export function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
       <div className="mx-auto max-w-6xl px-gutter py-section">
         <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-800 dark:bg-brand-900 dark:text-brand-100">
           <span className="size-1.5 rounded-full bg-brand-600" />
-          {t("eyebrow")}
+          {services.eyebrow}
         </span>
 
         <Heading
           id="services-heading"
           className="mt-6 max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl"
         >
-          {t("heading")}
+          {services.heading}
         </Heading>
 
         <p className="mt-6 max-w-prose text-lg leading-relaxed text-foreground-muted">
-          {t("lead")}
+          {services.lead}
         </p>
 
         {/*
@@ -86,9 +109,9 @@ export function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
         */}
         <ul className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {items.map((service, index) => {
-            const Icon = visuals[index].icon;
+            const Icon = visuals[service.key].icon;
             return (
-              <li key={`overview-${service.title}`}>
+              <li key={service.id ?? `overview-${index}`}>
                 <a
                   href={`#service-${index + 1}`}
                   className="group flex h-full flex-col rounded-2xl border border-brand-200 bg-surface p-6 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:border-brand-700 hover:bg-brand-50/40 dark:border-brand-700 dark:hover:border-brand-400 dark:hover:bg-brand-900/30"
@@ -114,10 +137,17 @@ export function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
 
         <ol className="mt-20 flex flex-col gap-8 md:gap-10">
           {items.map((service, index) => {
-            const { icon: Icon, image } = visuals[index];
+            const { icon: Icon, fallbackImage } = visuals[service.key];
+            // Owner can override the fallback with an uploaded Media doc;
+            // when populated (depth: 1 above) it's an object with `url`.
+            const customImage =
+              service.image && typeof service.image === "object"
+                ? (service.image as Media)
+                : null;
+            const imageSrc = customImage?.url ?? fallbackImage;
             const isImageRight = index % 2 === 1;
             return (
-              <RevealOnScroll key={service.title}>
+              <RevealOnScroll key={service.id ?? `row-${index}`}>
                 {/*
                   Bordered rectangle wrapping each row — defines a visual
                   region without the 2018 drop-shadow card look. Generous
@@ -142,7 +172,7 @@ export function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
                   >
                     <div className="relative aspect-[4/3] overflow-hidden rounded-xl">
                       <Image
-                        src={image}
+                        src={imageSrc}
                         alt={service.imageAlt}
                         fill
                         sizes="(max-width: 768px) 100vw, 45vw"
@@ -186,7 +216,7 @@ export function ServicesSection({ headingLevel = "h2" }: ServicesSectionProps) {
         </ol>
 
         <p className="mt-20 max-w-prose font-display text-2xl font-medium tracking-tight sm:text-3xl">
-          {t("closing")}
+          {services.closing}
         </p>
       </div>
     </section>

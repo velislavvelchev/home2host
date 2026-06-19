@@ -1,21 +1,31 @@
 import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { PricesSection } from "@/components/sections/PricesSection";
+import { getPayloadInstance } from "@/lib/payload";
+import type { Locale } from "@/i18n/routing";
 
 type Params = { locale: string };
 
 // Canonical → `/` for the same reason as /about-us/ and /services/: the home
 // page carries the full content of every section. See the sibling routes for
 // the longer reasoning.
+//
+// metaTitle / metaDescription live on the `pricing-plans` Global so the owner
+// can edit search-result copy alongside the plan cards in /admin.
 export async function generateMetadata({
   params,
 }: {
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Prices" });
-  const title = t("metaTitle");
-  const description = t("metaDescription");
+  const payload = await getPayloadInstance();
+  const pricing = await payload.findGlobal({
+    slug: "pricing-plans",
+    locale: locale as Locale,
+    depth: 0,
+  });
+  const title = pricing.metaTitle ?? undefined;
+  const description = pricing.metaDescription ?? undefined;
   return {
     title,
     description,

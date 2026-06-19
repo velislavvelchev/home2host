@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { AboutSection } from "@/components/sections/AboutSection";
+import { getPayloadInstance } from "@/lib/payload";
+import type { Locale } from "@/i18n/routing";
 
 type Params = { locale: string };
 
@@ -14,15 +16,23 @@ type Params = { locale: string };
 // social-share previews for this URL read for the section, not the home
 // page. `images` is intentionally left to inherit the root's OG image —
 // per-section share images are a separate design slice.
+//
+// metaTitle / metaDescription live on the `about` Global so the owner
+// can edit search-result copy alongside the section body in /admin.
 export async function generateMetadata({
   params,
 }: {
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "About" });
-  const title = t("metaTitle");
-  const description = t("metaDescription");
+  const payload = await getPayloadInstance();
+  const about = await payload.findGlobal({
+    slug: "about",
+    locale: locale as Locale,
+    depth: 0,
+  });
+  const title = about.metaTitle ?? undefined;
+  const description = about.metaDescription ?? undefined;
   return {
     title,
     description,

@@ -1,9 +1,11 @@
 import type { LucideIcon } from "lucide-react";
 import { Rocket, House, Wand2, Check } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { getLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 import { buttonStyles } from "@/components/Button";
+import { getPayloadInstance } from "@/lib/payload";
+import type { Locale } from "@/i18n/routing";
 
 // Reusable across the home page (embedded after Services) and the standalone
 // /prices/ route. `headingLevel` swaps h1/h2 so the document outline stays
@@ -11,8 +13,14 @@ import { buttonStyles } from "@/components/Button";
 //
 // Three equal-weight pricing cards (Start Smart, Full Care, Home Refresh) —
 // not three tiers of the same product, three different offerings, so no
-// "Recommended" highlight. Plan text lives in messages/<locale>.json under
-// `Prices.plans`; icons stay in code and are paired by index.
+// "Recommended" highlight.
+//
+// Plans are read from the Payload `pricing-plans` Global on every request.
+// Capped at exactly 3 entries because the 3-up grid is designed for that
+// count; the admin shows 3 in-place editable cards. Icon is picked per
+// card via a `select` field (rocket/house/wand) and resolved against the
+// `icons` map below — keyed, not indexed, so reordering in admin keeps
+// the right icon on the right card.
 //
 // Design notes vs the live WordPress version:
 // - Different Lucide icon per card instead of the same house thrice — signals
@@ -27,20 +35,26 @@ type PricesSectionProps = {
   headingLevel?: "h1" | "h2";
 };
 
-type PlanText = {
-  name: string;
-  cadence: string;
-  price: string;
-  priceUnit?: string;
-  features: string[];
+type PlanIconKey = "rocket" | "house" | "wand";
+
+const icons: Record<PlanIconKey, LucideIcon> = {
+  rocket: Rocket,
+  house: House,
+  wand: Wand2,
 };
 
-const planIcons: LucideIcon[] = [Rocket, House, Wand2];
-
-export function PricesSection({ headingLevel = "h2" }: PricesSectionProps) {
+export async function PricesSection({ headingLevel = "h2" }: PricesSectionProps) {
   const Heading = headingLevel;
-  const t = useTranslations("Prices");
-  const plans = t.raw("plans") as PlanText[];
+  const locale = (await getLocale()) as Locale;
+
+  const payload = await getPayloadInstance();
+  const pricing = await payload.findGlobal({
+    slug: "pricing-plans",
+    locale,
+    depth: 0,
+  });
+
+  const plans = pricing.plans ?? [];
 
   return (
     <section
@@ -51,18 +65,18 @@ export function PricesSection({ headingLevel = "h2" }: PricesSectionProps) {
       <div className="mx-auto max-w-6xl px-gutter py-section">
         <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-800 dark:bg-brand-900 dark:text-brand-100">
           <span className="size-1.5 rounded-full bg-brand-600" />
-          {t("eyebrow")}
+          {pricing.eyebrow}
         </span>
 
         <Heading
           id="prices-heading"
           className="mt-6 max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl"
         >
-          {t("heading")}
+          {pricing.heading}
         </Heading>
 
         <p className="mt-6 max-w-prose text-lg leading-relaxed text-foreground-muted">
-          {t("lead")}
+          {pricing.lead}
         </p>
 
         {/* 3-col grid only kicks in at `lg` (≥1024) — at `md` (768) the
@@ -72,13 +86,13 @@ export function PricesSection({ headingLevel = "h2" }: PricesSectionProps) {
             scannable three-up layout. */}
         <ul className="mt-16 grid gap-6 lg:grid-cols-3 lg:gap-8">
           {plans.map((plan, index) => {
-            const Icon = planIcons[index];
+            const Icon = icons[plan.icon];
             // Numeric prices get the unit treatment (split typography);
-            // the "Индивидуална оферта" plan needs the whole string at a
-            // smaller display size since it's a phrase, not a number.
+            // the "Индивидуална оферта" / "Custom quote" plan needs the
+            // whole string at a smaller display size since it's a phrase.
             const isNumericPrice = !!plan.priceUnit;
             return (
-              <RevealOnScroll key={plan.name} delayIndex={index}>
+              <RevealOnScroll key={plan.id ?? `plan-${index}`} delayIndex={index}>
                 <li className="flex h-full flex-col rounded-2xl border border-foreground-muted bg-surface p-6 md:p-8">
                   {/* Card header: icon + plan name + cadence */}
                   <div className="flex items-start gap-4">
@@ -119,9 +133,9 @@ export function PricesSection({ headingLevel = "h2" }: PricesSectionProps) {
 
                   {/* Feature list */}
                   <ul className="mt-6 flex flex-col gap-3">
-                    {plan.features.map((feature) => (
+                    {(plan.features ?? []).map((feature) => (
                       <li
-                        key={feature}
+                        key={feature.id ?? feature.label}
                         className="flex items-start gap-3 text-sm leading-relaxed text-foreground-muted"
                       >
                         <span
@@ -130,7 +144,7 @@ export function PricesSection({ headingLevel = "h2" }: PricesSectionProps) {
                         >
                           <Check className="size-3.5" strokeWidth={2.5} />
                         </span>
-                        <span>{feature}</span>
+                        <span>{feature.label}</span>
                       </li>
                     ))}
                   </ul>
@@ -141,7 +155,7 @@ export function PricesSection({ headingLevel = "h2" }: PricesSectionProps) {
                     href="/contacts/"
                     className={`${buttonStyles("primary", "md")} mt-8 w-full justify-center`}
                   >
-                    {t("cta")}
+                    {pricing.cta}
                   </Link>
                 </li>
               </RevealOnScroll>
