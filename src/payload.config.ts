@@ -245,6 +245,113 @@ export default buildConfig({
   ],
   globals: [
     {
+      slug: "landing-page",
+      label: "Landing page section",
+      admin: {
+        description:
+          "Editable copy + photos for the home-page hero — the first thing visitors see. Title is split into three parts so the highlighted phrase (rendered in brand indigo) is editable as plain text. Add multiple images to enable a slow crossfade slideshow; leave the images list empty to show the built-in default photo.",
+      },
+      access: { read: () => true },
+      fields: [
+        // Section copy.
+        { name: "eyebrow", type: "text", localized: true, required: true },
+
+        // Title is split so the styled highlight (brand-indigo span) is
+        // editable as plain text — no markup tokens for the owner to typo.
+        // Order: [before] [highlight] [after]. Any of them can be empty.
+        {
+          name: "titleBefore",
+          type: "text",
+          localized: true,
+          admin: {
+            description:
+              "First part of the heading, before the highlighted phrase. Leave empty if the highlight starts the title.",
+          },
+        },
+        {
+          name: "titleHighlight",
+          type: "text",
+          localized: true,
+          admin: {
+            description:
+              "The phrase rendered in the brand indigo accent color. Leave empty to skip the highlight entirely.",
+          },
+        },
+        {
+          name: "titleAfter",
+          type: "text",
+          localized: true,
+          admin: {
+            description:
+              "Trailing part of the heading, after the highlighted phrase. Often just punctuation (e.g. '.'). Leave empty if not needed.",
+          },
+        },
+
+        { name: "lead", type: "textarea", localized: true, required: true },
+
+        // CTAs — two button groups, label + url each.
+        {
+          name: "primaryCta",
+          type: "group",
+          admin: {
+            description: "The main filled button (right-most prominence). Required.",
+          },
+          fields: [
+            { name: "label", type: "text", localized: true, required: true },
+            {
+              name: "url",
+              type: "text",
+              required: true,
+              admin: {
+                description:
+                  "Where the button goes. Use a relative path (e.g. '/contacts/') for internal links — locale prefix is added automatically for EN visitors. Use a full URL ('https://…') for external links — those open in a new tab.",
+              },
+            },
+          ],
+        },
+        {
+          name: "secondaryCta",
+          type: "group",
+          admin: {
+            description: "The secondary outlined button. Required.",
+          },
+          fields: [
+            { name: "label", type: "text", localized: true, required: true },
+            {
+              name: "url",
+              type: "text",
+              required: true,
+              admin: { description: "Same convention as the primary button." },
+            },
+          ],
+        },
+
+        // Image slideshow. minRows: 0 → owner can leave it empty, and the
+        // frontend falls back to the built-in /hero-home.jpeg (with its
+        // alt text from messages JSON). When at least one image is
+        // uploaded, those take over. 2+ images enables auto-advancing
+        // crossfade rotation on the home page.
+        {
+          name: "images",
+          type: "array",
+          minRows: 0,
+          maxRows: 8,
+          admin: {
+            description:
+              "Hero photos. Leave empty to show the built-in default photo. Add one for a single static photo. Add two or more for a slow crossfade slideshow on the home page (6s per image with a 1s fade). Alt text for each photo comes from the Media doc's own Alt field.",
+          },
+          fields: [
+            {
+              name: "image",
+              type: "upload",
+              relationTo: "media",
+              required: true,
+            },
+          ],
+        },
+      ],
+    },
+    {
       slug: "about",
       label: "About section",
       admin: {

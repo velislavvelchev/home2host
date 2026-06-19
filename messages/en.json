@@ -46,11 +46,6 @@
     "ariaLabel": "Call us: {phone}"
   },
   "Hero": {
-    "eyebrow": "Short-term rental · Bansko and Burgas",
-    "title": "Property management in <highlight>Bansko and Burgas</highlight>.",
-    "lead": "Home2Host takes care of every part of running your short-term rental — from professional listings and guest communication to cleaning and maintenance. You earn the income; we handle the rest.",
-    "ctaPrimary": "Get in touch",
-    "ctaSecondary": "See our services",
     "imageAlt": "Bright living room with panoramic windows, a wooden ceiling, and a pool behind the glass doors"
   },
   "Apartments": {

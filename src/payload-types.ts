@@ -94,6 +94,7 @@ export interface Config {
   };
   fallbackLocale: ('false' | 'none' | 'null') | false | null | ('bg' | 'en') | ('bg' | 'en')[];
   globals: {
+    'landing-page': LandingPage;
     about: About;
     services: Service;
     'pricing-plans': PricingPlan;
@@ -101,6 +102,7 @@ export interface Config {
     'social-links': SocialLink;
   };
   globalsSelect: {
+    'landing-page': LandingPageSelect<false> | LandingPageSelect<true>;
     about: AboutSelect<false> | AboutSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     'pricing-plans': PricingPlansSelect<false> | PricingPlansSelect<true>;
@@ -544,6 +546,60 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   createdAt?: T;
 }
 /**
+ * Editable copy + photos for the home-page hero — the first thing visitors see. Title is split into three parts so the highlighted phrase (rendered in brand indigo) is editable as plain text. Add multiple images to enable a slow crossfade slideshow; leave the images list empty to show the built-in default photo.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "landing-page".
+ */
+export interface LandingPage {
+  id: number;
+  eyebrow: string;
+  /**
+   * First part of the heading, before the highlighted phrase. Leave empty if the highlight starts the title.
+   */
+  titleBefore?: string | null;
+  /**
+   * The phrase rendered in the brand indigo accent color. Leave empty to skip the highlight entirely.
+   */
+  titleHighlight?: string | null;
+  /**
+   * Trailing part of the heading, after the highlighted phrase. Often just punctuation (e.g. '.'). Leave empty if not needed.
+   */
+  titleAfter?: string | null;
+  lead: string;
+  /**
+   * The main filled button (right-most prominence). Required.
+   */
+  primaryCta: {
+    label: string;
+    /**
+     * Where the button goes. Use a relative path (e.g. '/contacts/') for internal links — locale prefix is added automatically for EN visitors. Use a full URL ('https://…') for external links — those open in a new tab.
+     */
+    url: string;
+  };
+  /**
+   * The secondary outlined button. Required.
+   */
+  secondaryCta: {
+    label: string;
+    /**
+     * Same convention as the primary button.
+     */
+    url: string;
+  };
+  /**
+   * Hero photos. Leave empty to show the built-in default photo. Add one for a single static photo. Add two or more for a slow crossfade slideshow on the home page (6s per image with a 1s fade). Alt text for each photo comes from the Media doc's own Alt field.
+   */
+  images?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Editable copy for the 'About us' section (embedded on the home page and shown at /about-us/). Two paragraphs sit side-by-side on desktop and stack on mobile.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -757,6 +813,38 @@ export interface SocialLink {
     | null;
   updatedAt?: string | null;
   createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "landing-page_select".
+ */
+export interface LandingPageSelect<T extends boolean = true> {
+  eyebrow?: T;
+  titleBefore?: T;
+  titleHighlight?: T;
+  titleAfter?: T;
+  lead?: T;
+  primaryCta?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+      };
+  secondaryCta?:
+    | T
+    | {
+        label?: T;
+        url?: T;
+      };
+  images?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
