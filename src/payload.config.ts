@@ -433,24 +433,128 @@ export default buildConfig({
     },
     {
       slug: "contacts",
-      label: "Contacts",
+      label: "Contacts section",
+      admin: {
+        description:
+          "Editable copy + contact data for the 'Contacts' section (embedded on the home page and shown at /contacts/). Also feeds the floating call button, the footer email, and the SEO structured data.",
+      },
       access: { read: () => true },
       fields: [
+        // Section copy — visible chrome the owner may want to retune.
+        { name: "eyebrow", type: "text", localized: true, required: true },
+        { name: "heading", type: "text", localized: true, required: true },
+        { name: "lead", type: "textarea", localized: true, required: true },
+        {
+          name: "serviceAreaHeading",
+          type: "text",
+          localized: true,
+          required: true,
+          admin: {
+            description: "Heading on the small 'Where we work' card (e.g. 'Къде работим?').",
+          },
+        },
+        {
+          name: "serviceAreaBody",
+          type: "textarea",
+          localized: true,
+          required: true,
+          admin: {
+            description: "Body of the 'Where we work' card — short description of the service area.",
+          },
+        },
+        {
+          name: "metaTitle",
+          type: "text",
+          localized: true,
+          admin: { description: "Browser tab + Google result title for /contacts/." },
+        },
+        {
+          name: "metaDescription",
+          type: "textarea",
+          localized: true,
+          admin: { description: "Google result snippet + social-share description." },
+        },
+
+        // Contact data — phones are explicit primary/secondary groups
+        // (rather than a free-form array) so it's unambiguous in the
+        // admin which number drives the bubble + WhatsApp link.
         { name: "email", type: "email", required: true },
-        { name: "phone", type: "text", required: true },
-        { name: "address", type: "textarea", localized: true },
+        {
+          name: "primaryPhone",
+          type: "group",
+          admin: {
+            description:
+              "The 'main' phone. Used wherever a single number is needed (the floating call bubble, the WhatsApp button), and shown first in the phone list on the Contacts section.",
+          },
+          fields: [
+            {
+              name: "display",
+              type: "text",
+              required: true,
+              admin: { description: "What visitors see (e.g. '+359 88 514 6191'). Spaces allowed." },
+            },
+            {
+              name: "dial",
+              type: "text",
+              required: true,
+              admin: {
+                description:
+                  "What goes into tel: and wa.me/ links. No spaces. Keep the leading + (e.g. '+359885146191').",
+              },
+            },
+          ],
+        },
+        {
+          name: "secondaryPhone",
+          type: "group",
+          admin: {
+            description:
+              "Optional second phone, shown only on the Contacts section under the primary one. Leave both fields empty if there's only one number.",
+          },
+          fields: [
+            {
+              name: "display",
+              type: "text",
+              admin: { description: "Optional — leave blank to hide the second phone." },
+            },
+            {
+              name: "dial",
+              type: "text",
+              admin: { description: "Required if 'Display' is filled. No spaces, keep the leading +." },
+            },
+          ],
+        },
+        {
+          name: "addressLine",
+          type: "text",
+          localized: true,
+          required: true,
+          admin: {
+            description:
+              "The displayed street address as one line (e.g. '2770 гр. Банско, ул. Кралев двор №5').",
+          },
+        },
+        {
+          name: "addressMapsUrl",
+          type: "text",
+          required: true,
+          admin: {
+            description:
+              "Google Maps link the address text points at. Open Google Maps, search the address, click Share → Copy link, paste here.",
+          },
+        },
         {
           name: "workingHours",
           type: "textarea",
           localized: true,
-          admin: { description: "Free-form text, one line per row." },
+          admin: { description: "Optional — free-form text, one line per row." },
         },
         {
           name: "mapEmbedUrl",
           type: "text",
           admin: {
             description:
-              "Google Maps embed URL (the src attribute from the embed iframe). Optional.",
+              "Optional — Google Maps embed URL (the src attribute from the embed iframe). Not currently rendered, kept for future map block.",
           },
         },
       ],

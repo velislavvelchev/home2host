@@ -1,8 +1,10 @@
 import { Phone } from "lucide-react";
-import { useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
+import { getPayloadInstance } from "@/lib/payload";
+import type { Locale } from "@/i18n/routing";
 
 // Persistent floating "call us" CTA. Lives at the layout level so it appears
-// on every (frontend) page. Pure server component — no state, no JS.
+// on every (frontend) page. Server component — no state, no JS.
 //
 // Responsive contract:
 // - <md: compact 56px circle with the phone icon only (saves screen real
@@ -16,24 +18,32 @@ import { useTranslations } from "next-intl";
 // default handler (FaceTime/Skype/etc.) or do nothing — acceptable, since
 // the visible number on desktop is the primary affordance.
 //
-// Phone number sourced from `docs/inventory/text/contacts.md`. When the
-// Payload Contacts global is populated, fetch from there instead and pass
-// in as a prop.
+// Phone is pulled from the `contacts` Global's primary phone. The owner
+// can change it in /admin → Contacts section without a code change. The
+// aria-label format (with {phone} placeholder) stays in the JSON because
+// it's a functional accessibility string with a templating token — owner
+// editing it could silently break the screen-reader announcement.
 
-const PHONE_DISPLAY = "+359 88 514 6191";
-const PHONE_DIAL = "+359885146191";
+export async function FloatingCallButton() {
+  const locale = (await getLocale()) as Locale;
+  const t = await getTranslations("FloatingCall");
 
-export function FloatingCallButton() {
-  const t = useTranslations("FloatingCall");
+  const payload = await getPayloadInstance();
+  const contacts = await payload.findGlobal({
+    slug: "contacts",
+    locale,
+    depth: 0,
+  });
+  const { display, dial } = contacts.primaryPhone;
 
   return (
     <a
-      href={`tel:${PHONE_DIAL}`}
-      aria-label={t("ariaLabel", { phone: PHONE_DISPLAY })}
+      href={`tel:${dial}`}
+      aria-label={t("ariaLabel", { phone: display })}
       className="fixed bottom-6 right-6 z-50 inline-flex h-14 w-14 items-center justify-center gap-3 rounded-full bg-brand-700 text-neutral-0 shadow-2 transition-all duration-300 ease-out hover:bg-brand-600 hover:shadow-3 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-400 motion-safe:hover:scale-105 md:w-auto md:px-5"
     >
       <Phone className="size-6 shrink-0" strokeWidth={2} aria-hidden="true" />
-      <span className="hidden font-medium md:inline">{PHONE_DISPLAY}</span>
+      <span className="hidden font-medium md:inline">{display}</span>
     </a>
   );
 }

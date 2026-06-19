@@ -8,7 +8,6 @@
   },
   "StructuredData": {
     "description": "Professional management of short-term rental properties in Bansko and Burgas. Listings, guest communication, cleaning, and maintenance.",
-    "addressStreet": "ul. Kralev Dvor 5",
     "addressLocality": "Bansko",
     "areaServed": [
       "Bansko",
@@ -75,22 +74,14 @@
     "metaDescription": "Answers to the most common questions about short-term rental property management — regulations, pricing, commission, and more."
   },
   "Contacts": {
-    "eyebrow": "Contact",
-    "heading": "Get in touch",
-    "lead": "Have a property you want to rent out? A question about our services? Write to us — we reply within the working day.",
-    "serviceAreaHeading": "Where we work",
-    "serviceAreaBody": "Home2Host manages properties in Burgas, Bansko, and the surrounding regions. We provide reliable management and solid returns on your property.",
     "phoneHeading": "Phone",
     "emailHeading": "Email",
     "addressHeading": "Address",
-    "address": "2770 Bansko, ul. Kralev Dvor 5",
     "whatsappCta": "Message us on WhatsApp",
     "whatsappPrefill": "Hello, I have a question about property management.",
     "socialLabel": "Social",
     "formHeading": "Send an inquiry",
-    "formRequiredNote": "Fields marked with an asterisk are required.",
-    "metaTitle": "Contact | Home2Host",
-    "metaDescription": "Get in touch with Home2Host about managing your short-term rental property in Burgas, Bansko, and the surrounding regions — phone, email, WhatsApp, and an inquiry form."
+    "formRequiredNote": "Fields marked with an asterisk are required."
   },
   "ContactForm": {
     "nameLabel": "Name",

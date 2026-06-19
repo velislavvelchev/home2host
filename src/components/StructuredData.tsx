@@ -1,22 +1,41 @@
-import { useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
+import { getPayloadInstance } from "@/lib/payload";
+import type { Locale } from "@/i18n/routing";
 
 // JSON-LD structured data for the business. Rendered server-side as a
 // <script type="application/ld+json"> tag so search engines can pick up
 // the schema.org LocalBusiness shape without our React tree needing to
 // know about it.
 //
-// Sourced from docs/inventory/text/contacts.md. Two phone numbers exposed
-// (primary first). When Payload's Contacts global gets populated, this
-// can switch to fetching from there instead of the hardcoded constants
-// — but the marketing site only needs one source of truth, and hardcoded
-// is simpler until then.
+// Phones / email / address line / social URLs come from the Payload
+// Globals (`contacts` + `social-links`) so the owner can update them in
+// /admin and have the structured data follow automatically. The
+// description + areaServed strings stay in messages JSON because
+// they're SEO-tuned copy (not contact data) and bundled with other
+// SEO-facing text. Postal code / locality / country stay hardcoded —
+// factual office data that doesn't churn; building admin UI for them
+// would be ceremony.
 //
 // JSON-LD lives outside React's render tree (innerHTML) on purpose: it's
 // pure data, never reads, never updates, and any React state would be
 // inert ceremony.
 
-export function StructuredData() {
-  const t = useTranslations("StructuredData");
+export async function StructuredData() {
+  const locale = (await getLocale()) as Locale;
+  const t = await getTranslations("StructuredData");
+
+  const payload = await getPayloadInstance();
+  const [contacts, social] = await Promise.all([
+    payload.findGlobal({ slug: "contacts", locale, depth: 0 }),
+    payload.findGlobal({ slug: "social-links", locale, depth: 0 }),
+  ]);
+
+  const phones: string[] = [contacts.primaryPhone.dial];
+  if (contacts.secondaryPhone?.dial) {
+    phones.push(contacts.secondaryPhone.dial);
+  }
+
+  const socialUrls = (social.links ?? []).map((l) => l.url);
 
   const org = {
     "@context": "https://schema.org",
@@ -26,11 +45,11 @@ export function StructuredData() {
     url: "https://home2host.vercel.app",
     logo: "https://home2host.vercel.app/logo.svg",
     image: "https://home2host.vercel.app/og-image.jpg",
-    telephone: ["+359885146191", "+359885777342"],
-    email: "info@home2host.com",
+    telephone: phones,
+    email: contacts.email,
     address: {
       "@type": "PostalAddress",
-      streetAddress: t("addressStreet"),
+      streetAddress: contacts.addressLine,
       addressLocality: t("addressLocality"),
       postalCode: "2770",
       addressCountry: "BG",
@@ -39,10 +58,7 @@ export function StructuredData() {
       "@type": "City",
       name,
     })),
-    sameAs: [
-      "https://facebook.com/home2hosteu",
-      "https://instagram.com/home2host_",
-    ],
+    sameAs: socialUrls,
   };
 
   return (

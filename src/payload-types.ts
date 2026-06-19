@@ -666,20 +666,73 @@ export interface PricingPlan {
   createdAt?: string | null;
 }
 /**
+ * Editable copy + contact data for the 'Contacts' section (embedded on the home page and shown at /contacts/). Also feeds the floating call button, the footer email, and the SEO structured data.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "contacts".
  */
 export interface Contact {
   id: number;
-  email: string;
-  phone: string;
-  address?: string | null;
+  eyebrow: string;
+  heading: string;
+  lead: string;
   /**
-   * Free-form text, one line per row.
+   * Heading on the small 'Where we work' card (e.g. 'Къде работим?').
+   */
+  serviceAreaHeading: string;
+  /**
+   * Body of the 'Where we work' card — short description of the service area.
+   */
+  serviceAreaBody: string;
+  /**
+   * Browser tab + Google result title for /contacts/.
+   */
+  metaTitle?: string | null;
+  /**
+   * Google result snippet + social-share description.
+   */
+  metaDescription?: string | null;
+  email: string;
+  /**
+   * The 'main' phone. Used wherever a single number is needed (the floating call bubble, the WhatsApp button), and shown first in the phone list on the Contacts section.
+   */
+  primaryPhone: {
+    /**
+     * What visitors see (e.g. '+359 88 514 6191'). Spaces allowed.
+     */
+    display: string;
+    /**
+     * What goes into tel: and wa.me/ links. No spaces. Keep the leading + (e.g. '+359885146191').
+     */
+    dial: string;
+  };
+  /**
+   * Optional second phone, shown only on the Contacts section under the primary one. Leave both fields empty if there's only one number.
+   */
+  secondaryPhone?: {
+    /**
+     * Optional — leave blank to hide the second phone.
+     */
+    display?: string | null;
+    /**
+     * Required if 'Display' is filled. No spaces, keep the leading +.
+     */
+    dial?: string | null;
+  };
+  /**
+   * The displayed street address as one line (e.g. '2770 гр. Банско, ул. Кралев двор №5').
+   */
+  addressLine: string;
+  /**
+   * Google Maps link the address text points at. Open Google Maps, search the address, click Share → Copy link, paste here.
+   */
+  addressMapsUrl: string;
+  /**
+   * Optional — free-form text, one line per row.
    */
   workingHours?: string | null;
   /**
-   * Google Maps embed URL (the src attribute from the embed iframe). Optional.
+   * Optional — Google Maps embed URL (the src attribute from the embed iframe). Not currently rendered, kept for future map block.
    */
   mapEmbedUrl?: string | null;
   updatedAt?: string | null;
@@ -781,9 +834,28 @@ export interface PricingPlansSelect<T extends boolean = true> {
  * via the `definition` "contacts_select".
  */
 export interface ContactsSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  lead?: T;
+  serviceAreaHeading?: T;
+  serviceAreaBody?: T;
+  metaTitle?: T;
+  metaDescription?: T;
   email?: T;
-  phone?: T;
-  address?: T;
+  primaryPhone?:
+    | T
+    | {
+        display?: T;
+        dial?: T;
+      };
+  secondaryPhone?:
+    | T
+    | {
+        display?: T;
+        dial?: T;
+      };
+  addressLine?: T;
+  addressMapsUrl?: T;
   workingHours?: T;
   mapEmbedUrl?: T;
   updatedAt?: T;

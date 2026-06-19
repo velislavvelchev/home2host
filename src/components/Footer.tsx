@@ -1,10 +1,17 @@
-import { useTranslations } from "next-intl";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
+import { getPayloadInstance } from "@/lib/payload";
+import type { Locale } from "@/i18n/routing";
 
 // Slugs match the live WordPress URLs (trailing slashes preserved) so
 // existing Google rankings carry over after the DNS switch in Stage 6.
 // Labels resolve from the `Nav` namespace so the footer reads BG on
 // `/...` and EN on `/en/...` — same source as the Header.
+//
+// Email is pulled from the `contacts` Global so the owner can update it
+// in /admin without a code change. Everything else here (tagline, sitemap
+// heading, regions copy) stays in messages JSON — Footer chrome the
+// owner is unlikely to want to retune, low edit value.
 const siteMap: { href: string; key: "aboutUs" | "services" | "prices" | "apartments" | "blog" | "questions" | "contacts" }[] = [
   { href: "/about-us/",   key: "aboutUs"    },
   { href: "/services/",   key: "services"   },
@@ -15,10 +22,18 @@ const siteMap: { href: string; key: "aboutUs" | "services" | "prices" | "apartme
   { href: "/contacts/",   key: "contacts"   },
 ];
 
-export function Footer() {
+export async function Footer() {
   const year = new Date().getFullYear();
-  const t = useTranslations("Footer");
-  const tNav = useTranslations("Nav");
+  const locale = (await getLocale()) as Locale;
+  const t = await getTranslations("Footer");
+  const tNav = await getTranslations("Nav");
+
+  const payload = await getPayloadInstance();
+  const contacts = await payload.findGlobal({
+    slug: "contacts",
+    locale,
+    depth: 0,
+  });
 
   return (
     <footer className="border-t border-border bg-surface-muted">
@@ -67,11 +82,10 @@ export function Footer() {
             <h2 className="text-xs font-semibold uppercase tracking-wider text-foreground-muted">
               {t("contactsHeading")}
             </h2>
-            {/* Placeholder until Contacts global is populated via the Payload admin. */}
             <dl className="mt-4 space-y-2 text-sm">
               <div>
                 <dt className="text-foreground-muted">{t("emailLabel")}</dt>
-                <dd className="text-foreground">info@home2host.com</dd>
+                <dd className="text-foreground">{contacts.email}</dd>
               </div>
               <div>
                 <dt className="text-foreground-muted">{t("regionsLabel")}</dt>
