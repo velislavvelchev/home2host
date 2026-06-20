@@ -1,305 +1,290 @@
-# Editor-facing SEO assessment in Payload admin — build-vs-adopt research
+# SEO quality assurance for home2host — direction
 
-**Status:** research complete, decision pending. Closed only after the three open
-questions at the bottom are answered.
-**Date:** 2026-06-19
-**Trigger:** owner-requested 2026-06-16 (Stage 5 bullet). Owner showed a screenshot
-of Yoast SEO inside WordPress and asked for the same kind of real-time scoring
-panel inside Payload admin — for **every** content type, not just blog — and for
-**both** BG and EN.
-**Why this doc exists:** capture the research findings so we can pick a direction
-on a later day without redoing the research. Decisions land in an ADR; this is
-just the prep.
+**Status:** decided 2026-06-20. Replaces the earlier "Yoast-style scoring panel"
+plan after a reframe with the owner.
+**Date opened:** 2026-06-19 (research)
+**Date decided:** 2026-06-20 (reframe + commit)
+**Trigger:** owner-requested 2026-06-16 (Stage 5 bullet). Owner showed a
+screenshot of Yoast SEO inside WordPress and asked for the same kind of
+real-time scoring panel inside Payload admin — for every content type, both BG
+and EN.
+**Why this doc exists:** the first research pass investigated *how to clone
+Yoast inside Payload*. On reading the result, the owner pushed back that the
+architecture was too complicated and mixed, and asked the better question:
+**"what's the standard way Next.js apps make sure their SEO is doing great?"**
+This doc records the answer to that question and the simpler direction we
+landed on — plus the abandoned-cloning research at the bottom, for record.
 
 ---
 
 ## TL;DR
 
-No off-the-shelf solution covers the home2host case (Yoast-style real-time
-scoring in Payload v3 admin, Bulgarian-first, multi-collection).
+**Drop the custom scoring panel idea.** It's a WordPress-era pattern that
+solves a problem we don't have. The standard Next.js stack already covers the
+SEO fundamentals; for the editor experience, ship a small focused set instead:
 
-The realistic shape is a **hybrid build**:
+1. **Install `@payloadcms/plugin-seo`** — gives the owner meta-title + meta-
+   description fields with character counters + a live Google SERP-snippet
+   preview per collection / global. This is the bottom half of the Yoast
+   screenshot and the only editor-facing piece worth shipping.
+2. **External-tools menu in the Payload admin top bar** — single source of
+   truth for the dashboards the owner actually uses (Search Console after
+   launch, Vercel, the live site, Lighthouse / PageSpeed, etc.). Tiny custom
+   admin component, no new dependencies.
+3. **Stage 6 already covers the measurement loop** — Google Search Console
+   verification + Lighthouse pass on the Vercel preview before DNS switch.
+4. **For draft-content review** — the owner pastes the draft into an AI chat
+   (ChatGPT/Claude). More useful than any rules-based analyzer we could ship,
+   works in Bulgarian natively, zero maintenance.
 
-1. Adopt the official `@payloadcms/plugin-seo` for **metadata fields + SERP
-   preview** (the bottom half of the Yoast screenshot — meta title, description,
-   social image, character counters, live Google snippet). It already does that
-   part well; reinventing it would be busywork.
-2. Build **one custom `type: 'ui'` field component** ("SEO assessment") that
-   attaches to every collection/global that needs it. It does the **scoring**
-   part Yoast does (the top half of the screenshot — focus keyphrase, traffic
-   lights, suggestion list).
-
-Within the custom component, two scoring paths:
-
-- **EN content** → run [`yoastseo`](https://www.npmjs.com/package/yoastseo) (the
-  open-source analysis engine that powers Yoast itself).
-- **BG content** → run a small in-house rules-based analyzer. Optionally backed
-  by [`readability-cyr`](https://github.com/Amice13/readability-cyr) for
-  Cyrillic-aware readability stats.
-
-Trade-offs and open decisions are at the bottom.
+No new content-analysis engine, no GPL license decision, no two-engine BG/EN
+split, no Web Worker. The Stage 5 roadmap bullet collapses from "multi-week
+build" to "~half a day for plugin-seo + ~half a day for the icon menu."
 
 ---
 
-## What we ruled out
+## How standard Next.js sites handle SEO
 
-### Embedding Yoast itself
+Three layers, none of which require building a custom analyzer in the CMS:
 
-No supported path exists. Yoast SEO is a WordPress plugin. There is no:
+### Layer 1 — Framework fundamentals (we already have these)
 
-- iframe-embeddable hosted Yoast,
-- public SaaS / REST API for Yoast scoring,
-- standalone browser extension that exposes the Yoast UI.
+Next.js + the App Router cover the entire *technical* SEO checklist out of
+the box. We have all of this shipped:
 
-Yoast's *content-analysis engine* is published separately as the `yoastseo` npm
-package — that's the only Yoast-branded option for non-WP apps. It does not ship
-a UI; you build the UI yourself.
+- Server-side rendering (crawlable HTML — the single biggest gap WordPress
+  used to plug)
+- Per-page `Metadata` API: title, description, canonical, OG, Twitter card
+- `sitemap.ts` with hreflang pairs for BG/EN
+- `robots.ts` allowing public content, disallowing `/admin` + `/api`
+- `next/image` for Core Web Vitals (CLS, LCP)
+- JSON-LD `LocalBusiness` structured data in the layout
+- Legacy-URL 308 redirects (preserve Google rankings through the DNS switch)
+- `trailingSlash: true` to match live WP shape exactly
 
-### `react-yoastseo` (the only existing React wrapper)
+In WordPress, Yoast does most of this *because WordPress doesn't*. In Next.js,
+the framework does it; Yoast's reason for existing largely evaporates.
 
-Effectively abandoned. Last release **June 14, 2021** (v1.1.0). Peer dependencies
-pin `react@^17.x` and `yoastseo@^1.x`. Upstream repo is 404 on GitHub. Snyk
-classifies it INACTIVE.
+### Layer 2 — Editor metadata UX (one plugin, that's it)
 
-Our stack is Next.js 15 / React 19 / `yoastseo` 3.x. Adopting it would mean
-forking and modernizing — not less work than wiring `yoastseo` directly.
+The official [`@payloadcms/plugin-seo`](https://payloadcms.com/docs/plugins/seo)
+ships:
 
-### `@payloadcms/plugin-seo` as a complete solution
+- A meta-fields group per collection (title, description, image)
+- Character counters with green / yellow / red bands
+- A live Google search-result preview that updates as you type
+- Extensible custom fields (e.g. og:title overrides)
 
-The official Payload plugin is **metadata-only**:
+That's the part of Yoast editors actually use day-to-day. The "focus
+keyphrase" traffic-light theatre on top is largely 2010s SEO mythology.
 
-- meta title, description, image fields,
-- character counters,
-- real-time SERP (Google search result) preview snippet.
+### Layer 3 — Content quality measured outside the editor
 
-The docs explicitly say the UI "might feel familiar to Yoast users" — that
-comparison is purely visual (the SERP preview), not analytical. No content
-scoring, no keyphrase analysis, no readability. We will use it for what it
-*does* cover and supplement with a custom panel for the rest.
+Real SEO loops happen against real Google data, not against a rules engine
+running in your CMS:
 
----
+- **Google Search Console** — the official authority on what Google indexes,
+  what queries surface your pages, what's broken. Free. **Already on the
+  Stage 6 list.** This is the actual measurement loop.
+- **Lighthouse / PageSpeed Insights** — Google's own audit, covers SEO + a11y
+  + performance + best practices. Built into Chrome DevTools, also runs from
+  pagespeed.web.dev against the live URL. **Worth running before each
+  significant deploy.**
+- **Vercel Speed Insights** — Core Web Vitals in production from real
+  visitors (not synthetic). Already a Vercel feature, just needs enabling.
+- **AI assistant on the draft** — for "is this article SEO-good?" feedback
+  while writing, pasting the draft into ChatGPT or Claude is *more* useful
+  than Yoast's traffic lights, works fluently in Bulgarian, and costs nothing.
 
-## What we'll use
+### Why not the Yoast-style scoring panel
 
-### `yoastseo` npm package (for EN scoring)
+Three reasons the first research pass should have surfaced:
 
-- **Latest version:** 3.6.0 (Feb 2026).
-- **Maintenance:** active but slow cadence. Standalone npm releases are not a
-  Yoast priority (issue [#17899](https://github.com/Yoast/wordpress-seo/issues/17899)
-  open since 2021 with no Yoast staff response). The package isn't dead — 3.6.0
-  did ship — but don't expect rapid upstream fixes.
-- **License: GPL-3.0** (not MIT). **This is the most consequential finding.**
-  Strong copyleft. Bundling `yoastseo` into the Payload admin React tree is
-  normal in-house use, but if home2host is ever open-sourced or distributed,
-  GPL-3.0 may extend to the surrounding admin code. **Decision needed before
-  installing the package.** See "Open questions" below.
-- **Bulgarian support: none.** Yoast's official language tables cover ~21
-  languages for SEO assessments, readability, and word-form recognition.
-  Bulgarian appears in none of them. Other Cyrillic-script languages (Russian)
-  *are* supported — so the gap is per-language linguistic resources, not a
-  script-level limitation. Means: `yoastseo` is **EN-only** for our purposes.
-- **What it exports** (per the package README): a documented JS API with three
-  integration patterns — bare-bones `AbstractResearcher` + `Paper`, Webpack +
-  web-worker, and a React example. The web-worker pattern is the one we want —
-  keeps the analysis off the main thread so keystrokes stay responsive.
-- **Embeddable in non-WP JS apps?** Yes. Sanity has two community plugins that do
-  exactly this — [`sanity-plugin-seo-pane`](https://github.com/sanity-io/sanity-plugin-seo-pane)
-  and [`LiahMartens/sanity-plugin-seo-tools`](https://github.com/LiahMartens/sanity-plugin-seo-tools)
-  — both wrap `yoastseo` into a Sanity Studio panel. Confirms the pattern is
-  viable; we're doing the same in Payload.
-
-### `readability-cyr` (for BG readability — needs trial)
-
-- A Cyrillic-aware readability library surfaced in the research, by
-  [Amice13/readability-cyr](https://github.com/Amice13/readability-cyr).
-- Claims to handle Cyrillic tokenization + a few readability scores. **Has not
-  been verified hands-on yet** — trial before committing.
-- Worst case: skip the library and roll our own counters (sentence length,
-  paragraph length, word count) on Cyrillic-aware string ops, which is ~50
-  lines of code and zero dependencies.
-
-### `@payloadcms/plugin-seo` (for metadata + SERP preview)
-
-- Official Payload plugin, current v3.79.0.
-- Renders a meta-fields group + live Google preview that updates as you type.
-- Extensible — we can add custom fields (e.g. og:title overrides) per collection.
-- Will be installed alongside the custom scoring component.
+- **Google publicly rejects keyword density as a ranking signal.** Modern
+  Google ranking (post-2022 "Helpful Content Update") leans on perceived
+  content quality and E-E-A-T (Experience, Expertise, Authority, Trust) —
+  neither of which any algorithm running in our admin can measure. Yoast's
+  green dot does not correlate with rankings; experienced SEOs treat it as
+  noise.
+- **The BG gap was a tell that the abstraction is wrong.** If the "best"
+  library option for Bulgarian is to roll our own counters because nothing
+  exists, that's a sign there's nothing real to measure that we couldn't
+  eyeball or ask Claude about.
+- **The complicated architecture I previously proposed was complicated
+  *because the goal was wrong.*** Two scoring engines + a Web Worker + a
+  GPL license decision + a rules library to trial + plugin-seo on top —
+  all to recreate a panel whose advice is largely outdated. Dropping the
+  scoring panel collapses every one of those decisions.
 
 ---
 
-## Payload v3 integration plan
+## What we're actually shipping
 
-Payload v3 has all the primitives we need. None of this is exotic.
+### Item 1 — Install `@payloadcms/plugin-seo`
 
-### Component shape: `type: 'ui'` field
+Add the meta-fields + SERP preview to every content type that gets indexed.
+Scope at install time:
 
-Payload's [UI Field](https://payloadcms.com/docs/fields/ui) is purpose-built for
-presentational widgets that observe other fields but **persist nothing** to the
-document. It's exactly the shape Yoast's panel has: it reads everything else on
-the form and renders scores; it doesn't store its own data.
+- `blog-posts` collection (priority — long-form indexed content)
+- `apartments` collection (cards link to Airbnb, but `/apartments/` itself
+  is indexed)
+- `landing-page`, `about`, `services`, `pricing-plans`, `contacts` globals
+  (all map to indexed routes)
 
-Configuration shape (per the docs):
+`faqs` collection and `social-links` global don't need SEO meta — they don't
+have their own URLs.
+
+Implementation:
 
 ```ts
-{
-  name: 'seoAssessment',
-  type: 'ui',
-  admin: {
-    components: {
-      Field: '@/components/admin/SeoAssessment#SeoAssessment',
-    },
-    position: 'sidebar', // or main column; sidebar matches the Yoast layout
-  },
-}
+import { seoPlugin } from "@payloadcms/plugin-seo";
+
+plugins: [
+  vercelBlobStorage({ ... }),
+  seoPlugin({
+    collections: ["blog-posts", "apartments"],
+    globals: ["landing-page", "about", "services", "pricing-plans", "contacts"],
+    uploadsCollection: "media",
+    generateTitle: ({ doc }) => `${doc?.title || ""} — Home2Host`,
+    generateDescription: ({ doc }) => doc?.excerpt || "",
+    tabbedUI: true,
+  }),
+],
 ```
 
-The same field block can be appended to every collection/global that needs the
-panel (BlogPost, Hero global, About/Services/Pricing globals, etc.).
+Many of the affected collections/globals already have hand-rolled
+`metaTitle` + `metaDescription` fields (added during the Priority C–E
+slices). On installing the plugin, those should be removed and replaced
+with the plugin's `meta` field group so we have a single source of truth.
+That's a small data-migration task to plan: the `<page>.metadata.ts` files
+that read from the globals also need updating to read from the new
+`meta.title` / `meta.description` instead of the bare fields.
 
-### Reactive hooks (sufficient for live scoring)
+### Item 2 — External-tools icon menu in the admin top bar
 
-Payload v3 exposes the React hooks a live-scoring sidebar needs:
+A small Payload custom admin component that renders a row of icon links to
+the dashboards the owner uses. Clicked → opens in a new tab.
 
-- [`useFormFields`](https://payloadcms.com/docs/admin/react-hooks#useformfields)
-  — Redux-like selector pattern, **only re-renders when the selected fields
-  change**. Subscribe to `title`, `meta.description`, `slug`, `body`, etc.
-  individually so keystrokes on unrelated fields don't trigger rescoring.
-- `useAllFormFields` — whole-form read with `reduceFieldsToValues` /
-  `getSiblingData` helpers. Use sparingly (re-renders on every form change).
-- `useField` — single-field hook returning `{ value, setValue, errorMessage,
-  formInitializing, formProcessing, ... }` — for the per-collection
-  focus-keyphrase input.
-- `useLocale` — returns `{ code, label, rtl }`. We branch on `code === 'bg'`
-  vs `'en'` to pick the scoring path.
+Scope is owner-confirmed below ("Open question — link list"). Likely
+includes Search Console (post-launch), Vercel, the live site, Lighthouse /
+PageSpeed Insights, possibly GA4 / Vercel Blob / GitHub repo / Upstash.
 
-### Where the component lives in the repo
+Implementation shape (concise):
 
-Tentative layout (decide at implementation time):
-
-```
-src/components/admin/
-  SeoAssessment/
-    SeoAssessment.tsx         ← top-level UI Field component
-    useScoringWorker.ts       ← spawns a Web Worker, posts content to it
-    worker.ts                 ← runs yoastseo (EN) or rules engine (BG)
-    rules/
-      bg.ts                   ← BG rules-based analyzer
-      shared.ts               ← language-agnostic signals
-    ui/
-      TrafficLight.tsx
-      SuggestionList.tsx
-      FocusKeyphraseInput.tsx
+```ts
+// src/components/admin/ExternalToolsMenu.tsx
+import { ExternalLink } from "lucide-react";
+// renders a row of <a target="_blank" rel="noopener"> with icons
+// configuration is a single LINKS array at the top of the file
 ```
 
-The Web Worker matters: `yoastseo` is heavy (does string-search-heavy analysis
-on every keystroke) and we want the admin to stay snappy. The Yoast package
-README documents the worker pattern as the canonical embed.
+Wired in `payload.config.ts` via the root `admin.components.actions` slot.
+Refresh the import map (`npm run generate:importmap`) after registration.
+
+Zero new dependencies (`lucide-react` is already in the project). No state,
+no fetch, no auth. ~30–60 minutes of work end-to-end.
+
+### Item 3 — Pre-launch Stage 6 additions
+
+Already on the Stage 6 list, but call out for completeness:
+
+- Google Search Console verification (after DNS switch)
+- Lighthouse pass on the Vercel preview URL pre-launch
+- Optionally: enable Vercel Speed Insights for production CWV monitoring
 
 ---
 
-## What scoring signals look like
+## Open question (one, not three)
 
-Pulled apart by **language dependency**, so we know which we can ship today
-(language-agnostic, just string ops) versus which need linguistic resources we
-don't have for BG.
+Confirm the link set for the external-tools menu. Sensible starting set:
 
-### Language-agnostic (ship for both BG and EN today)
+- **Live site (production)** — `https://home2host.vercel.app` today,
+  `https://home2host.com` after the Stage 6 DNS switch
+- **Google Search Console** — `https://search.google.com/search-console`
+  (becomes useful post-launch; harmless to ship now)
+- **PageSpeed Insights** — `https://pagespeed.web.dev/` (pre-filled with
+  the prod URL would be even nicer, but not required)
+- **Vercel project** — `https://vercel.com/<team>/home2host`
+- **GitHub repo** — `https://github.com/velislavvelchev/home2host`
+- **Google Analytics 4** — link straight to the property dashboard
 
-These are just string + regex operations on the document fields:
+Less essential but worth considering:
 
-- Focus keyphrase **present** in: title, meta description, slug, H1, first
-  paragraph, body. (Simple substring/lowercase match.)
-- Keyphrase **density** in body (1–2.5% target). (Word count / occurrence
-  count.)
-- Meta title length (50–60 chars target).
-- Meta description length (120–156 chars target).
-- Slug length + presence of stop-character noise.
-- Image alt-text coverage (count of `<img>` without `alt`).
-- Internal-link presence (count of relative `href`s in body).
-- Sentence length distribution (split on `[.!?]` — works for Cyrillic too).
-- Paragraph length distribution (split on double newlines / `<p>` boundaries).
-
-### Language-dependent (EN today, BG later)
-
-These need per-language word lists or morphological resources:
-
-- **Transition-word frequency** (Yoast: ~30% of sentences should contain a
-  transition word). Needs a curated BG transition-word list. Yoast doesn't
-  ship one.
-- **Stop-word filtering** for keyphrase density (so "и", "на", "от" don't
-  count as keyphrase tokens). Needs a BG stop-word list.
-- **Flesch-Kincaid / similar readability score**. Needs a syllable counter.
-  English has good libraries; BG syllable rules are different. `readability-cyr`
-  may or may not help here — trial needed.
-- **Word-form recognition** (Yoast in EN treats "manage", "manages",
-  "managing" as the same keyphrase). Needs a stemmer/lemmatizer. None available
-  for BG in the JS ecosystem.
-
-V1 strategy: ship language-agnostic signals for both locales. EN also gets
-the `yoastseo` engine layered on top (which adds the language-dependent
-signals via Yoast's bundled EN resources). BG gets a "readability not yet
-scored" placeholder, or `readability-cyr` if it works in trial.
+- **Vercel Blob** (media storage dashboard)
+- **Upstash Redis** (rate limit dashboard)
+- **Neon Postgres** (DB console)
+- **Hostinger webmail** (info@home2host.com inbox)
 
 ---
 
-## Open questions (these block any code)
+## Appendix — abandoned Yoast-clone research (2026-06-19)
 
-1. **`yoastseo` GPL-3.0 — accept or avoid?**
-   - Accept: cleanest EN scoring quality, ~mature analysis, well-known UX.
-     Document in an ADR. The repo stays private, so copyleft has minimal
-     practical impact in-house. If we ever open-source, plan for it then.
-   - Avoid: build a smaller in-house EN analyzer too. EN scoring quality drops
-     to roughly BG quality (rules-based only). More code, no Yoast brand
-     recognition, but zero license risk.
-   - Defer: ship a unified rules-based analyzer for both BG and EN at V1, layer
-     `yoastseo` in for EN later if the rules version feels weak.
+Kept for record only. The reframe on 2026-06-20 made these findings
+non-load-bearing — but if anyone in future wants to revisit "should we
+build a Yoast-style scoring panel after all," this is the answer.
 
-2. **Scope at V1 — which collections/globals get the panel?**
-   - Heavy-text candidates: BlogPost, Hero global, About/Services/Pricing
-     globals.
-   - Lighter-text candidates: Contacts, FAQ, Apartments.
-   - All-or-nothing is fine if we wire it as a reusable UI-field block.
+### What we ruled out
 
-3. **BG readability at V1 — `readability-cyr`, in-house counters only, or skip?**
-   - `readability-cyr`: trial, ship if usable. Best owner experience.
-   - In-house counters only: simplest, no external dep, no Flesch-style score.
-   - Skip readability for BG entirely at V1: structural signals only (keyphrase,
-     lengths, alts, links). Add readability in a V2 pass.
+- **Embedding Yoast itself.** No supported path. Yoast SEO is a WordPress
+  plugin; no iframe-embeddable hosted variant, no public SaaS / REST API,
+  no standalone browser extension that exposes the Yoast UI.
+- **`react-yoastseo`** — last release June 14, 2021 (v1.1.0). React 17 /
+  yoastseo 1.x peer-pinned. Repo 404 on GitHub, Snyk INACTIVE. Unusable on
+  our React 19 / Next.js 15 stack without a fork-and-rewrite.
+- **`@payloadcms/plugin-seo` as a complete solution.** Metadata only —
+  fields + SERP preview. No content scoring. (This is fine; it's *exactly*
+  what we want for the new direction.)
 
----
+### `yoastseo` npm package (the analysis engine)
 
-## Sources
+- Latest 3.6.0 (Feb 2026), active but slow cadence (issue
+  [#17899](https://github.com/Yoast/wordpress-seo/issues/17899) open since
+  2021).
+- **License: GPL-3.0**, not MIT. Strong copyleft. Was the most
+  consequential finding — bundling it into the admin React tree would
+  trigger a license decision. Sidestepped by not using it.
+- **No Bulgarian support.** Yoast covers ~21 languages for SEO assessments,
+  readability, and word-form recognition; Bulgarian is absent across all
+  three feature tables. Other Cyrillic-script languages (Russian) are
+  supported — the gap is per-language linguistic resources, not script.
+- Embeddable in non-WP JS apps via documented web-worker / React / bare
+  patterns. Two Sanity community plugins do this:
+  [sanity-plugin-seo-pane](https://github.com/sanity-io/sanity-plugin-seo-pane)
+  and [LiahMartens/sanity-plugin-seo-tools](https://github.com/LiahMartens/sanity-plugin-seo-tools).
 
-Primary (cited in the research synthesis):
+### Payload v3 admin integration (still relevant for Item 2)
 
-- [npm: yoastseo (versions)](https://www.npmjs.com/package/yoastseo?activeTab=versions) —
-  3.6.0, GPL-3.0, last published Feb 2026.
-- [Yoast/wordpress-seo · `packages/yoastseo`](https://github.com/Yoast/wordpress-seo/tree/trunk/packages/yoastseo) —
-  README with three integration examples (worker, React, bare-bones).
-- [yoast.com/features/languages/](https://yoast.com/features/languages/) — official
-  per-feature language matrix (Bulgarian absent across all three tables).
-- [yoast.com/help/features-per-language/](https://yoast.com/help/features-per-language/) —
-  same data, in help-doc form.
-- [GH issue #17899 — Publish updates of yoastseo on NPM](https://github.com/Yoast/wordpress-seo/issues/17899) —
-  community signal on maintenance cadence; open since 2021.
-- [npm: react-yoastseo](https://www.npmjs.com/package/react-yoastseo) — last release
-  v1.1.0 2021-06-14, React 17 / yoastseo 1.x.
+The same primitives we'd have used for the scoring panel are also what
+the external-tools menu uses:
+
+- Custom React components register via file-path strings in
+  `admin.components.<slot>` and `admin.importMap.baseDir`. After any
+  registration change, run `npm run generate:importmap` (architecture
+  doc, ADR-equivalent).
+- For top-bar additions, the relevant slot is the root
+  `admin.components.actions` array.
+- For per-document field components (the original Yoast-panel use case),
+  it's `type: 'ui'` fields with `admin.components.Field` pointing at a
+  React component path.
+- Reactive form hooks (`useFormFields` with selectors, `useField`,
+  `useLocale`) are available for components that need to read the
+  document's live values — not needed for the external-tools menu, but
+  good to know they exist.
+
+### Sources (research provenance)
+
+- [npm: yoastseo (versions)](https://www.npmjs.com/package/yoastseo?activeTab=versions)
+- [Yoast/wordpress-seo · packages/yoastseo](https://github.com/Yoast/wordpress-seo/tree/trunk/packages/yoastseo)
+- [yoast.com/features/languages/](https://yoast.com/features/languages/)
+- [yoast.com/help/features-per-language/](https://yoast.com/help/features-per-language/)
+- [npm: react-yoastseo](https://www.npmjs.com/package/react-yoastseo)
 - [Payload v3 docs — Custom Admin Components](https://payloadcms.com/docs/admin/components)
 - [Payload v3 docs — React Hooks](https://payloadcms.com/docs/admin/react-hooks)
 - [Payload v3 docs — UI Field](https://payloadcms.com/docs/fields/ui)
 - [Payload v3 docs — SEO Plugin](https://payloadcms.com/docs/plugins/seo)
 - [github.com/payloadcms/plugin-seo](https://github.com/payloadcms/plugin-seo)
-- [npm: readability-cyr](https://www.npmjs.com/package/readability-cyr) —
-  Cyrillic-aware readability lib (trial pending).
+- [npm: readability-cyr](https://www.npmjs.com/package/readability-cyr)
 - [github.com/Amice13/readability-cyr](https://github.com/Amice13/readability-cyr)
-- [github.com/retextjs/retext-readability](https://github.com/retextjs/retext-readability) —
-  unified-ecosystem readability; English-only.
-- [github.com/sanity-io/sanity-plugin-seo-pane](https://github.com/sanity-io/sanity-plugin-seo-pane) —
-  Sanity's official SEO pane, embeds `yoastseo`.
-- [github.com/LiahMartens/sanity-plugin-seo-tools](https://github.com/LiahMartens/sanity-plugin-seo-tools) —
-  community Sanity plugin, also wraps `yoastseo`.
-
-Refuted claim worth noting (so we don't fall for it later): "Yoast stopped
-publishing yoastseo to npm, breaking ~20k Drupal sites." Verification 0–3 against:
-the package *is* on npm with recent releases (3.6.0 Feb 2026). Cadence is slow,
-not zero.
+- [github.com/retextjs/retext-readability](https://github.com/retextjs/retext-readability)
+- [github.com/sanity-io/sanity-plugin-seo-pane](https://github.com/sanity-io/sanity-plugin-seo-pane)
+- [github.com/LiahMartens/sanity-plugin-seo-tools](https://github.com/LiahMartens/sanity-plugin-seo-tools)

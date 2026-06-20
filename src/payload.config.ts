@@ -15,6 +15,13 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      // Top-right of the admin panel (left of the user/logout menu).
+      // One centralized launcher for the external dashboards the owner
+      // uses — live site, Search Console, PageSpeed, Vercel, GA4,
+      // GitHub, webmail.
+      actions: ["/components/admin/ExternalToolsMenu#ExternalToolsMenu"],
+    },
   },
   localization: {
     locales: [
