@@ -243,6 +243,14 @@ export interface BlogPost {
       }[]
     | null;
   publishedAt: string;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -277,6 +285,14 @@ export interface Apartment {
    * Uncheck to hide from the site without deleting.
    */
   isActive?: boolean | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -474,6 +490,13 @@ export interface BlogPostsSelect<T extends boolean = true> {
         id?: T;
       };
   publishedAt?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -490,6 +513,13 @@ export interface ApartmentsSelect<T extends boolean = true> {
   city?: T;
   order?: T;
   isActive?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -596,6 +626,14 @@ export interface LandingPage {
         id?: string | null;
       }[]
     | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -619,6 +657,14 @@ export interface About {
    * Google result snippet + social-share description.
    */
   metaDescription?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -661,6 +707,14 @@ export interface Service {
    * Google result snippet + social-share description.
    */
   metaDescription?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -718,6 +772,14 @@ export interface PricingPlan {
    * Google result snippet + social-share description.
    */
   metaDescription?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -791,6 +853,14 @@ export interface Contact {
    * Optional — Google Maps embed URL (the src attribute from the embed iframe). Not currently rendered, kept for future map block.
    */
   mapEmbedUrl?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
   updatedAt?: string | null;
   createdAt?: string | null;
 }
@@ -842,6 +912,13 @@ export interface LandingPageSelect<T extends boolean = true> {
         image?: T;
         id?: T;
       };
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -857,6 +934,13 @@ export interface AboutSelect<T extends boolean = true> {
   paragraph2?: T;
   metaTitle?: T;
   metaDescription?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -882,6 +966,13 @@ export interface ServicesSelect<T extends boolean = true> {
       };
   metaTitle?: T;
   metaDescription?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -913,6 +1004,13 @@ export interface PricingPlansSelect<T extends boolean = true> {
       };
   metaTitle?: T;
   metaDescription?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
@@ -946,6 +1044,13 @@ export interface ContactsSelect<T extends boolean = true> {
   addressMapsUrl?: T;
   workingHours?: T;
   mapEmbedUrl?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
