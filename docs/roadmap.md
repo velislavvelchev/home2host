@@ -96,10 +96,10 @@ Order: static pages first, then CMS-driven ones.
 - ⬜ WordPress kept as a backup for several weeks post-launch
 - ⬜ Verify GA and Google Search Console after launch
 - ⬜ **Set `NEXT_PUBLIC_SERVER_URL` on Vercel** — deferred from 2026-06-22. Today the email-adapter slice auto-resolves the public origin via `VERCEL_URL` (auto-injected, unique per deployment), so password-reset links work but look like `https://home2host-abc123.vercel.app/...`. At the DNS switch, set `NEXT_PUBLIC_SERVER_URL=https://home2host.com` on Production + Preview + Development and reset/verification emails get clean stable links. Bring this forward if a second admin (the partner) is added before launch — per-deploy URLs in their reset email can read as phishy.
-- ⬜ **Real-device mobile pass** — open the Vercel preview URL on an actual Android phone and an actual iPhone (Safari behaves differently from Chrome DevTools' mobile emulation, especially on viewport-height units and tap targets). Catch issues DevTools never shows.
+- ✅ **Real-device mobile pass** — owner walked the Vercel preview URL on actual phones (Android Chrome + iPhone Safari). Closed 2026-06-22; no issues surfaced that DevTools emulation had missed.
 - ⬜ Security baseline (before/at DNS switch):
   - ⬜ Put **Cloudflare's free tier** in front of `home2host.com` for L7 DDoS, WAF, rate-limiting rules, bot management, always-on caching. Single biggest security upgrade available; covers ~90% of what Vercel charges for in Pro.
-  - ⬜ Harden Payload admin auth — set `maxLoginAttempts: 5` and `lockTime: 15 * 60 * 1000` on the `users` collection to block brute-force login attempts.
+  - ✅ **Hardened Payload admin auth** (2026-06-22). `users` collection's `auth: true` replaced with `auth: { maxLoginAttempts: 5, lockTime: 15 * 60 * 1000 }` — Payload tracks failed attempts in the users table itself (no external rate limiter needed) and locks the account for 15 min after the 5th miss. Recovery path is the password-reset flow shipped earlier today: resetting issues a new password and clears the attempt counter, so a locked-out owner is back in within the time it takes to read an email.
   - ⬜ Enable **Vercel usage alerts** (Settings → Billing → Usage alerts) at 50% / 80% / 100% — early warning for traffic spikes or runaway crawlers.
 
 ## Known follow-ups (don't lose these)

@@ -101,7 +101,18 @@ export default buildConfig({
   collections: [
     {
       slug: "users",
-      auth: true,
+      // Brute-force defense: lock the account after 5 failed login
+      // attempts for 15 minutes. Payload tracks attempts in the
+      // users table itself, so this works without any external rate
+      // limiter. The password-reset flow (email adapter wired earlier
+      // 2026-06-22) is the recovery path if a legitimate admin trips
+      // the lockout — reset issues a new password and clears the
+      // attempt counter, so a locked-out owner is back in within the
+      // time it takes to read an email.
+      auth: {
+        maxLoginAttempts: 5,
+        lockTime: 15 * 60 * 1000,
+      },
       admin: { useAsTitle: "email" },
       fields: [],
     },
