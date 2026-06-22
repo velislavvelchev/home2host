@@ -25,7 +25,7 @@ import { OverviewComponent as OverviewComponent_a8a977ebc872c5d5ea7ee689724c0860
 import { MetaTitleComponent as MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { MetaDescriptionComponent as MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
-import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
+import { SeoPreviewWithImage as SeoPreviewWithImage_d2b0e75a5133e8e919fb9aa528507dbd } from '../../../components/admin/SeoPreviewWithImage'
 import { FetchFromAirbnbField as FetchFromAirbnbField_d5f6ebe9170174e7e8df63b2112d1348 } from '../../../components/admin/FetchFromAirbnbField'
 import { RefreshAirbnbRatingField as RefreshAirbnbRatingField_71e9ce0a916df0abf09d8d3c04a7a25a } from '../../../components/admin/RefreshAirbnbRatingField'
 import { BrandIcon as BrandIcon_d0588eb7948ddcaab14f9f6ea2cd1dd7 } from '../../../components/admin/BrandIcon'
@@ -63,7 +63,7 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#MetaTitleComponent": MetaTitleComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#MetaDescriptionComponent": MetaDescriptionComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "@payloadcms/plugin-seo/client#MetaImageComponent": MetaImageComponent_a8a977ebc872c5d5ea7ee689724c0860,
-  "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
+  "/components/admin/SeoPreviewWithImage#SeoPreviewWithImage": SeoPreviewWithImage_d2b0e75a5133e8e919fb9aa528507dbd,
   "/components/admin/FetchFromAirbnbField#FetchFromAirbnbField": FetchFromAirbnbField_d5f6ebe9170174e7e8df63b2112d1348,
   "/components/admin/RefreshAirbnbRatingField#RefreshAirbnbRatingField": RefreshAirbnbRatingField_71e9ce0a916df0abf09d8d3c04a7a25a,
   "/components/admin/BrandIcon#BrandIcon": BrandIcon_d0588eb7948ddcaab14f9f6ea2cd1dd7,

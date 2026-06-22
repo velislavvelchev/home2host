@@ -11,6 +11,29 @@ import sharp from "sharp";
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
+// Trim long body text into a Google-friendly meta description (~150
+// chars). Tries a sentence boundary first (period / exclam / question)
+// to land on a natural cut; falls back to a word boundary with an
+// ellipsis; last-resort hard cut. The 80-char floor avoids degenerate
+// cuts ("Home2Host е..." with nothing useful before the punctuation).
+function truncateForMeta(text: string, maxLen = 155): string {
+  const trimmed = text.trim().replace(/\s+/g, " ");
+  if (trimmed.length <= maxLen) return trimmed;
+
+  const window = trimmed.slice(0, maxLen);
+  const lastSentence = Math.max(
+    window.lastIndexOf("."),
+    window.lastIndexOf("!"),
+    window.lastIndexOf("?"),
+  );
+  if (lastSentence >= 80) return window.slice(0, lastSentence + 1).trim();
+
+  const lastSpace = window.lastIndexOf(" ");
+  if (lastSpace >= 80) return `${window.slice(0, lastSpace).trim()}…`;
+
+  return `${window.slice(0, maxLen - 1).trim()}…`;
+}
+
 // Resolve the public URL the admin + API are reachable at. Used by
 // Payload to build absolute links in outbound mail (password reset,
 // account verification) and as the implicit CORS/CSRF allowlist when
@@ -778,37 +801,107 @@ export default buildConfig({
       ],
       uploadsCollection: "media",
       tabbedUI: true,
-      // Content-type-aware defaults for the auto-generate buttons.
-      // The `doc` passed in carries the current-locale resolved fields,
-      // so clicking auto-generate on the BG tab pulls BG content and
-      // on the EN tab pulls EN content — same function, both locales.
+      // Replace the plugin's stock Preview field component (URL +
+      // title + description only) with one that also renders the
+      // uploaded meta.image as a thumbnail — image-rich SERP style.
+      // See src/components/admin/SeoPreviewWithImage.tsx for the
+      // motivation; the override here just remaps the field's
+      // component path, leaving every other Preview prop intact.
+      fields: ({ defaultFields }) =>
+        defaultFields.map((field) => {
+          if (
+            field.type === "ui" &&
+            "name" in field &&
+            field.name === "preview"
+          ) {
+            return {
+              ...field,
+              admin: {
+                ...(field.admin ?? {}),
+                components: {
+                  ...(field.admin?.components ?? {}),
+                  Field: {
+                    // Carry over the plugin's client-side props
+                    // (descriptionPath, hasGenerateURLFn, titlePath)
+                    // by spreading the existing Field config — our
+                    // component accepts the same shape, so they pass
+                    // straight through.
+                    ...(typeof field.admin?.components?.Field === "object"
+                      ? field.admin.components.Field
+                      : {}),
+                    path: "/components/admin/SeoPreviewWithImage#SeoPreviewWithImage",
+                  },
+                },
+              },
+            };
+          }
+          return field;
+        }),
+      // Content-type-aware defaults for the auto-generate buttons in
+      // the SEO tab. The `doc` carries the current-locale resolved
+      // fields (BG when clicked on BG tab, EN on EN); the `locale`
+      // arg lets us emit a locale-appropriate brand+keyword suffix.
       //
-      // Order of preference (first non-empty wins):
-      //   1. Collection-specific source (title / excerpt).
-      //   2. Landing-page's split title parts, stitched.
-      //   3. Section heading / lead body, where present.
-      generateTitle: ({ doc }) => {
+      // Title formula matches the live WordPress site's existing SEO
+      // pattern (which has accumulated Google ranking signal):
+      //   "{short page name} - {keyword phrase} - Home2Host"
+      // The keyword phrase is the part Google has indexed the site on.
+      //
+      // Per-slug "short page name" map is non-obvious but deliberate:
+      // each Global's visible `heading` field carries marketing copy
+      // ("Кои сме ние" — "Who we are"), not the short SEO label
+      // ("За нас" — "About"). The map sidesteps that by hard-coding
+      // the right short name per page, in both locales. If a new
+      // Global is added later, fall through to the heading until the
+      // map is updated.
+      //
+      // Description truncates to fit the 150-char SEO limit, preferring
+      // a sentence boundary, then a word boundary, then a hard cut
+      // with an ellipsis.
+      generateTitle: ({ doc, locale, globalSlug, collectionSlug }) => {
         if (!doc || typeof doc !== "object") return "";
         const o = doc as Record<string, unknown>;
         const str = (v: unknown): string =>
           typeof v === "string" && v.length > 0 ? v : "";
+        const isEn = locale === "en";
 
-        const title = str(o.title);
-        if (title) return `${title} — Home2Host`;
+        const suffix = isEn
+          ? " - Property Management in Bansko & Burgas - Home2Host"
+          : " - Управление на Имоти в Банско и Бургас - Home2Host";
+        const brandOnly = suffix.replace(/^ - /, "");
 
-        const stitched = [
-          str(o.titleBefore),
-          str(o.titleHighlight),
-          str(o.titleAfter),
-        ]
-          .filter(Boolean)
-          .join(" ");
-        if (stitched) return `${stitched} — Home2Host`;
+        // Landing page: no per-page short name — homepage's identity
+        // is the brand+keyword itself.
+        if (globalSlug === "landing-page") return brandOnly;
 
+        // Per-Global short SEO label, BG + EN. Decoupled from the
+        // visible `heading` field, which carries marketing phrasing.
+        const SHORT_NAMES: Record<string, { bg: string; en: string }> = {
+          about: { bg: "За нас", en: "About" },
+          services: { bg: "Услуги", en: "Services" },
+          "pricing-plans": { bg: "Цени", en: "Pricing" },
+          contacts: { bg: "Контакти", en: "Contacts" },
+        };
+
+        if (globalSlug && SHORT_NAMES[globalSlug]) {
+          const name = SHORT_NAMES[globalSlug][isEn ? "en" : "bg"];
+          return `${name}${suffix}`;
+        }
+
+        // Collections (blog-posts, apartments): per-doc title is the
+        // right "page name" — those vary per document.
+        if (collectionSlug) {
+          const title = str(o.title);
+          if (title) return `${title}${suffix}`;
+          return brandOnly;
+        }
+
+        // Defensive fallback for any future Global not in the map —
+        // visible heading is better than nothing.
         const heading = str(o.heading);
-        if (heading) return `${heading} — Home2Host`;
+        if (heading) return `${heading}${suffix}`;
 
-        return "";
+        return brandOnly;
       },
       generateDescription: ({ doc }) => {
         if (!doc || typeof doc !== "object") return "";
@@ -816,13 +909,13 @@ export default buildConfig({
         const str = (v: unknown): string =>
           typeof v === "string" && v.length > 0 ? v : "";
 
-        const excerpt = str(o.excerpt);
-        if (excerpt) return excerpt;
+        // Source order: excerpt (blog-posts) → lead (Globals with one)
+        // → paragraph1 (About has no lead).
+        const source =
+          str(o.excerpt) || str(o.lead) || str(o.paragraph1);
+        if (!source) return "";
 
-        const lead = str(o.lead);
-        if (lead) return lead;
-
-        return "";
+        return truncateForMeta(source);
       },
     }),
   ],
