@@ -1,4 +1,5 @@
 import { postgresAdapter } from "@payloadcms/db-postgres";
+import { nodemailerAdapter } from "@payloadcms/email-nodemailer";
 import { seoPlugin } from "@payloadcms/plugin-seo";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
@@ -10,7 +11,25 @@ import sharp from "sharp";
 const filename = fileURLToPath(import.meta.url);
 const dirname = path.dirname(filename);
 
+// Resolve the public URL the admin + API are reachable at. Used by
+// Payload to build absolute links in outbound mail (password reset,
+// account verification) and as the implicit CORS/CSRF allowlist when
+// neither is set explicitly. Resolution order:
+//   1. NEXT_PUBLIC_SERVER_URL — explicit override, the right answer
+//      for production where the domain is known (set this on Vercel
+//      Production to https://home2host.vercel.app today, flip to
+//      https://home2host.com at the Stage 6 DNS switch).
+//   2. VERCEL_URL — auto-injected per deployment on Preview; gives
+//      every preview deploy its own correct origin without hand-set
+//      env vars per branch.
+//   3. http://localhost:3000 — dev fallback.
+const serverURL =
+  process.env.NEXT_PUBLIC_SERVER_URL ||
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
+  "http://localhost:3000";
+
 export default buildConfig({
+  serverURL,
   admin: {
     user: "users",
     importMap: {
@@ -690,6 +709,42 @@ export default buildConfig({
     },
   ],
   editor: lexicalEditor(),
+  // Email transport for password-reset, account verification, and any
+  // future Payload-initiated mail. Reuses the same Hostinger SMTP
+  // mailbox as the contact form (info@home2host.com) — most SMTP
+  // servers reject envelope-from mismatches as relay attempts, so the
+  // FROM address must match SMTP_USER.
+  //
+  // Guarded by env-var presence: if any of the three SMTP_* vars is
+  // missing, fall back to Payload's default console transport (writes
+  // emails to the dev log, doesn't deliver). Keeps `npm run dev`
+  // working on a fresh clone without Hostinger creds — the resulting
+  // dev-mode warning ("Email transport not configured…") is the cue
+  // that production needs the env vars set.
+  email:
+    process.env.SMTP_HOST &&
+    process.env.SMTP_USER &&
+    process.env.SMTP_PASSWORD
+      ? nodemailerAdapter({
+          defaultFromAddress: process.env.SMTP_USER,
+          defaultFromName: "Home2Host Admin",
+          transportOptions: {
+            host: process.env.SMTP_HOST,
+            port: Number(process.env.SMTP_PORT) || 465,
+            // Port 465 is implicit-TLS (the legacy "SSL" mode); 587 is
+            // STARTTLS. `secure: true` means implicit-TLS — correct
+            // for our Hostinger setup. If the port ever flips to 587,
+            // also flip this to `false` so nodemailer upgrades the
+            // connection via STARTTLS instead of expecting TLS from
+            // byte zero.
+            secure: (Number(process.env.SMTP_PORT) || 465) === 465,
+            auth: {
+              user: process.env.SMTP_USER,
+              pass: process.env.SMTP_PASSWORD,
+            },
+          },
+        })
+      : undefined,
   secret: process.env.PAYLOAD_SECRET || "",
   typescript: {
     outputFile: path.resolve(dirname, "payload-types.ts"),

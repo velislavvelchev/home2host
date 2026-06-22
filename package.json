@@ -16,6 +16,7 @@
   "dependencies": {
     "@next/third-parties": "^16.2.9",
     "@payloadcms/db-postgres": "^3.85.0",
+    "@payloadcms/email-nodemailer": "^3.85.0",
     "@payloadcms/next": "^3.85.0",
     "@payloadcms/plugin-seo": "^3.85.0",
     "@payloadcms/richtext-lexical": "^3.85.0",
