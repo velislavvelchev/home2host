@@ -10,8 +10,9 @@ type Params = { locale: string };
 // page carries the full content of every section. See the sibling routes for
 // the longer reasoning.
 //
-// metaTitle / metaDescription live on the `pricing-plans` Global so the owner
-// can edit search-result copy alongside the plan cards in /admin.
+// SEO copy lives in the `pricing-plans` Global's `meta` group (added by the
+// @payloadcms/plugin-seo plugin) so the owner can edit search-result
+// title + description alongside the plan cards in /admin's SEO tab.
 export async function generateMetadata({
   params,
 }: {
@@ -24,8 +25,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     depth: 0,
   });
-  const title = pricing.metaTitle ?? undefined;
-  const description = pricing.metaDescription ?? undefined;
+  const title = pricing.meta?.title ?? undefined;
+  const description = pricing.meta?.description ?? undefined;
   return {
     title,
     description,

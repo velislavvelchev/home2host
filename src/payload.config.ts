@@ -372,18 +372,6 @@ export default buildConfig({
         { name: "heading", type: "text", localized: true, required: true },
         { name: "paragraph1", type: "textarea", localized: true, required: true },
         { name: "paragraph2", type: "textarea", localized: true, required: true },
-        {
-          name: "metaTitle",
-          type: "text",
-          localized: true,
-          admin: { description: "Browser tab + Google result title for /about-us/." },
-        },
-        {
-          name: "metaDescription",
-          type: "textarea",
-          localized: true,
-          admin: { description: "Google result snippet + social-share description." },
-        },
       ],
     },
     {
@@ -439,18 +427,6 @@ export default buildConfig({
               },
             },
           ],
-        },
-        {
-          name: "metaTitle",
-          type: "text",
-          localized: true,
-          admin: { description: "Browser tab + Google result title for /services/." },
-        },
-        {
-          name: "metaDescription",
-          type: "textarea",
-          localized: true,
-          admin: { description: "Google result snippet + social-share description." },
         },
       ],
     },
@@ -532,18 +508,6 @@ export default buildConfig({
             },
           ],
         },
-        {
-          name: "metaTitle",
-          type: "text",
-          localized: true,
-          admin: { description: "Browser tab + Google result title for /prices/." },
-        },
-        {
-          name: "metaDescription",
-          type: "textarea",
-          localized: true,
-          admin: { description: "Google result snippet + social-share description." },
-        },
       ],
     },
     {
@@ -576,18 +540,6 @@ export default buildConfig({
           admin: {
             description: "Body of the 'Where we work' card — short description of the service area.",
           },
-        },
-        {
-          name: "metaTitle",
-          type: "text",
-          localized: true,
-          admin: { description: "Browser tab + Google result title for /contacts/." },
-        },
-        {
-          name: "metaDescription",
-          type: "textarea",
-          localized: true,
-          admin: { description: "Google result snippet + social-share description." },
         },
 
         // Contact data — phones are explicit primary/secondary groups
@@ -736,14 +688,6 @@ export default buildConfig({
     // live Google SERP preview to each enabled content type. The
     // tabbedUI option puts the group into its own "SEO" tab in the
     // edit form (cleaner than stacking the fields at the bottom).
-    //
-    // Coexistence note: About / Services / Pricing / Contacts globals
-    // already carry hand-rolled `metaTitle` + `metaDescription` fields
-    // from earlier Priority C–D slices. Those stay in place for now —
-    // removing them would wipe content the owner has typed. Plan a
-    // dedicated migration slice that copies values into the new
-    // `meta` group, updates `<page>.metadata.ts` readers, then drops
-    // the hand-rolled fields (tracked in roadmap.md Stage 5).
     seoPlugin({
       collections: ["blog-posts", "apartments"],
       globals: [
@@ -761,20 +705,14 @@ export default buildConfig({
       // on the EN tab pulls EN content — same function, both locales.
       //
       // Order of preference (first non-empty wins):
-      //   1. Hand-rolled metaTitle / metaDescription — lets the button
-      //      double as a one-click "import from the legacy field" during
-      //      the planned migration that retires those fields.
-      //   2. Collection-specific source (title / excerpt).
-      //   3. Landing-page's split title parts, stitched.
-      //   4. Section heading / lead body, where present.
+      //   1. Collection-specific source (title / excerpt).
+      //   2. Landing-page's split title parts, stitched.
+      //   3. Section heading / lead body, where present.
       generateTitle: ({ doc }) => {
         if (!doc || typeof doc !== "object") return "";
         const o = doc as Record<string, unknown>;
         const str = (v: unknown): string =>
           typeof v === "string" && v.length > 0 ? v : "";
-
-        const handRolled = str(o.metaTitle);
-        if (handRolled) return handRolled;
 
         const title = str(o.title);
         if (title) return `${title} — Home2Host`;
@@ -798,9 +736,6 @@ export default buildConfig({
         const o = doc as Record<string, unknown>;
         const str = (v: unknown): string =>
           typeof v === "string" && v.length > 0 ? v : "";
-
-        const handRolled = str(o.metaDescription);
-        if (handRolled) return handRolled;
 
         const excerpt = str(o.excerpt);
         if (excerpt) return excerpt;

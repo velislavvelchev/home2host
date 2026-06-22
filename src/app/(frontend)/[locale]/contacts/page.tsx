@@ -10,8 +10,9 @@ type Params = { locale: string };
 // home page carries the full content of every section. See the sibling
 // routes for the longer reasoning.
 //
-// metaTitle / metaDescription live on the `contacts` Global so the owner
-// can edit search-result copy alongside the section body in /admin.
+// SEO copy lives in the `contacts` Global's `meta` group (added by the
+// @payloadcms/plugin-seo plugin) so the owner can edit search-result
+// title + description alongside the section body in /admin's SEO tab.
 export async function generateMetadata({
   params,
 }: {
@@ -24,8 +25,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     depth: 0,
   });
-  const title = contacts.metaTitle ?? undefined;
-  const description = contacts.metaDescription ?? undefined;
+  const title = contacts.meta?.title ?? undefined;
+  const description = contacts.meta?.description ?? undefined;
   return {
     title,
     description,

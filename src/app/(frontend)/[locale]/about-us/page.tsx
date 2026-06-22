@@ -17,8 +17,9 @@ type Params = { locale: string };
 // page. `images` is intentionally left to inherit the root's OG image —
 // per-section share images are a separate design slice.
 //
-// metaTitle / metaDescription live on the `about` Global so the owner
-// can edit search-result copy alongside the section body in /admin.
+// SEO copy lives in the `about` Global's `meta` group (added by the
+// @payloadcms/plugin-seo plugin) so the owner can edit search-result
+// title + description alongside the section body in /admin's SEO tab.
 export async function generateMetadata({
   params,
 }: {
@@ -31,8 +32,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     depth: 0,
   });
-  const title = about.metaTitle ?? undefined;
-  const description = about.metaDescription ?? undefined;
+  const title = about.meta?.title ?? undefined;
+  const description = about.meta?.description ?? undefined;
   return {
     title,
     description,

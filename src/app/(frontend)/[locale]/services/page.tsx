@@ -11,8 +11,9 @@ type Params = { locale: string };
 // match the live WordPress URL shape and serve deep-links, not to compete
 // with the home for keywords. See src/app/(frontend)/[locale]/about-us/page.tsx.
 //
-// metaTitle / metaDescription live on the `services` Global so the owner
-// can edit search-result copy alongside the section body in /admin.
+// SEO copy lives in the `services` Global's `meta` group (added by the
+// @payloadcms/plugin-seo plugin) so the owner can edit search-result
+// title + description alongside the section body in /admin's SEO tab.
 export async function generateMetadata({
   params,
 }: {
@@ -25,8 +26,8 @@ export async function generateMetadata({
     locale: locale as Locale,
     depth: 0,
   });
-  const title = services.metaTitle ?? undefined;
-  const description = services.metaDescription ?? undefined;
+  const title = services.meta?.title ?? undefined;
+  const description = services.meta?.description ?? undefined;
   return {
     title,
     description,

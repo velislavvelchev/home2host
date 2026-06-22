@@ -649,14 +649,6 @@ export interface About {
   heading: string;
   paragraph1: string;
   paragraph2: string;
-  /**
-   * Browser tab + Google result title for /about-us/.
-   */
-  metaTitle?: string | null;
-  /**
-   * Google result snippet + social-share description.
-   */
-  metaDescription?: string | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -699,14 +691,6 @@ export interface Service {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Browser tab + Google result title for /services/.
-   */
-  metaTitle?: string | null;
-  /**
-   * Google result snippet + social-share description.
-   */
-  metaDescription?: string | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -764,14 +748,6 @@ export interface PricingPlan {
         id?: string | null;
       }[]
     | null;
-  /**
-   * Browser tab + Google result title for /prices/.
-   */
-  metaTitle?: string | null;
-  /**
-   * Google result snippet + social-share description.
-   */
-  metaDescription?: string | null;
   meta?: {
     title?: string | null;
     description?: string | null;
@@ -802,14 +778,6 @@ export interface Contact {
    * Body of the 'Where we work' card — short description of the service area.
    */
   serviceAreaBody: string;
-  /**
-   * Browser tab + Google result title for /contacts/.
-   */
-  metaTitle?: string | null;
-  /**
-   * Google result snippet + social-share description.
-   */
-  metaDescription?: string | null;
   email: string;
   /**
    * The 'main' phone. Used wherever a single number is needed (the floating call bubble, the WhatsApp button), and shown first in the phone list on the Contacts section.
@@ -932,8 +900,6 @@ export interface AboutSelect<T extends boolean = true> {
   heading?: T;
   paragraph1?: T;
   paragraph2?: T;
-  metaTitle?: T;
-  metaDescription?: T;
   meta?:
     | T
     | {
@@ -964,8 +930,6 @@ export interface ServicesSelect<T extends boolean = true> {
         image?: T;
         id?: T;
       };
-  metaTitle?: T;
-  metaDescription?: T;
   meta?:
     | T
     | {
@@ -1002,8 +966,6 @@ export interface PricingPlansSelect<T extends boolean = true> {
             };
         id?: T;
       };
-  metaTitle?: T;
-  metaDescription?: T;
   meta?:
     | T
     | {
@@ -1025,8 +987,6 @@ export interface ContactsSelect<T extends boolean = true> {
   lead?: T;
   serviceAreaHeading?: T;
   serviceAreaBody?: T;
-  metaTitle?: T;
-  metaDescription?: T;
   email?: T;
   primaryPhone?:
     | T
