@@ -96,9 +96,60 @@ the i18n JSON files.
 
 ---
 
+## Individual blog posts (Payload `blog-posts` collection)
+
+Captured 2026-06-22 from the live site's WP REST API (`/wp-json/wp/v2/posts`) which exposes Yoast SEO data directly via `yoast_head_json`. Unlike the marketing pages above, blog-post `<title>` and OG title share the same formula here — `{post title} - Home2Host Управление на имоти в Банско и Бургас` — so a single value covers both. Six posts total.
+
+### Post 1 — "Регламент (ЕС) 2024/1028: какво трябва да знаем?"
+
+- **Payload slug** (renamed during import): `eu-regulation-2024-1028-what-to-know`
+- **Live URL** (Cyrillic; 308 redirects to the renamed slug): `https://home2host.com/регламент-ес-2024-1028-какво-трябва-да-знаем-copy/`
+- **SEO title:** `Регламент (ЕС) 2024/1028: какво трябва да знаем? - Home2Host Управление на имоти в Банско и Бургас`
+- **SEO description:** `Научете как Регламент (ЕС) 2024/1028 ще промени краткосрочните наеми в България през май 2026 г. – изисквания за регистрация и ЕСТИ, данъци.`
+
+### Post 2 — "Фирма за управление – как да изберете правилния партньор?"
+
+- **Slug:** `property-management-company-how-to-choose`
+- **SEO title:** `Фирма за управление – как да изберете правилния партньор? - Home2Host Управление на имоти в Банско и Бургас`
+- **SEO description:** `Фирма за управление на имоти – как да изберете правилния партньор, за да увеличите заетостта, приходите и ефективното управление.`
+
+### Post 3 — "Резервации и гости при градски Airbnb"
+
+- **Slug:** `bookings-and-guests`
+- **SEO title:** `Резервации и гости при градски Airbnb - Home2Host Управление на имоти в Банско и Бургас`
+- **SEO description:** `Открийте как да увеличите своите резервации и удовлетворите вашите гости с вашия градски Airbnb. Вижте кои 7 ключови фактора.`
+
+### Post 4 — "Дизайнът и декорацията на вашия Airbnb имот"
+
+- **Slug:** `key-advice-for-design-and-decoration`
+- **SEO title:** `Дизайнът и декорацията на вашия Airbnb имот - Home2Host Управление на имоти в Банско и Бургас`
+- **SEO description:** `Дизайнът и декорацията на вашия Airbnb имот могат да повишат заетостта и оценките дори извън сезона. Вижте пет ключови съвета.`
+
+### Post 5 — "Защо Банско е перфектното място за отдаване под наем"
+
+- **Slug:** `bansko-perfect-for-rental-apartments`
+- **SEO title:** `Защо Банско е перфектното място за отдаване под наем - Home2Host Управление на имоти в Банско и Бургас`
+- **SEO description:** `Банско предлага отлична доходност от отдаване под наем. Разберете как локацията, сезонността и управлението увеличават печалбата.`
+
+### Post 6 — "Управление на краткосрочни наеми и Предимствата от него"
+
+- **Slug:** `benefits-short-term-rental-management`
+- **SEO title:** `Управление на краткосрочни наеми и Предимствата от него - Home2Host Управление на имоти в Банско и Бургас`
+- **SEO description:** `Професионално управление на краткосрочни наеми увеличава приходите и намалява стреса. Разберете как динамичното ценообразуване и оптимизацията на обяви носят повече резервации и отлични оценки.`
+
+---
+
+## Individual apartments — not applicable
+
+The live WordPress site does **not** have per-apartment URLs. `/apartments/` is a single listing page (covered above) containing Airbnb embed widgets — actual apartment pages live on `airbnb.com`, not on `home2host.com`. There is no per-apartment WP SEO to recover.
+
+In our new Payload setup, individual Apartment docs have SEO fields enabled by the plugin but those fields are currently unused on the frontend (the apartments render only inside the carousel). Leave `meta` empty on apartment docs unless we add standalone apartment detail pages later.
+
+---
+
 ## Notes for future-self
 
-- The `<title>` tags all mix English + Cyrillic ("Home - Home2Host Управление…"). The OG titles are uniformly Bulgarian and read better for a BG audience. **Prefer the OG title pattern** when restoring values from this snapshot.
+- The `<title>` tags on marketing pages mix English + Cyrillic ("Home - Home2Host Управление…"). The OG titles are uniformly Bulgarian. **Prefer the OG title pattern** when restoring marketing-page values.
 - The OG titles follow a consistent formula: `{Page name in BG} - Управление на Имоти в Банско и Бургас - Home2Host`. The improved `generateTitle` callback bakes this formula in.
+- Blog posts use one formula for both `<title>` and OG: `{post title} - Home2Host Управление на имоти в Банско и Бургас`. Slightly different word order from the marketing-page OG pattern — Yoast generates it from a different template.
 - The meta descriptions duplicate across home + about (same copy). The improved Payload-driven version differentiates them — paragraph1 of each Global feeds the description, so editing the visible page content also refreshes the SEO copy via auto-generate.
-- Individual blog-post `<title>` and `<meta description>` were not in scope of this scrape — they live per-post in WordPress and would need to be scraped per-slug if maximum continuity is desired post-launch.

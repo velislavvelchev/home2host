@@ -191,5 +191,72 @@ for (const route of ROUTES) {
   await sleep(600); // polite throttle
 }
 
+// ── Individual blog posts ───────────────────────────────────────────
+//
+// The live site runs Yoast SEO, which exposes per-post meta via the
+// WP REST API as `yoast_head_json.title` / `yoast_head_json.description`.
+// Much cleaner than HTML parsing — fields come back pre-extracted with
+// HTML entities already decoded.
+//
+// Apartments are intentionally skipped: the live WP site has only one
+// `/apartments/` page (already scraped above) containing Airbnb embed
+// widgets. There are no per-apartment URLs to scrape.
+console.log("");
+console.log(HR);
+console.log("# Individual blog posts (via WP REST API)");
+console.log("# Destination: Payload `blog-posts` collection → SEO tab (BG)");
+console.log("# Match by slug — see each block's URL.");
+console.log("");
+
+try {
+  const res = await fetch(
+    `${LIVE}/wp-json/wp/v2/posts?per_page=20&_fields=id,slug,link,title,yoast_head_json`,
+    {
+      headers: {
+        "User-Agent":
+          "home2host-seo-scrape/1.0 (one-off, fetching own live site)",
+      },
+    },
+  );
+  const posts = await res.json();
+  if (!Array.isArray(posts)) {
+    console.log(`ERR: unexpected response shape: ${JSON.stringify(posts).slice(0, 200)}`);
+  } else {
+    for (const post of posts) {
+      const decodedSlug = (() => {
+        try {
+          return decodeURIComponent(post.slug || "");
+        } catch {
+          return post.slug;
+        }
+      })();
+      const decodedLink = (() => {
+        try {
+          return decodeURIComponent(post.link || "");
+        } catch {
+          return post.link;
+        }
+      })();
+      const title = post.yoast_head_json?.title ?? "";
+      const desc = post.yoast_head_json?.description ?? "";
+      const ogTitle = post.yoast_head_json?.og_title ?? "";
+      const ogDesc = post.yoast_head_json?.og_description ?? "";
+      const postTitle = decode(post.title?.rendered ?? "");
+      console.log(HR);
+      console.log(`POST TITLE:    ${postTitle}`);
+      console.log(`SLUG:          ${decodedSlug}`);
+      console.log(`URL:           ${decodedLink}`);
+      console.log("");
+      console.log(`SEO Title:     ${title}`);
+      console.log(`SEO Desc:      ${desc}`);
+      console.log(`OG Title:      ${ogTitle}`);
+      console.log(`OG Desc:       ${ogDesc}`);
+      console.log("");
+    }
+  }
+} catch (err) {
+  console.log(`ERR fetching blog posts: ${err.message}`);
+}
+
 console.log(HR);
 console.log("# Done.");
