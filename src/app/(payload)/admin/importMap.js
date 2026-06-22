@@ -28,6 +28,8 @@ import { MetaImageComponent as MetaImageComponent_a8a977ebc872c5d5ea7ee689724c08
 import { PreviewComponent as PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860 } from '@payloadcms/plugin-seo/client'
 import { FetchFromAirbnbField as FetchFromAirbnbField_d5f6ebe9170174e7e8df63b2112d1348 } from '../../../components/admin/FetchFromAirbnbField'
 import { RefreshAirbnbRatingField as RefreshAirbnbRatingField_71e9ce0a916df0abf09d8d3c04a7a25a } from '../../../components/admin/RefreshAirbnbRatingField'
+import { BrandIcon as BrandIcon_d0588eb7948ddcaab14f9f6ea2cd1dd7 } from '../../../components/admin/BrandIcon'
+import { BrandLogo as BrandLogo_9bb8ea9971948830b3de812baaa56aec } from '../../../components/admin/BrandLogo'
 import { ExternalToolsMenu as ExternalToolsMenu_e1e81e138239db5f96596c6aec0b175a } from '../../../components/admin/ExternalToolsMenu'
 import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e } from '@payloadcms/storage-vercel-blob/client'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -64,6 +66,8 @@ export const importMap = {
   "@payloadcms/plugin-seo/client#PreviewComponent": PreviewComponent_a8a977ebc872c5d5ea7ee689724c0860,
   "/components/admin/FetchFromAirbnbField#FetchFromAirbnbField": FetchFromAirbnbField_d5f6ebe9170174e7e8df63b2112d1348,
   "/components/admin/RefreshAirbnbRatingField#RefreshAirbnbRatingField": RefreshAirbnbRatingField_71e9ce0a916df0abf09d8d3c04a7a25a,
+  "/components/admin/BrandIcon#BrandIcon": BrandIcon_d0588eb7948ddcaab14f9f6ea2cd1dd7,
+  "/components/admin/BrandLogo#BrandLogo": BrandLogo_9bb8ea9971948830b3de812baaa56aec,
   "/components/admin/ExternalToolsMenu#ExternalToolsMenu": ExternalToolsMenu_e1e81e138239db5f96596c6aec0b175a,
   "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler": VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1

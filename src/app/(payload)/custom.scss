@@ -1,1 +1,110 @@
-/* Project-specific admin overrides go here. Empty for now. */
+// Home2Host admin theme overrides.
+//
+// Strategy: leave Payload's layout/spacing/component structure alone
+// (well-tested, future-proof) and override only the CSS custom
+// properties that drive color + typography. The variable names below
+// come from `node_modules/@payloadcms/ui/dist/scss/colors.scss`.
+//
+// Brand anchor: --color-success-500 = #122C69 (deep indigo, matches
+// the marketing site's --color-brand-800). Payload treats the
+// `success` scale as the primary accent (counterintuitive, but that's
+// the scale that drives primary buttons, focus rings, active nav).
+// The `blue` scale is overridden in lockstep — used in a few accents.
+//
+// Light mode keeps Payload's neutral-gray chrome; only the accent
+// switches to brand indigo. Dark mode swaps the chrome from
+// near-black to a brand-tinted navy so the admin reads as part of
+// the Home2Host product instead of stock Payload.
+//
+// Geist Sans is loaded in (payload)/layout.tsx via next/font with the
+// CSS-variable strategy, then surfaced here as --font-body so all of
+// Payload's typography utilities pick it up automatically.
+
+:root {
+  // ── Brand indigo scale (replaces Payload's success + blue) ──────
+  // Anchored at slot 500 = #122C69. Slots above go darker toward
+  // navy-black; slots below interpolate toward a pale indigo wash.
+  --color-success-50: rgb(238, 240, 250);
+  --color-success-100: rgb(218, 223, 245);
+  --color-success-150: rgb(195, 203, 236);
+  --color-success-200: rgb(170, 182, 224);
+  --color-success-250: rgb(145, 161, 212);
+  --color-success-300: rgb(120, 140, 199);
+  --color-success-350: rgb(95, 118, 184);
+  --color-success-400: rgb(72, 97, 168);
+  --color-success-450: rgb(45, 76, 145);
+  --color-success-500: rgb(18, 44, 105); // ← #122C69 BRAND
+  --color-success-550: rgb(17, 41, 99);
+  --color-success-600: rgb(16, 38, 91);
+  --color-success-650: rgb(15, 35, 84);
+  --color-success-700: rgb(13, 32, 77);
+  --color-success-750: rgb(12, 28, 69);
+  --color-success-800: rgb(11, 25, 61);
+  --color-success-850: rgb(9, 22, 53);
+  --color-success-900: rgb(8, 19, 46);
+  --color-success-950: rgb(7, 15, 35);
+
+  --color-blue-50: rgb(238, 240, 250);
+  --color-blue-100: rgb(218, 223, 245);
+  --color-blue-150: rgb(195, 203, 236);
+  --color-blue-200: rgb(170, 182, 224);
+  --color-blue-250: rgb(145, 161, 212);
+  --color-blue-300: rgb(120, 140, 199);
+  --color-blue-350: rgb(95, 118, 184);
+  --color-blue-400: rgb(72, 97, 168);
+  --color-blue-450: rgb(45, 76, 145);
+  --color-blue-500: rgb(18, 44, 105);
+  --color-blue-550: rgb(17, 41, 99);
+  --color-blue-600: rgb(16, 38, 91);
+  --color-blue-650: rgb(15, 35, 84);
+  --color-blue-700: rgb(13, 32, 77);
+  --color-blue-750: rgb(12, 28, 69);
+  --color-blue-800: rgb(11, 25, 61);
+  --color-blue-850: rgb(9, 22, 53);
+  --color-blue-900: rgb(8, 19, 46);
+  --color-blue-950: rgb(7, 15, 35);
+
+  // Geist Sans (loaded in (payload)/layout.tsx via next/font). The
+  // fallback chain matches the marketing site so admin and frontend
+  // typography read as the same product. Payload's whole admin
+  // references this single var via `var(--font-body)`.
+  --font-body:
+    var(--font-geist-sans),
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    Roboto,
+    'Helvetica Neue',
+    Arial,
+    sans-serif;
+}
+
+// ── Dark mode chrome: brand-tinted navy instead of neutral gray ──
+// Overriding --theme-elevation-* directly (not the underlying
+// --color-base-*) keeps light mode untouched. Elevation runs from 0
+// (page floor, darkest in dark mode) up to 1000 (highest, brightest).
+// The hues here are sampled around `#0B1730`-ish, picking up just
+// enough blue to read as "navy" without going saturated.
+html[data-theme='dark'] {
+  --theme-elevation-0: rgb(9, 14, 28);
+  --theme-elevation-50: rgb(13, 19, 36);
+  --theme-elevation-100: rgb(17, 24, 44);
+  --theme-elevation-150: rgb(23, 31, 54);
+  --theme-elevation-200: rgb(30, 39, 65);
+  --theme-elevation-250: rgb(40, 50, 78);
+  --theme-elevation-300: rgb(53, 64, 93);
+  --theme-elevation-350: rgb(70, 81, 110);
+  --theme-elevation-400: rgb(89, 100, 128);
+  --theme-elevation-450: rgb(107, 117, 144);
+  --theme-elevation-500: rgb(128, 137, 161);
+  --theme-elevation-550: rgb(148, 156, 177);
+  --theme-elevation-600: rgb(167, 174, 193);
+  --theme-elevation-650: rgb(185, 191, 207);
+  --theme-elevation-700: rgb(202, 207, 220);
+  --theme-elevation-750: rgb(217, 221, 230);
+  --theme-elevation-800: rgb(230, 233, 240);
+  --theme-elevation-850: rgb(240, 242, 246);
+  --theme-elevation-900: rgb(247, 248, 251);
+  --theme-elevation-950: rgb(252, 253, 254);
+  --theme-elevation-1000: rgb(255, 255, 255);
+}

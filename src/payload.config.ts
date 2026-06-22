@@ -16,12 +16,36 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    // Force dark mode globally. The owner is the only admin and asked
+    // for the brand-navy dark theme as the permanent look; this also
+    // removes the in-app theme toggle so there's no way to land in the
+    // unstyled light view by accident. Flip to 'all' if a user toggle
+    // is ever needed back.
+    theme: "dark",
+    meta: {
+      // Browser-tab favicon + title for the admin. Same icon set the
+      // frontend uses (public/logo-icon.svg + PNG fallbacks), so the
+      // admin tab is visually paired with the marketing site tabs.
+      titleSuffix: " — Home2Host admin",
+      icons: [
+        { url: "/logo-icon.svg", type: "image/svg+xml" },
+        { url: "/favicon-32.png", sizes: "32x32", type: "image/png" },
+        { url: "/favicon-192.png", sizes: "192x192", type: "image/png" },
+      ],
+    },
     components: {
       // Top-right of the admin panel (left of the user/logout menu).
       // One centralized launcher for the external dashboards the owner
       // uses — live site, Search Console, PageSpeed, Vercel, GA4,
       // GitHub, webmail.
       actions: ["/components/admin/ExternalToolsMenu#ExternalToolsMenu"],
+      // Brand graphics — Icon shows in the sidebar top-left, Logo
+      // shows on the login screen. Both server components rendering
+      // the SVGs from /public.
+      graphics: {
+        Icon: "/components/admin/BrandIcon#BrandIcon",
+        Logo: "/components/admin/BrandLogo#BrandLogo",
+      },
     },
   },
   localization: {
