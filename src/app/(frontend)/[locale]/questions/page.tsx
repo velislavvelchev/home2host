@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { FaqSection } from "@/components/sections/FaqSection";
+import { getPayloadInstance } from "@/lib/payload";
+import { type Locale } from "@/i18n/routing";
 
 type Params = { locale: string };
 
@@ -9,6 +11,10 @@ type Params = { locale: string };
 // routes for the longer reasoning.
 //
 // URL is `/questions/` (not `/faq/`) to match the live WordPress slug.
+//
+// Meta is owner-controlled via the `listings-faq` Global → SEO tab.
+// Falls back to the i18n JSON copy until the owner saves admin values,
+// so day-1 ships with the existing live-site-pattern title/description.
 export async function generateMetadata({
   params,
 }: {
@@ -16,8 +22,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Faq" });
-  const title = t("metaTitle");
-  const description = t("metaDescription");
+  const payload = await getPayloadInstance();
+  const listing = await payload.findGlobal({
+    slug: "listings-faq",
+    locale: locale as Locale,
+    depth: 0,
+  });
+  const title = listing.meta?.title || t("metaTitle");
+  const description = listing.meta?.description || t("metaDescription");
   return {
     title,
     description,

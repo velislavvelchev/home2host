@@ -20,6 +20,9 @@ type CardPost = BlogPost & { isUntranslated: boolean };
 // no canonical-to-home, no on-home embed. It owns its own URL.
 // Per-page `openGraph` so shares of `/blog/` read for the blog rather
 // than the home; per-post OG is set separately in [slug]/page.tsx.
+//
+// Meta is owner-controlled via the `listings-blog` Global → SEO tab.
+// Falls back to the i18n JSON copy until the owner saves admin values.
 export async function generateMetadata({
   params,
 }: {
@@ -27,8 +30,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Blog" });
-  const title = t("metaTitle");
-  const description = t("metaDescription");
+  const payload = await getPayloadInstance();
+  const listing = await payload.findGlobal({
+    slug: "listings-blog",
+    locale: locale as Locale,
+    depth: 0,
+  });
+  const title = listing.meta?.title || t("metaTitle");
+  const description = listing.meta?.description || t("metaDescription");
   return {
     title,
     description,

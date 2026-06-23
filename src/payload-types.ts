@@ -100,6 +100,9 @@ export interface Config {
     'pricing-plans': PricingPlan;
     contacts: Contact;
     'social-links': SocialLink;
+    'listings-faq': ListingsFaq;
+    'listings-blog': ListingsBlog;
+    'listings-apartments': ListingsApartment;
   };
   globalsSelect: {
     'landing-page': LandingPageSelect<false> | LandingPageSelect<true>;
@@ -108,6 +111,9 @@ export interface Config {
     'pricing-plans': PricingPlansSelect<false> | PricingPlansSelect<true>;
     contacts: ContactsSelect<false> | ContactsSelect<true>;
     'social-links': SocialLinksSelect<false> | SocialLinksSelect<true>;
+    'listings-faq': ListingsFaqSelect<false> | ListingsFaqSelect<true>;
+    'listings-blog': ListingsBlogSelect<false> | ListingsBlogSelect<true>;
+    'listings-apartments': ListingsApartmentsSelect<false> | ListingsApartmentsSelect<true>;
   };
   locale: 'bg' | 'en';
   widgets: {
@@ -853,6 +859,75 @@ export interface SocialLink {
   createdAt?: string | null;
 }
 /**
+ * SEO settings for the FAQ listing page at /questions/. Edit meta title, description, and image in the SEO tab.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings-faq".
+ */
+export interface ListingsFaq {
+  id: number;
+  /**
+   * Optional internal note (not displayed publicly). Use this space for your own reminders about this listing page.
+   */
+  note?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * SEO settings for the blog listing page at /blog/. Edit meta title, description, and image in the SEO tab. Per-post SEO lives on each blog post.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings-blog".
+ */
+export interface ListingsBlog {
+  id: number;
+  /**
+   * Optional internal note (not displayed publicly). Use this space for your own reminders about this listing page.
+   */
+  note?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * SEO settings for the apartments listing page at /apartments/. Edit meta title, description, and image in the SEO tab. Individual apartments have their own SEO under the Apartments collection.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings-apartments".
+ */
+export interface ListingsApartment {
+  id: number;
+  /**
+   * Optional internal note (not displayed publicly). Use this space for your own reminders about this listing page.
+   */
+  note?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "landing-page_select".
  */
@@ -1027,6 +1102,57 @@ export interface SocialLinksSelect<T extends boolean = true> {
         url?: T;
         label?: T;
         id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings-faq_select".
+ */
+export interface ListingsFaqSelect<T extends boolean = true> {
+  note?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings-blog_select".
+ */
+export interface ListingsBlogSelect<T extends boolean = true> {
+  note?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings-apartments_select".
+ */
+export interface ListingsApartmentsSelect<T extends boolean = true> {
+  note?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
       };
   updatedAt?: T;
   createdAt?: T;

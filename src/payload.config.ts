@@ -741,6 +741,83 @@ export default buildConfig({
         },
       ],
     },
+    // Listing-page SEO holders. The three pages /questions/, /blog/, and
+    // /apartments/ used to take their meta from messages/<locale>.json,
+    // invisible to the owner in admin. These Globals exist solely to
+    // surface that meta in the SEO tab UX — same shape as the other
+    // section Globals so the workflow is identical (auto-generate from
+    // the live-site pattern in payload.config's generateTitle map, then
+    // hand-tune as needed). Each Global has one `note` field for the
+    // Content tab; the actual SEO fields are injected by plugin-seo.
+    //
+    // Why three Globals instead of one with sub-groups: plugin-seo adds
+    // one `meta` group per doc, so a single Global with three sub-groups
+    // would share ONE meta across all three listings. Three Globals,
+    // grouped under "Listings" in the admin sidebar, gets us the per-page
+    // SEO tab + SERP preview + image thumbnail for free.
+    {
+      slug: "listings-faq",
+      label: "Listings — FAQ page",
+      admin: {
+        group: "Listings",
+        description:
+          "SEO settings for the FAQ listing page at /questions/. Edit meta title, description, and image in the SEO tab.",
+      },
+      access: { read: () => true },
+      fields: [
+        {
+          name: "note",
+          type: "textarea",
+          localized: true,
+          admin: {
+            description:
+              "Optional internal note (not displayed publicly). Use this space for your own reminders about this listing page.",
+          },
+        },
+      ],
+    },
+    {
+      slug: "listings-blog",
+      label: "Listings — Blog page",
+      admin: {
+        group: "Listings",
+        description:
+          "SEO settings for the blog listing page at /blog/. Edit meta title, description, and image in the SEO tab. Per-post SEO lives on each blog post.",
+      },
+      access: { read: () => true },
+      fields: [
+        {
+          name: "note",
+          type: "textarea",
+          localized: true,
+          admin: {
+            description:
+              "Optional internal note (not displayed publicly). Use this space for your own reminders about this listing page.",
+          },
+        },
+      ],
+    },
+    {
+      slug: "listings-apartments",
+      label: "Listings — Apartments page",
+      admin: {
+        group: "Listings",
+        description:
+          "SEO settings for the apartments listing page at /apartments/. Edit meta title, description, and image in the SEO tab. Individual apartments have their own SEO under the Apartments collection.",
+      },
+      access: { read: () => true },
+      fields: [
+        {
+          name: "note",
+          type: "textarea",
+          localized: true,
+          admin: {
+            description:
+              "Optional internal note (not displayed publicly). Use this space for your own reminders about this listing page.",
+          },
+        },
+      ],
+    },
   ],
   editor: lexicalEditor(),
   // Email transport for password-reset, account verification, and any
@@ -809,6 +886,9 @@ export default buildConfig({
         "services",
         "pricing-plans",
         "contacts",
+        "listings-faq",
+        "listings-blog",
+        "listings-apartments",
       ],
       uploadsCollection: "media",
       tabbedUI: true,
@@ -892,6 +972,12 @@ export default buildConfig({
           services: { bg: "Услуги", en: "Services" },
           "pricing-plans": { bg: "Цени", en: "Pricing" },
           contacts: { bg: "Контакти", en: "Contacts" },
+          "listings-faq": {
+            bg: "Често задавани въпроси",
+            en: "Frequently asked questions",
+          },
+          "listings-blog": { bg: "Блог", en: "Blog" },
+          "listings-apartments": { bg: "Апартаменти", en: "Apartments" },
         };
 
         if (globalSlug && SHORT_NAMES[globalSlug]) {
@@ -914,11 +1000,36 @@ export default buildConfig({
 
         return brandOnly;
       },
-      generateDescription: ({ doc }) => {
+      generateDescription: ({ doc, locale, globalSlug }) => {
         if (!doc || typeof doc !== "object") return "";
         const o = doc as Record<string, unknown>;
         const str = (v: unknown): string =>
           typeof v === "string" && v.length > 0 ? v : "";
+        const isEn = locale === "en";
+
+        // Listing pages (no content fields) get hardcoded live-site
+        // descriptions per locale so the auto-generate button still
+        // produces something useful. Owner can hand-tune afterwards.
+        const LISTING_DESCRIPTIONS: Record<
+          string,
+          { bg: string; en: string }
+        > = {
+          "listings-faq": {
+            bg: "Често задавани въпроси за управление на имоти за краткосрочен наем в Банско и Бургас — какво включват услугите ни, как ценообразуваме и какво осигуряваме за собствениците.",
+            en: "Frequently asked questions about short-term rental property management in Bansko and Burgas — what our services include, how we price, and what we provide for owners.",
+          },
+          "listings-blog": {
+            bg: "Блог за управление на краткосрочни наеми в България. Съвети за Airbnb мениджмънт, динамично ценообразуване, оптимизация на обяви и повишаване на доходността на имота.",
+            en: "Blog about short-term rental management in Bulgaria. Tips on Airbnb management, dynamic pricing, listing optimization, and improving property returns.",
+          },
+          "listings-apartments": {
+            bg: "Разгледайте имотите, които управляваме за краткосрочен наем в Банско и Бургас — професионално подготвени, готови да приемат гости през Airbnb и Booking.",
+            en: "Browse the properties we manage for short-term rental in Bansko and Burgas — professionally prepared, ready for guests through Airbnb and Booking.",
+          },
+        };
+        if (globalSlug && LISTING_DESCRIPTIONS[globalSlug]) {
+          return LISTING_DESCRIPTIONS[globalSlug][isEn ? "en" : "bg"];
+        }
 
         // Source order: excerpt (blog-posts) → lead (Globals with one)
         // → paragraph1 (About has no lead).

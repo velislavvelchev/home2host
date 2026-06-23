@@ -1,12 +1,18 @@
 import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ApartmentsSection } from "@/components/sections/ApartmentsSection";
+import { getPayloadInstance } from "@/lib/payload";
+import { type Locale } from "@/i18n/routing";
 
 type Params = { locale: string };
 
 // Canonical → `/` for the same reason as the other section routes: the
 // home page carries the full content of every section. See the sibling
 // routes for the longer reasoning.
+//
+// Meta is owner-controlled via the `listings-apartments` Global → SEO
+// tab. Falls back to the i18n JSON copy until the owner saves admin
+// values.
 export async function generateMetadata({
   params,
 }: {
@@ -14,8 +20,14 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "Apartments" });
-  const title = t("metaTitle");
-  const description = t("metaDescription");
+  const payload = await getPayloadInstance();
+  const listing = await payload.findGlobal({
+    slug: "listings-apartments",
+    locale: locale as Locale,
+    depth: 0,
+  });
+  const title = listing.meta?.title || t("metaTitle");
+  const description = listing.meta?.description || t("metaDescription");
   return {
     title,
     description,
