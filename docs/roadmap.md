@@ -110,6 +110,12 @@ Order: static pages first, then CMS-driven ones.
   - ✅ **Hardened Payload admin auth** (2026-06-22). `users` collection's `auth: true` replaced with `auth: { maxLoginAttempts: 5, lockTime: 15 * 60 * 1000 }` — Payload tracks failed attempts in the users table itself (no external rate limiter needed) and locks the account for 15 min after the 5th miss. Recovery path is the password-reset flow shipped earlier today: resetting issues a new password and clears the attempt counter, so a locked-out owner is back in within the time it takes to read an email.
   - ⬜ Enable **Vercel usage alerts** (Settings → Billing → Usage alerts) at 50% / 80% / 100% — early warning for traffic spikes or runaway crawlers.
 
+## Stage 7 — post-launch considerations (not scheduled, may never happen)
+
+Ideas that come up during Stage 6 but are deliberately NOT on the launch path. The new site debuts feature-parity with the live WordPress site; anything that adds genuinely new surface area waits until after the DNS switch is settled.
+
+- 💭 **Per-apartment landing pages (`/apartments/[slug]/`)** — surfaced 2026-06-24. Today each apartment card links straight to Airbnb; we have no per-apartment URL on `home2host.com` (the live WordPress site is the same). Building these pages would be entirely new functionality, not migration work. Possible upside: rank for long-tail guest queries (*"апартамент Банско ски лифт"*, *"apartment near Pirin"*), keep visitors in our funnel before the Airbnb hand-off, earn schema-rich SERP results. Real costs: each page needs unique 200–300 word descriptions or Google penalizes thin/duplicated content; ongoing photo + listing-state maintenance; potential doorway-page classification if pages exist mostly to push the Airbnb button. Whether it moves bookings vs. just sending visitors straight to Airbnb is unknown. Mostly relevant if Home2Host ever wants to drive *guest* traffic (vs. its current focus on acquiring *managed properties*). Revisit only if (a) owner explicitly wants to chase guest-side bookings, or (b) post-launch shows the manager-acquisition funnel needs a second traffic engine. If it ever happens, re-enable `apartments` in the `seoPlugin({ collections: [...] })` array — the per-apartment SEO tab + `generateImage`/`generateTitle` plumbing was already proven before being removed.
+
 ## Known follow-ups (don't lose these)
 
 Small items deferred during Stage 1 — none block Stage 2, but each will bite at a specific later moment if forgotten.

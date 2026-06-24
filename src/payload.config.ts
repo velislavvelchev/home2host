@@ -879,7 +879,12 @@ export default buildConfig({
     // tabbedUI option puts the group into its own "SEO" tab in the
     // edit form (cleaner than stacking the fields at the bottom).
     seoPlugin({
-      collections: ["blog-posts", "apartments"],
+      // `apartments` deliberately NOT included — no per-apartment route
+      // exists on the public site (cards link straight to Airbnb), so the
+      // SEO tab on individual apartment docs would render nowhere. Add
+      // back here if a /apartments/[slug]/ landing-page route ever ships
+      // (parked as a Stage 7 consideration in roadmap.md).
+      collections: ["blog-posts"],
       globals: [
         "landing-page",
         "about",
@@ -985,8 +990,8 @@ export default buildConfig({
           return `${name}${suffix}`;
         }
 
-        // Collections (blog-posts, apartments): per-doc title is the
-        // right "page name" — those vary per document.
+        // Collections (blog-posts): per-doc title is the right "page
+        // name" — those vary per document.
         if (collectionSlug) {
           const title = str(o.title);
           if (title) return `${title}${suffix}`;
@@ -1067,12 +1072,11 @@ export default buildConfig({
           return "";
         };
 
-        // Collections — both blog-posts and apartments have a
-        // `featuredImage` field that already drives the visible card.
-        if (
-          collectionSlug === "blog-posts" ||
-          collectionSlug === "apartments"
-        ) {
+        // Collections — blog-posts have a `featuredImage` field that
+        // already drives the visible card. Apartments are out of the
+        // SEO plugin entirely (see note on the `collections` array
+        // above), so no branch needed here.
+        if (collectionSlug === "blog-posts") {
           return asMediaId(o.featuredImage);
         }
 
