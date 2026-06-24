@@ -16,21 +16,8 @@ import { fetchAirbnbRating } from "@/lib/airbnb";
 export async function POST(req: Request) {
   const payload = await getPayloadInstance();
 
-  // See /api/fetch-airbnb for the rationale on req.headers vs next/headers.
-  let user: unknown = null;
-  try {
-    const res = await payload.auth({ headers: req.headers });
-    user = res.user;
-  } catch (err) {
-    console.error("[refresh-airbnb-rating] payload.auth threw:", err);
-  }
+  const { user } = await payload.auth({ headers: req.headers });
   if (!user) {
-    const cookieHeader = req.headers.get("cookie") ?? "";
-    console.warn("[refresh-airbnb-rating] auth returned no user", {
-      hasCookieHeader: cookieHeader.length > 0,
-      hasPayloadToken: cookieHeader.includes("payload-token="),
-      cookieLength: cookieHeader.length,
-    });
     return Response.json(
       { ok: false, error: "Not authenticated." },
       { status: 401 },
