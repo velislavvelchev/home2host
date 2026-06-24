@@ -1039,6 +1039,75 @@ export default buildConfig({
 
         return truncateForMeta(source);
       },
+      // Auto-generate button for the SEO tab's Meta Image. The owner
+      // had been uploading the same image twice on every post — once
+      // into `featuredImage` for the card, once into `meta.image` for
+      // social shares. This wires the SEO Meta Image to default to
+      // whatever image the doc already references, so the auto-generate
+      // button doubles as a one-click "use the existing image".
+      //
+      // Return shape per plugin-seo: number ID, { id }, or "" to clear.
+      // The form sends the current edit-buffer values (not the DB row),
+      // and for upload fields that means the relation is just the ID —
+      // not a resolved object — so a number is the right thing to return.
+      //
+      // Pages with no source image (about, pricing-plans, contacts,
+      // listings-*) return "" → the field stays empty and the owner
+      // uploads a custom OG image directly into the SEO tab.
+      generateImage: ({ doc, globalSlug, collectionSlug }) => {
+        if (!doc || typeof doc !== "object") return "";
+        const o = doc as Record<string, unknown>;
+
+        const asMediaId = (v: unknown): number | string => {
+          if (typeof v === "number" || typeof v === "string") return v;
+          if (v && typeof v === "object" && "id" in v) {
+            const id = (v as { id: unknown }).id;
+            if (typeof id === "number" || typeof id === "string") return id;
+          }
+          return "";
+        };
+
+        // Collections — both blog-posts and apartments have a
+        // `featuredImage` field that already drives the visible card.
+        if (
+          collectionSlug === "blog-posts" ||
+          collectionSlug === "apartments"
+        ) {
+          return asMediaId(o.featuredImage);
+        }
+
+        // Landing page — the hero's first uploaded image is the
+        // natural OG image for the home page. The `images` array can
+        // legitimately be empty (the frontend then falls back to the
+        // built-in /hero-home.jpeg) — return "" in that case.
+        if (globalSlug === "landing-page") {
+          const images = Array.isArray(o.images) ? o.images : [];
+          for (const row of images) {
+            if (row && typeof row === "object" && "image" in row) {
+              const id = asMediaId((row as { image: unknown }).image);
+              if (id) return id;
+            }
+          }
+          return "";
+        }
+
+        // Services — first row that has a custom uploaded image.
+        // The 6 items default to in-code /services/{key}.jpg fallbacks
+        // when no Image is uploaded, so most owners will skip this
+        // until they add custom photography.
+        if (globalSlug === "services") {
+          const items = Array.isArray(o.items) ? o.items : [];
+          for (const item of items) {
+            if (item && typeof item === "object" && "image" in item) {
+              const id = asMediaId((item as { image: unknown }).image);
+              if (id) return id;
+            }
+          }
+          return "";
+        }
+
+        return "";
+      },
     }),
   ],
 });
