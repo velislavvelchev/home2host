@@ -17,7 +17,6 @@
 // the admin component surfaces inline. Owner can always fall back to
 // filling the fields manually.
 
-import { headers as nextHeaders } from "next/headers";
 import { getPayloadInstance } from "@/lib/payload";
 import { fetchAirbnbMeta, uploadImageToMedia } from "@/lib/airbnb";
 
@@ -26,10 +25,24 @@ export async function POST(req: Request) {
 
   // Reject anonymous requests — this endpoint downloads remote content
   // and writes to media storage, both of which we only want signed-in
-  // admins to trigger.
-  const headersList = await nextHeaders();
-  const { user } = await payload.auth({ headers: headersList });
+  // admins to trigger. Use req.headers directly (not next/headers); the
+  // latter has been observed to drop the cookie in some Vercel prod
+  // runtimes while dev works fine, surfacing as a confusing 401-only-
+  // in-prod bug.
+  let user: unknown = null;
+  try {
+    const res = await payload.auth({ headers: req.headers });
+    user = res.user;
+  } catch (err) {
+    console.error("[fetch-airbnb] payload.auth threw:", err);
+  }
   if (!user) {
+    const cookieHeader = req.headers.get("cookie") ?? "";
+    console.warn("[fetch-airbnb] auth returned no user", {
+      hasCookieHeader: cookieHeader.length > 0,
+      hasPayloadToken: cookieHeader.includes("payload-token="),
+      cookieLength: cookieHeader.length,
+    });
     return Response.json(
       { ok: false, error: "Not authenticated." },
       { status: 401 },

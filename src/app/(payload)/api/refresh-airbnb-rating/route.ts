@@ -10,16 +10,27 @@
 // success: the button's UX shows "Listing has no rating yet — left
 // empty" so the editor knows the empty state is intentional).
 
-import { headers as nextHeaders } from "next/headers";
 import { getPayloadInstance } from "@/lib/payload";
 import { fetchAirbnbRating } from "@/lib/airbnb";
 
 export async function POST(req: Request) {
   const payload = await getPayloadInstance();
 
-  const headersList = await nextHeaders();
-  const { user } = await payload.auth({ headers: headersList });
+  // See /api/fetch-airbnb for the rationale on req.headers vs next/headers.
+  let user: unknown = null;
+  try {
+    const res = await payload.auth({ headers: req.headers });
+    user = res.user;
+  } catch (err) {
+    console.error("[refresh-airbnb-rating] payload.auth threw:", err);
+  }
   if (!user) {
+    const cookieHeader = req.headers.get("cookie") ?? "";
+    console.warn("[refresh-airbnb-rating] auth returned no user", {
+      hasCookieHeader: cookieHeader.length > 0,
+      hasPayloadToken: cookieHeader.includes("payload-token="),
+      cookieLength: cookieHeader.length,
+    });
     return Response.json(
       { ok: false, error: "Not authenticated." },
       { status: 401 },
