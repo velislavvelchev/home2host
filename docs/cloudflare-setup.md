@@ -215,12 +215,55 @@ These were deferred today; revisit after launch is stable:
 - **Custom WAF rules**: add the WP-attack-path blocker rule (`/wp-login.php`, `/xmlrpc.php`, `/wp-config.php` probes → block). These will be 100% attacker traffic on the new site.
 - **Always Online**: still ON. Worth keeping.
 
-### Rollback path
+### Rollback playbook — Vercel → Hostinger WP
 
-If something breaks immediately after the Vercel cutover:
+The full operation if you need to switch back to WP after going live on Vercel. Designed to be runnable end-to-end without re-deriving anything. **Time-to-rollback target: under 5 minutes.**
 
-- **Quick fix**: edit Cloudflare's two A records back to the Hostinger IPs (`77.37.76.87`, `92.112.198.111`) → propagation reverses in seconds. Site is back to WP.
-- This is the *primary* reason Cloudflare-first was the right ordering for launch.
+#### When to roll back
+
+Don't roll back for cosmetic glitches or a single broken page — fix forward. Roll back if:
+
+- The site is broadly unreachable (5xx errors across most pages)
+- A critical user-facing flow is broken with no quick fix (contact form catastrophically failing, all blog posts 500'ing, admin completely locked)
+- A security incident is unfolding that's harder to contain than to revert
+- Performance is so degraded (10s+ TTFB) that staying live is worse than reverting
+
+The bar is "noticeably worse than the old WP site for real users." Not "I noticed a typo."
+
+#### Steps (in order)
+
+1. **Cloudflare → DNS** → edit the two `home2host.com` A records → change content **back to the Hostinger IPs**:
+   - `77.37.76.87`
+   - `92.112.198.111`
+   - Both stay orange-cloud (proxied)
+2. **Cloudflare → DNS** → **re-add the two AAAA records** that were deleted at switch time (Vercel handles its own IPv6, but Hostinger needs them):
+   - `home2host.com` AAAA `2a02:4780:51:9:0:0:0:1` *(replace with the exact value captured from the pre-switch DNS snapshot — see roadmap pre-switch checklist)*
+   - `home2host.com` AAAA `2a02:4780:4f:c:0:0:0:1` *(same — exact value from the snapshot)*
+   - Both orange-cloud (proxied)
+   - **If you didn't capture them pre-switch**: skip the AAAA recreation. IPv6 visitors will fall back to IPv4 via the A records (Happy Eyeballs algorithm in browsers handles this gracefully). Site still works, just no native IPv6 path to origin.
+3. **Cloudflare → Caching → Configuration** → click **"Purge Everything"** at the bottom of the page. This clears any cached Vercel content from Cloudflare's edge so visitors see WP immediately instead of stale Vercel responses for cached assets.
+4. **Vercel (optional, for hygiene only)**: in Project → Settings → Domains, remove `home2host.com` from the Vercel project. Not strictly required — Vercel will just serve 404s for that hostname which nobody will reach anymore — but it prevents future confusion.
+5. **Verify**: hard-refresh `home2host.com` in incognito. Should serve WP. Response headers should show `server: cloudflare` (Cloudflare still in front) and the body should be the WP HTML.
+
+#### Why this works in seconds
+
+- Cloudflare's DNS records propagate at the edge (their own anycast network), not through the global registrar→TLD→nameserver hierarchy. Edit lands across their 300+ POPs in ~5 seconds globally.
+- No registrar-level nameserver change happens during rollback — Hostinger's nameservers stay pointing at Cloudflare throughout. The rollback is entirely contained within Cloudflare.
+- HSTS is deliberately off (see SSL/TLS section above) so no browser is forcing HTTPS-only behavior that could mask a cert problem during the switch.
+- Cloudflare's Universal SSL cert covers `home2host.com` regardless of origin — no TLS hiccup during rollback.
+
+#### What WP loses during the rollback period
+
+- Any blog posts, apartment additions, or Global edits made on the new site between launch and rollback **do not exist on WP**. WP serves the content as of launch day.
+- If the owner adds new WP content during the rollback period and you later switch forward to Vercel again, that WP content **won't be on Vercel** either. Lesson: during a rollback period, **freeze content edits on both systems** until the path forward is decided.
+
+#### Forward again after rollback
+
+If the issue gets fixed on Vercel and you want to switch forward again, repeat the original DNS switch (Cloudflare DNS edit: Hostinger IPs → Vercel anycast `76.76.21.21`, delete AAAA), purge Cloudflare cache. Same 5 minutes.
+
+### Pre-switch IPv6 capture
+
+Before performing the DNS switch, **screenshot or copy out** the exact AAAA values currently in Cloudflare's DNS panel for `home2host.com`. They look like `2a02:4780:51:9:....:....:....:....` and `2a02:4780:4f:c:....:....:....:....`. Paste them into the rollback playbook above so they're one-click ready if rollback is ever needed. The values in this doc today are partial because the full IPv6 wasn't visible in the original Cloudflare scan screenshot.
 
 ## Verification commands
 
