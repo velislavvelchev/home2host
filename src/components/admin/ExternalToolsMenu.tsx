@@ -1,7 +1,15 @@
 // Custom admin top-bar component — renders a row of icon links to the
-// external dashboards the owner uses (live site, Google Search Console,
-// PageSpeed Insights, Vercel, GA4, GitHub, Hostinger webmail). One
-// centralized launcher instead of bookmarks the owner has to remember.
+// external dashboards the owner uses (Hostinger panel, Cloudflare,
+// live site, Google Search Console, PageSpeed Insights, Vercel, GA4,
+// GitHub, Hostinger webmail). One centralized launcher instead of
+// bookmarks the owner has to remember.
+//
+// Convention for icon choice: lucide-react icons that conceptually
+// represent the tool (Server for hosting, Cloud for Cloudflare, etc.)
+// rather than brand-mark logos. Tooltip + aria-label carry the actual
+// name. Keeps the icon row visually consistent. Only exception is
+// GithubIcon (inlined simple-icons SVG) because lucide-react ships
+// without brand marks for trademark reasons.
 //
 // Registered via root `admin.components.actions` in payload.config.ts.
 // Per the Payload v3 config types, `actions` renders "to the top right
@@ -14,10 +22,12 @@
 import type { ComponentType } from "react";
 import {
   BarChart3,
+  Cloud,
   Gauge,
   Globe,
   Mail,
   Search,
+  Server,
   Triangle,
 } from "lucide-react";
 
@@ -60,6 +70,22 @@ type ToolLink = {
 };
 
 const LINKS: ToolLink[] = [
+  {
+    // Hostinger panel — domain registrar, DNS history, mail account
+    // management. Distinct destination from the webmail link further
+    // down: hpanel = admin / configuration; mail.hostinger.com = inbox.
+    href: "https://hpanel.hostinger.com",
+    label: "Hostinger panel (domain, DNS, mail config)",
+    Icon: Server,
+  },
+  {
+    // Cloudflare dashboard — DNS records, WAF/security rules, cache
+    // rules, SSL/TLS settings. See docs/cloudflare-setup.md for the
+    // full configuration reference.
+    href: "https://dash.cloudflare.com",
+    label: "Cloudflare (DNS, security, cache)",
+    Icon: Cloud,
+  },
   {
     href: LIVE_SITE_URL,
     label: "Live site",
