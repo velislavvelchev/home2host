@@ -94,12 +94,31 @@ export async function generateMetadata({
       : null;
   const ogImageUrl = image?.sizes?.hero?.url ?? image?.url ?? null;
 
+  // Prefer the SEO tab's meta.title / meta.description (added by
+  // @payloadcms/plugin-seo) when filled — the SEO tab is the surface
+  // where the owner reasons about search-result vs. on-page copy
+  // separately. Visible H1 + lead on the post stay derived from the
+  // post's own `title` + `excerpt` fields (see PostHeader below); only
+  // what Google + social platforms see comes from `meta`.
+  //
+  // Falls back to the previous behavior when meta is empty so a new
+  // post without an explicit SEO tab pass still ships with a sensible
+  // title and description.
+  const metaTitle = post.meta?.title ?? "";
+  const metaDescription = post.meta?.description ?? "";
+  const seoTitle = metaTitle || `${post.title} | Home2Host`;
+  const seoDescription = metaDescription || post.excerpt || undefined;
+  // OG title historically had no " | Home2Host" suffix (cleaner share
+  // card). Preserve that when falling back; an explicit meta.title is
+  // used verbatim (owner chose exactly what they wanted to appear).
+  const ogTitle = metaTitle || post.title;
+
   return {
-    title: `${post.title} | Home2Host`,
-    description: post.excerpt ?? undefined,
+    title: seoTitle,
+    description: seoDescription,
     openGraph: {
-      title: post.title,
-      description: post.excerpt ?? undefined,
+      title: ogTitle,
+      description: seoDescription,
       type: "article",
       publishedTime: post.publishedAt,
       ...(ogImageUrl
