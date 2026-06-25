@@ -761,10 +761,17 @@ export default buildConfig({
       admin: {
         group: "Listings",
         description:
-          "SEO settings for the FAQ listing page at /questions/. Edit meta title, description, and image in the SEO tab.",
+          "Editable section chrome (eyebrow, heading, lead) + SEO settings for the FAQ listing page at /questions/. Same shape as About / Services / Pricing — eyebrow is the small pill above the heading, heading is the H1, lead is the introductory paragraph beneath. Q&A items themselves live in the FAQs collection.",
       },
       access: { read: () => true },
       fields: [
+        // Section chrome — these are part of the page design, not
+        // optional editorial decoration, so saving the Global without
+        // them would ship a broken-looking page. Required matches the
+        // shape of the other section Globals (about, services, etc.).
+        { name: "eyebrow", type: "text", localized: true, required: true },
+        { name: "heading", type: "text", localized: true, required: true },
+        { name: "lead", type: "textarea", localized: true, required: true },
         {
           name: "note",
           type: "textarea",
@@ -782,10 +789,13 @@ export default buildConfig({
       admin: {
         group: "Listings",
         description:
-          "SEO settings for the blog listing page at /blog/. Edit meta title, description, and image in the SEO tab. Per-post SEO lives on each blog post.",
+          "Editable section chrome (eyebrow, heading, lead) + SEO settings for the blog listing page at /blog/. Same shape as About / Services / Pricing — eyebrow is the small pill above the heading, heading is the H1, lead is the introductory paragraph beneath. Individual blog posts live in the Blog posts collection.",
       },
       access: { read: () => true },
       fields: [
+        { name: "eyebrow", type: "text", localized: true },
+        { name: "heading", type: "text", localized: true },
+        { name: "lead", type: "textarea", localized: true },
         {
           name: "note",
           type: "textarea",
@@ -803,10 +813,13 @@ export default buildConfig({
       admin: {
         group: "Listings",
         description:
-          "SEO settings for the apartments listing page at /apartments/. Edit meta title, description, and image in the SEO tab. Individual apartments have their own SEO under the Apartments collection.",
+          "Editable section chrome (eyebrow, heading, lead) + SEO settings for the apartments listing page at /apartments/. Same shape as About / Services / Pricing — eyebrow is the small pill above the heading, heading is the H1, lead is the introductory paragraph beneath. Individual apartments live in the Apartments collection.",
       },
       access: { read: () => true },
       fields: [
+        { name: "eyebrow", type: "text", localized: true },
+        { name: "heading", type: "text", localized: true },
+        { name: "lead", type: "textarea", localized: true },
         {
           name: "note",
           type: "textarea",

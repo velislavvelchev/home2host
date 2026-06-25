@@ -1,5 +1,5 @@
 import { ChevronDown } from "lucide-react";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getLocale } from "next-intl/server";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 import { getPayloadInstance } from "@/lib/payload";
 import type { Locale } from "@/i18n/routing";
@@ -21,9 +21,11 @@ import type { Locale } from "@/i18n/routing";
 // enabled on the collection, passing `locale` selects the right language
 // and untranslated EN fields fall back to BG via `defaultLocale` config.
 //
-// Eyebrow / heading / lead stay in messages/<locale>.json because they're
-// section chrome (Q&A list framing), not editorial content the owner
-// would want to churn on.
+// Eyebrow / heading / lead come from the `listings-faq` Global so the
+// owner can edit them in admin (same shape as the About/Services/etc.
+// Globals). All three are `required: true` in payload.config.ts — the
+// Global can't be saved with empty values, so we read them directly
+// without a fallback.
 
 type FaqSectionProps = {
   headingLevel?: "h1" | "h2";
@@ -32,18 +34,24 @@ type FaqSectionProps = {
 export async function FaqSection({ headingLevel = "h2" }: FaqSectionProps) {
   const Heading = headingLevel;
   const locale = (await getLocale()) as Locale;
-  const t = await getTranslations("Faq");
 
   const payload = await getPayloadInstance();
-  const { docs } = await payload.find({
-    collection: "faqs",
-    locale,
-    sort: "order",
-    // Higher than we'd ever expect — keeps a single round trip even if
-    // the owner adds dozens of Q&As over time.
-    limit: 100,
-    depth: 0,
-  });
+  const [{ docs }, listing] = await Promise.all([
+    payload.find({
+      collection: "faqs",
+      locale,
+      sort: "order",
+      // Higher than we'd ever expect — keeps a single round trip even if
+      // the owner adds dozens of Q&As over time.
+      limit: 100,
+      depth: 0,
+    }),
+    payload.findGlobal({
+      slug: "listings-faq",
+      locale,
+      depth: 0,
+    }),
+  ]);
 
   return (
     <section
@@ -61,18 +69,18 @@ export async function FaqSection({ headingLevel = "h2" }: FaqSectionProps) {
       <div className="mx-auto max-w-6xl px-gutter py-section">
         <span className="inline-flex items-center gap-2 rounded-full bg-brand-100 px-3 py-1 text-xs font-medium text-brand-900">
           <span className="size-1.5 rounded-full bg-brand-700" />
-          {t("eyebrow")}
+          {listing.eyebrow}
         </span>
 
         <Heading
           id="questions-heading"
           className="mt-6 max-w-3xl font-display text-4xl font-semibold tracking-tight text-white sm:text-5xl md:text-6xl"
         >
-          {t("heading")}
+          {listing.heading}
         </Heading>
 
         <p className="mt-6 max-w-prose text-lg leading-relaxed text-brand-100">
-          {t("lead")}
+          {listing.lead}
         </p>
 
         <ul className="mt-12 max-w-3xl divide-y divide-white/15">

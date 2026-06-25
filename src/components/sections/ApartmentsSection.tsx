@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { ArrowUpRight, Star } from "lucide-react";
 import { getLocale, getTranslations } from "next-intl/server";
+// getTranslations is still used for the city labels below ("Apartments.cities");
+// only the eyebrow/heading/lead fallback is gone.
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 import { ApartmentsCarousel } from "./ApartmentsCarousel";
 import { getPayloadInstance } from "@/lib/payload";
@@ -24,6 +26,12 @@ import type { Apartment, Media } from "@/payload-types";
 //
 // City labels resolve through `Apartments.cities` so EN visitors see
 // "Bansko"/"Burgas" while BG visitors see "Банско"/"Бургас".
+//
+// Eyebrow / heading / lead come from the `listings-apartments` Global
+// so the owner can edit them in admin (same shape as the About/Services
+// Globals). All three are `required: true` in payload.config.ts — the
+// Global can't be saved with empty values, so we read them directly
+// without a fallback.
 
 type ApartmentsSectionProps = {
   headingLevel?: "h1" | "h2";
@@ -37,16 +45,23 @@ export async function ApartmentsSection({
   const t = await getTranslations("Apartments");
 
   const payload = await getPayloadInstance();
-  const { docs } = await payload.find({
-    collection: "apartments",
-    where: { isActive: { equals: true } },
-    sort: "order",
-    locale,
-    // depth: 1 populates the featuredImage relation so we can read
-    // sizes/url directly without a second round trip.
-    depth: 1,
-    limit: 100,
-  });
+  const [{ docs }, listing] = await Promise.all([
+    payload.find({
+      collection: "apartments",
+      where: { isActive: { equals: true } },
+      sort: "order",
+      locale,
+      // depth: 1 populates the featuredImage relation so we can read
+      // sizes/url directly without a second round trip.
+      depth: 1,
+      limit: 100,
+    }),
+    payload.findGlobal({
+      slug: "listings-apartments",
+      locale,
+      depth: 0,
+    }),
+  ]);
 
   return (
     <section
@@ -57,18 +72,18 @@ export async function ApartmentsSection({
       <div className="mx-auto max-w-6xl px-gutter py-section">
         <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-800 dark:bg-brand-900 dark:text-brand-100">
           <span className="size-1.5 rounded-full bg-brand-600" />
-          {t("eyebrow")}
+          {listing.eyebrow}
         </span>
 
         <Heading
           id="apartments-heading"
           className="mt-6 max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl"
         >
-          {t("heading")}
+          {listing.heading}
         </Heading>
 
         <p className="mt-6 max-w-prose text-lg leading-relaxed text-foreground-muted">
-          {t("lead")}
+          {listing.lead}
         </p>
 
         <div className="mt-12">

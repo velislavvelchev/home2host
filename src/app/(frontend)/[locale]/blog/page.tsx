@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { useTranslations } from "next-intl";
-import { getTranslations, setRequestLocale } from "next-intl/server";
+import { setRequestLocale } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { RevealOnScroll } from "@/components/RevealOnScroll";
 import { getPayloadInstance } from "@/lib/payload";
@@ -22,22 +22,22 @@ type CardPost = BlogPost & { isUntranslated: boolean };
 // than the home; per-post OG is set separately in [slug]/page.tsx.
 //
 // Meta is owner-controlled via the `listings-blog` Global → SEO tab.
-// Falls back to the i18n JSON copy until the owner saves admin values.
+// The owner has populated values for both locales, so no JSON fallback
+// is needed.
 export async function generateMetadata({
   params,
 }: {
   params: Promise<Params>;
 }): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: "Blog" });
   const payload = await getPayloadInstance();
   const listing = await payload.findGlobal({
     slug: "listings-blog",
     locale: locale as Locale,
     depth: 0,
   });
-  const title = listing.meta?.title || t("metaTitle");
-  const description = listing.meta?.description || t("metaDescription");
+  const title = listing.meta?.title ?? undefined;
+  const description = listing.meta?.description ?? undefined;
   return {
     title,
     description,
@@ -48,6 +48,18 @@ export async function generateMetadata({
 // Each post lives in the DB; this page reads fresh on each request.
 // Could move to ISR later if traffic warrants it.
 export const dynamic = "force-dynamic";
+
+// Eyebrow / heading / lead for the listing page come from the
+// `listings-blog` Global so the owner can edit them in admin (same
+// shape as the About/Services Globals). All three are `required: true`
+// in payload.config.ts — the Global can't be saved with empty values.
+// We narrow them to non-null strings here and pass them as the chrome
+// prop into BlogView (which is a synchronous render component).
+type Chrome = {
+  eyebrow: string;
+  heading: string;
+  lead: string;
+};
 
 export default async function BlogIndexPage({
   params,
@@ -70,13 +82,26 @@ export default async function BlogIndexPage({
   // Payload's default find already excludes draft-only documents,
   // and the explicit filter was producing 0-match results when
   // combined with non-ASCII slug values.
-  const { docs } = await payload.find({
-    collection: "blog-posts",
-    sort: "-publishedAt",
-    limit: 24,
-    locale,
-    depth: 1, // populate the featuredImage relation
-  });
+  const [{ docs }, listing] = await Promise.all([
+    payload.find({
+      collection: "blog-posts",
+      sort: "-publishedAt",
+      limit: 24,
+      locale,
+      depth: 1, // populate the featuredImage relation
+    }),
+    payload.findGlobal({
+      slug: "listings-blog",
+      locale,
+      depth: 0,
+    }),
+  ]);
+
+  const chrome: Chrome = {
+    eyebrow: listing.eyebrow ?? "",
+    heading: listing.heading ?? "",
+    lead: listing.lead ?? "",
+  };
 
   // Translation-status probe: second pass for the same locale, this
   // time with fallback disabled, so untranslated fields come back as
@@ -90,7 +115,7 @@ export default async function BlogIndexPage({
     isUntranslated: untranslatedIds.has(String(p.id)),
   }));
 
-  return <BlogView posts={posts} />;
+  return <BlogView posts={posts} chrome={chrome} />;
 }
 
 async function detectUntranslatedIds(
@@ -118,9 +143,7 @@ async function detectUntranslatedIds(
   );
 }
 
-function BlogView({ posts }: { posts: CardPost[] }) {
-  const t = useTranslations("Blog");
-
+function BlogView({ posts, chrome }: { posts: CardPost[]; chrome: Chrome }) {
   return (
     <main className="flex-1">
       <section className="bg-surface-muted" aria-labelledby="blog-heading">
@@ -128,17 +151,17 @@ function BlogView({ posts }: { posts: CardPost[] }) {
           <RevealOnScroll>
             <span className="inline-flex items-center gap-2 rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-800 dark:bg-brand-900 dark:text-brand-100">
               <span className="size-1.5 rounded-full bg-brand-600" />
-              {t("eyebrow")}
+              {chrome.eyebrow}
             </span>
 
             <h1
               id="blog-heading"
               className="mt-6 max-w-3xl font-display text-4xl font-semibold tracking-tight sm:text-5xl md:text-6xl"
             >
-              {t("heading")}
+              {chrome.heading}
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-foreground-muted">
-              {t("lead")}
+              {chrome.lead}
             </p>
           </RevealOnScroll>
 

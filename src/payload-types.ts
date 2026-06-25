@@ -844,13 +844,16 @@ export interface SocialLink {
   createdAt?: string | null;
 }
 /**
- * SEO settings for the FAQ listing page at /questions/. Edit meta title, description, and image in the SEO tab.
+ * Editable section chrome (eyebrow, heading, lead) + SEO settings for the FAQ listing page at /questions/. Same shape as About / Services / Pricing — eyebrow is the small pill above the heading, heading is the H1, lead is the introductory paragraph beneath. Q&A items themselves live in the FAQs collection.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "listings-faq".
  */
 export interface ListingsFaq {
   id: number;
+  eyebrow: string;
+  heading: string;
+  lead: string;
   /**
    * Optional internal note (not displayed publicly). Use this space for your own reminders about this listing page.
    */
@@ -867,13 +870,16 @@ export interface ListingsFaq {
   createdAt?: string | null;
 }
 /**
- * SEO settings for the blog listing page at /blog/. Edit meta title, description, and image in the SEO tab. Per-post SEO lives on each blog post.
+ * Editable section chrome (eyebrow, heading, lead) + SEO settings for the blog listing page at /blog/. Same shape as About / Services / Pricing — eyebrow is the small pill above the heading, heading is the H1, lead is the introductory paragraph beneath. Individual blog posts live in the Blog posts collection.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "listings-blog".
  */
 export interface ListingsBlog {
   id: number;
+  eyebrow?: string | null;
+  heading?: string | null;
+  lead?: string | null;
   /**
    * Optional internal note (not displayed publicly). Use this space for your own reminders about this listing page.
    */
@@ -890,13 +896,16 @@ export interface ListingsBlog {
   createdAt?: string | null;
 }
 /**
- * SEO settings for the apartments listing page at /apartments/. Edit meta title, description, and image in the SEO tab. Individual apartments have their own SEO under the Apartments collection.
+ * Editable section chrome (eyebrow, heading, lead) + SEO settings for the apartments listing page at /apartments/. Same shape as About / Services / Pricing — eyebrow is the small pill above the heading, heading is the H1, lead is the introductory paragraph beneath. Individual apartments live in the Apartments collection.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "listings-apartments".
  */
 export interface ListingsApartment {
   id: number;
+  eyebrow?: string | null;
+  heading?: string | null;
+  lead?: string | null;
   /**
    * Optional internal note (not displayed publicly). Use this space for your own reminders about this listing page.
    */
@@ -1097,6 +1106,9 @@ export interface SocialLinksSelect<T extends boolean = true> {
  * via the `definition` "listings-faq_select".
  */
 export interface ListingsFaqSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  lead?: T;
   note?: T;
   meta?:
     | T
@@ -1114,6 +1126,9 @@ export interface ListingsFaqSelect<T extends boolean = true> {
  * via the `definition` "listings-blog_select".
  */
 export interface ListingsBlogSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  lead?: T;
   note?: T;
   meta?:
     | T
@@ -1131,6 +1146,9 @@ export interface ListingsBlogSelect<T extends boolean = true> {
  * via the `definition` "listings-apartments_select".
  */
 export interface ListingsApartmentsSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  lead?: T;
   note?: T;
   meta?:
     | T
