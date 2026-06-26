@@ -13,12 +13,12 @@ Scroll down for project context, design notes, SEO preservation strategy, and th
 
 ### Public site (Bulgarian default; EN at `/en/...`)
 
-![home2host landing page](docs/images/home-hero.png)
+<img width="1357" height="810" alt="image" src="https://github.com/user-attachments/assets/9678edde-16ce-44cf-8a7f-456bcd5feafa" />
+
 
 ### Payload CMS admin panel — what the business owner uses to manage content
 
-![Payload admin dashboard](docs/images/admin-dashboard.png)
-
+<img width="1570" height="786" alt="image" src="https://github.com/user-attachments/assets/63d291f7-b135-47c0-b033-7aa3d7a83ce6" />
 
 ## 🧭 Project Context
 
