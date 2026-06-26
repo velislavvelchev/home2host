@@ -51,7 +51,10 @@
   "Apartments": {
     "cities": {
       "bansko": "Bansko",
-      "burgas": "Burgas"
+      "burgas": "Burgas",
+      "razlog": "Razlog",
+      "chernomorets": "Chernomorets",
+      "slanchev-bryag": "Slanchev Bryag"
     },
     "carouselPrev": "Previous apartments",
     "carouselNext": "Next apartments"

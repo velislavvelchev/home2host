@@ -51,7 +51,10 @@
   "Apartments": {
     "cities": {
       "bansko": "Банско",
-      "burgas": "Бургас"
+      "burgas": "Бургас",
+      "razlog": "Разлог",
+      "chernomorets": "Черноморец",
+      "slanchev-bryag": "Слънчев бряг"
     },
     "carouselPrev": "Предишни апартаменти",
     "carouselNext": "Следващи апартаменти"

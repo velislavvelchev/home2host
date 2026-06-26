@@ -273,6 +273,8 @@ export default buildConfig({
             { label: "Bansko", value: "bansko" },
             { label: "Burgas", value: "burgas" },
             { label: "Razlog", value: "razlog" },
+            { label: "Chernomorets", value: "chernomorets" },
+            { label: "Slanchev Bryag", value: "slanchev-bryag" },
           ],
         },
         {

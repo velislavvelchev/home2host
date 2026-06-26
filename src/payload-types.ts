@@ -282,7 +282,7 @@ export interface Apartment {
    * Star rating shown on the card (e.g. 4.85). Auto-filled by 'Fetch from Airbnb'; click the refresh icon below to pull just the latest number from Airbnb without overwriting title or photo. Leave empty to hide the rating pill (use for ★New listings).
    */
   rating?: number | null;
-  city: 'bansko' | 'burgas' | 'razlog';
+  city: 'bansko' | 'burgas' | 'razlog' | 'chernomorets' | 'slanchev-bryag';
   /**
    * Lower numbers appear first.
    */
