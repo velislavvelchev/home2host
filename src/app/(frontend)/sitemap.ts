@@ -27,8 +27,7 @@ import type { BlogPost } from "@/payload-types";
 // to honour them.
 //
 // `BASE_URL` matches the `metadataBase` set in (frontend)/[locale]/layout.tsx.
-// Update both at Stage 6 when the custom domain is live.
-const BASE_URL = "https://home2host.vercel.app";
+const BASE_URL = "https://home2host.com";
 
 type StaticRoute = { path: string; priority: number };
 

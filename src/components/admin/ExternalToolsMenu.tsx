@@ -56,12 +56,9 @@ function GithubIcon({ size = 18 }: { size?: number }) {
   );
 }
 
-// The site's public URL. Today the production Next.js site lives on
-// home2host.vercel.app (WordPress still owns the real domain). At the
-// Stage 6 DNS switch, change this constant to https://home2host.com —
-// and bump src/app/(frontend)/[locale]/layout.tsx's metadataBase to
-// match. Tracked in roadmap.md Stage 6.
-const LIVE_SITE_URL = "https://home2host.vercel.app";
+// The site's public URL — drives the "Live site" + PageSpeed Insights
+// links in the admin top bar.
+const LIVE_SITE_URL = "https://home2host.com";
 
 type ToolLink = {
   href: string;

@@ -10,7 +10,7 @@ Reference for the Cloudflare configuration shipped 2026-06-25. Captures every to
 
 ## Domain registration vs DNS split
 
-- **Hostinger remains the registrar** — holds the domain ownership, handles WHOIS, renewals, expiry. Domain expires 2026-09-28 per [[infrastructure-domain-and-mailbox]].
+- **Hostinger remains the registrar** — holds the domain ownership, handles WHOIS, renewals, expiry. Domain expires 2026-09-11 per [[infrastructure-domain-and-mailbox]].
 - **Cloudflare is the DNS provider** — answers all DNS queries, proxies web traffic, runs security/cache. Hostinger's "Manage DNS records" panel is now **functionally dead** — any edits there are ignored. All DNS changes happen in Cloudflare from this point on.
 
 ## DNS records — proxy status (the critical configuration)
@@ -193,7 +193,7 @@ The whole point of putting Cloudflare in front *before* the cutover: the DNS swi
 
 1. **Vercel side**: Project Settings → Domains → add `home2host.com`. Vercel will tell you the target — either A record at their anycast IP (`76.76.21.21`) or CNAME to `cname.vercel-dns.com`. Note which.
 2. **Cloudflare DNS**: edit the two `home2host.com` A records → change content from Hostinger IPs (`77.37.76.87`, `92.112.198.111`) to Vercel's. Keep the orange cloud (proxied).
-3. **Cloudflare DNS**: delete the two AAAA records (`2a02:4780:51:9…`, `2a02:4780:4f:c…`) — Vercel handles IPv6 itself.
+3. **Cloudflare DNS**: delete the two AAAA records (`2a02:4780:51:9b43:4bec:c5d0:2606:756e`, `2a02:4780:4f:cc6b:27d1:60bd:3861:56b5`) — Vercel handles IPv6 itself.
 4. **Vercel env vars**: set `NEXT_PUBLIC_SERVER_URL=https://home2host.com` on Production + Preview + Development. Critical: without this, server-side admin auth breaks (see [[payload-serverurl-csrf-trap]] memory note).
 5. **Redeploy Vercel** (un-tick "Use existing build cache") so the new env var bakes into the runtime config.
 6. **Verify**: `https://home2host.com` should now serve the new Next.js site. Hard-refresh, check headers for `cf-ray` + the right content.
@@ -236,11 +236,10 @@ The bar is "noticeably worse than the old WP site for real users." Not "I notice
    - `77.37.76.87`
    - `92.112.198.111`
    - Both stay orange-cloud (proxied)
-2. **Cloudflare → DNS** → **re-add the two AAAA records** that were deleted at switch time (Vercel handles its own IPv6, but Hostinger needs them):
-   - `home2host.com` AAAA `2a02:4780:51:9:0:0:0:1` *(replace with the exact value captured from the pre-switch DNS snapshot — see roadmap pre-switch checklist)*
-   - `home2host.com` AAAA `2a02:4780:4f:c:0:0:0:1` *(same — exact value from the snapshot)*
+2. **Cloudflare → DNS** → **re-add the two AAAA records** that were deleted at switch time (Vercel handles its own IPv6, but Hostinger needs them). Captured 2026-06-26 before the switch:
+   - `home2host.com` AAAA `2a02:4780:51:9b43:4bec:c5d0:2606:756e`
+   - `home2host.com` AAAA `2a02:4780:4f:cc6b:27d1:60bd:3861:56b5`
    - Both orange-cloud (proxied)
-   - **If you didn't capture them pre-switch**: skip the AAAA recreation. IPv6 visitors will fall back to IPv4 via the A records (Happy Eyeballs algorithm in browsers handles this gracefully). Site still works, just no native IPv6 path to origin.
 3. **Cloudflare → Caching → Configuration** → click **"Purge Everything"** at the bottom of the page. This clears any cached Vercel content from Cloudflare's edge so visitors see WP immediately instead of stale Vercel responses for cached assets.
 4. **Vercel (optional, for hygiene only)**: in Project → Settings → Domains, remove `home2host.com` from the Vercel project. Not strictly required — Vercel will just serve 404s for that hostname which nobody will reach anymore — but it prevents future confusion.
 5. **Verify**: hard-refresh `home2host.com` in incognito. Should serve WP. Response headers should show `server: cloudflare` (Cloudflare still in front) and the body should be the WP HTML.
@@ -261,9 +260,9 @@ The bar is "noticeably worse than the old WP site for real users." Not "I notice
 
 If the issue gets fixed on Vercel and you want to switch forward again, repeat the original DNS switch (Cloudflare DNS edit: Hostinger IPs → Vercel anycast `76.76.21.21`, delete AAAA), purge Cloudflare cache. Same 5 minutes.
 
-### Pre-switch IPv6 capture
+### Pre-switch IPv6 capture — done 2026-06-26
 
-Before performing the DNS switch, **screenshot or copy out** the exact AAAA values currently in Cloudflare's DNS panel for `home2host.com`. They look like `2a02:4780:51:9:....:....:....:....` and `2a02:4780:4f:c:....:....:....:....`. Paste them into the rollback playbook above so they're one-click ready if rollback is ever needed. The values in this doc today are partial because the full IPv6 wasn't visible in the original Cloudflare scan screenshot.
+The two `home2host.com` AAAA values were captured from Cloudflare's DNS panel before the Vercel switch and embedded into the rollback playbook above. No further action needed; the rollback steps can be followed verbatim.
 
 ## Verification commands
 

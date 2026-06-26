@@ -10,7 +10,7 @@
 // Output is human-readable; the agent that runs this reads it back
 // and writes the actual analysis.
 
-const BASE = "https://home2host.vercel.app";
+const BASE = "https://home2host.com";
 
 const PAGES = [
   // Marketing — BG

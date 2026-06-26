@@ -11,7 +11,7 @@ import type { MetadataRoute } from "next";
 // `(frontend)` and the route never appeared in the build output.
 // Sitemap doesn't have the same quirk: `(frontend)/sitemap.ts` works.
 
-const BASE_URL = "https://home2host.vercel.app";
+const BASE_URL = "https://home2host.com";
 
 export default function robots(): MetadataRoute.Robots {
   return {

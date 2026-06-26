@@ -42,9 +42,9 @@ export async function StructuredData() {
     "@type": "LocalBusiness",
     name: "Home2Host",
     description: t("description"),
-    url: "https://home2host.vercel.app",
-    logo: "https://home2host.vercel.app/logo.svg",
-    image: "https://home2host.vercel.app/og-image.jpg",
+    url: "https://home2host.com",
+    logo: "https://home2host.com/logo.svg",
+    image: "https://home2host.com/og-image.jpg",
     telephone: phones,
     email: contacts.email,
     address: {
