@@ -141,6 +141,12 @@
   --animate-glow: glow 8s ease-in-out infinite;
   --animate-ken-burns: ken-burns 24s ease-in-out infinite;
 
+  /* Partners marquee — pair with `motion-safe:animate-marquee` on the
+     track. Speed tuned for ~40s per full cycle at typical logo counts;
+     the container width doesn't affect perceived speed because the
+     animation is percentage-based (0 → -50% of a duplicated list). */
+  --animate-marquee: partners-marquee 40s linear infinite;
+
   /* Breakpoints — Tailwind's default scale, declared explicitly so this file
      is the single source of truth and future codemods can't silently shift
      them. Mobile-first: utilities with no prefix apply everywhere, prefixed
@@ -190,6 +196,42 @@ body {
 @keyframes ken-burns {
   0%, 100% { transform: scale(1.00); }
   50%      { transform: scale(1.06); }
+}
+
+/* Partners section marquee. The track renders each partner N times
+   (originals + N-1 clones); animating translateX from 0 → ((N-1)/N) ×
+   -100% shifts the first copy off-screen exactly as the last copy
+   fills its old spot, so the loop is seamless regardless of N.
+   PartnersSection sets `--marquee-end` inline based on the copy count
+   (2 copies → -50%, 3 → -66.6%, …); the fallback covers the default
+   2-copy case. Pause-on-hover lets a visitor pin a logo they want to
+   click. */
+@keyframes partners-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(var(--marquee-end, -50%)); }
+}
+.partners-marquee:hover .partners-marquee-track,
+.partners-marquee:focus-within .partners-marquee-track {
+  animation-play-state: paused;
+}
+/* Edge fade — hides the "cut" where logos enter/leave the viewport.
+   Applied only when the marquee is actually animating; in reduced-
+   motion mode the row wraps to multiple lines and the fade would
+   just clip content unnecessarily. */
+@media (prefers-reduced-motion: no-preference) {
+  .partners-marquee {
+    -webkit-mask-image: linear-gradient(to right, transparent 0, black 32px, black calc(100% - 32px), transparent 100%);
+            mask-image: linear-gradient(to right, transparent 0, black 32px, black calc(100% - 32px), transparent 100%);
+  }
+}
+/* Marquee-clone pattern: the second copy of the list is marked with
+   this class + aria-hidden so screen readers don't announce duplicate
+   partners, and it's hidden entirely when reduced motion is preferred
+   (no animation → no need to loop → no need for a second copy). */
+@media (prefers-reduced-motion: reduce) {
+  .marquee-clone {
+    display: none;
+  }
 }
 
 /* ---------- Blog post body typography ----------

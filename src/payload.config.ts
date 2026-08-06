@@ -121,7 +121,13 @@ export default buildConfig({
       admin: { useAsTitle: "filename" },
       access: { read: () => true },
       upload: {
-        mimeTypes: ["image/*"],
+        // `image/*` alone rejects SVGs that Windows/Chrome report as
+        // `application/xml` (happens with files that begin with an XML
+        // declaration `<?xml version="1.0" ?>`). Adding both the canonical
+        // and misdetected MIMEs so partner-logo SVGs upload reliably.
+        // Security note: only the trusted owner has admin access, so the
+        // usual SVG-carries-a-script-tag concern doesn't apply here.
+        mimeTypes: ["image/*", "image/svg+xml", "application/xml"],
         imageSizes: [
           { name: "thumbnail", width: 400, height: 300, position: "centre" },
           { name: "card", width: 768, height: 512, position: "centre" },
@@ -288,6 +294,63 @@ export default buildConfig({
           type: "checkbox",
           defaultValue: true,
           admin: { description: "Uncheck to hide from the site without deleting." },
+        },
+      ],
+    },
+    {
+      slug: "partners",
+      labels: { singular: "Partner", plural: "Partners" },
+      admin: {
+        useAsTitle: "name",
+        defaultColumns: ["id", "name", "url", "order", "isActive"],
+        description:
+          "Partner brand logos shown in the marquee on the home page. The section's copy (eyebrow / heading / lead) and its master on/off switch live in the 'Listings — Partners' Global.",
+      },
+      access: { read: () => true },
+      defaultSort: "order",
+      fields: [
+        {
+          name: "name",
+          type: "text",
+          required: true,
+          admin: {
+            description:
+              "Partner name (e.g. 'Airbnb', 'Booking.com'). Used as the hover tooltip and as alt text for accessibility — not displayed as visible text on the site.",
+          },
+        },
+        {
+          name: "logo",
+          type: "upload",
+          relationTo: "media",
+          required: true,
+          admin: {
+            description:
+              "Partner logo. SVG or transparent PNG with the brand's actual colors works best — the section background follows the site theme (white in light mode, dark navy in dark mode), so pure-white logos disappear in light mode and pure-black logos disappear in dark mode. Full-color brand marks work on both.",
+          },
+        },
+        {
+          name: "url",
+          type: "text",
+          required: true,
+          admin: {
+            description:
+              "Full URL to the partner's website (e.g. 'https://www.airbnb.com'). Opens in a new tab.",
+          },
+        },
+        {
+          name: "order",
+          type: "number",
+          defaultValue: 0,
+          admin: { description: "Lower numbers appear first in the marquee." },
+        },
+        {
+          name: "isActive",
+          type: "checkbox",
+          defaultValue: true,
+          admin: {
+            description:
+              "Uncheck to hide this specific partner from the site without deleting the record. The whole section can also be hidden via 'Show section on the site' on the 'Listings — Partners' Global.",
+          },
         },
       ],
     },
@@ -833,6 +896,53 @@ export default buildConfig({
         },
       ],
     },
+    {
+      // Partners has no dedicated listing PAGE today (no /partners/
+      // route) — the Global carries the chrome + kill switch for the
+      // section embedded on the home page. Grouped under 'Listings'
+      // and given the SEO tab for admin-shape consistency with the
+      // other listings-* Globals; the SEO fields sit unused until a
+      // standalone Partners page ships (if ever), at which point the
+      // meta.title/description are ready to consume.
+      slug: "listings-partners",
+      label: "Listings — Partners section",
+      admin: {
+        group: "Listings",
+        description:
+          "Editable section chrome + master on/off switch for the 'Partners' section on the home page (below FAQ). Toggle 'Show section on the site' to hide the whole section without losing the text or the partner list. Individual partner logos live in the Partners collection.",
+      },
+      access: { read: () => true },
+      fields: [
+        {
+          // Kill switch. The three text fields below are `required`, so
+          // the Global cannot be saved with them empty — this checkbox
+          // is the only clean way to hide the section while keeping the
+          // data. Default off so a partially-set-up section doesn't
+          // accidentally publish; the owner explicitly flips it on when
+          // ready.
+          name: "isVisible",
+          type: "checkbox",
+          label: "Show section on the site",
+          defaultValue: false,
+          admin: {
+            description:
+              "Tick to render the Partners section on the home page. Untick to hide it — all copy and partner logos stay saved and reappear when re-ticked.",
+          },
+        },
+        { name: "eyebrow", type: "text", localized: true, required: true },
+        { name: "heading", type: "text", localized: true, required: true },
+        { name: "lead", type: "textarea", localized: true, required: true },
+        {
+          name: "note",
+          type: "textarea",
+          localized: true,
+          admin: {
+            description:
+              "Optional internal note (not displayed publicly). Use this space for your own reminders about this section.",
+          },
+        },
+      ],
+    },
   ],
   editor: lexicalEditor(),
   // Email transport for password-reset, account verification, and any
@@ -909,6 +1019,10 @@ export default buildConfig({
         "listings-faq",
         "listings-blog",
         "listings-apartments",
+        // No /partners/ page yet — SEO fields here are unused at runtime
+        // and included purely for admin consistency with the other
+        // listings-* Globals. See the block comment on the Global itself.
+        "listings-partners",
       ],
       uploadsCollection: "media",
       tabbedUI: true,
@@ -998,6 +1112,7 @@ export default buildConfig({
           },
           "listings-blog": { bg: "Блог", en: "Blog" },
           "listings-apartments": { bg: "Апартаменти", en: "Apartments" },
+          "listings-partners": { bg: "Партньори", en: "Partners" },
         };
 
         if (globalSlug && SHORT_NAMES[globalSlug]) {
@@ -1045,6 +1160,10 @@ export default buildConfig({
           "listings-apartments": {
             bg: "Разгледайте имотите, които управляваме за краткосрочен наем в Банско и Бургас — професионално подготвени, готови да приемат гости през Airbnb и Booking.",
             en: "Browse the properties we manage for short-term rental in Bansko and Burgas — professionally prepared, ready for guests through Airbnb and Booking.",
+          },
+          "listings-partners": {
+            bg: "Работим в партньорство с водещите платформи за краткосрочен наем в света — максимална видимост и повече резервации за вашия имот.",
+            en: "We work in partnership with the world's leading short-term rental platforms — maximum visibility and more bookings for your property.",
           },
         };
         if (globalSlug && LISTING_DESCRIPTIONS[globalSlug]) {

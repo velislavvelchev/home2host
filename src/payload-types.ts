@@ -71,6 +71,7 @@ export interface Config {
     media: Media;
     'blog-posts': BlogPost;
     apartments: Apartment;
+    partners: Partner;
     faqs: Faq;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -83,6 +84,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     apartments: ApartmentsSelect<false> | ApartmentsSelect<true>;
+    partners: PartnersSelect<false> | PartnersSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -103,6 +105,7 @@ export interface Config {
     'listings-faq': ListingsFaq;
     'listings-blog': ListingsBlog;
     'listings-apartments': ListingsApartment;
+    'listings-partners': ListingsPartner;
   };
   globalsSelect: {
     'landing-page': LandingPageSelect<false> | LandingPageSelect<true>;
@@ -114,6 +117,7 @@ export interface Config {
     'listings-faq': ListingsFaqSelect<false> | ListingsFaqSelect<true>;
     'listings-blog': ListingsBlogSelect<false> | ListingsBlogSelect<true>;
     'listings-apartments': ListingsApartmentsSelect<false> | ListingsApartmentsSelect<true>;
+    'listings-partners': ListingsPartnersSelect<false> | ListingsPartnersSelect<true>;
   };
   locale: 'bg' | 'en';
   widgets: {
@@ -295,6 +299,37 @@ export interface Apartment {
   createdAt: string;
 }
 /**
+ * Partner brand logos shown in the marquee on the home page. The section's copy (eyebrow / heading / lead) and its master on/off switch live in the 'Listings — Partners' Global.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners".
+ */
+export interface Partner {
+  id: number;
+  /**
+   * Partner name (e.g. 'Airbnb', 'Booking.com'). Used as the hover tooltip and as alt text for accessibility — not displayed as visible text on the site.
+   */
+  name: string;
+  /**
+   * Partner logo. SVG or transparent PNG with the brand's actual colors works best — the section background follows the site theme (white in light mode, dark navy in dark mode), so pure-white logos disappear in light mode and pure-black logos disappear in dark mode. Full-color brand marks work on both.
+   */
+  logo: number | Media;
+  /**
+   * Full URL to the partner's website (e.g. 'https://www.airbnb.com'). Opens in a new tab.
+   */
+  url: string;
+  /**
+   * Lower numbers appear first in the marquee.
+   */
+  order?: number | null;
+  /**
+   * Uncheck to hide this specific partner from the site without deleting the record. The whole section can also be hidden via 'Show section on the site' on the 'Listings — Partners' Global.
+   */
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "faqs".
  */
@@ -349,6 +384,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'apartments';
         value: number | Apartment;
+      } | null)
+    | ({
+        relationTo: 'partners';
+        value: number | Partner;
       } | null)
     | ({
         relationTo: 'faqs';
@@ -509,6 +548,19 @@ export interface ApartmentsSelect<T extends boolean = true> {
   featuredImage?: T;
   rating?: T;
   city?: T;
+  order?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "partners_select".
+ */
+export interface PartnersSelect<T extends boolean = true> {
+  name?: T;
+  logo?: T;
+  url?: T;
   order?: T;
   isActive?: T;
   updatedAt?: T;
@@ -922,6 +974,36 @@ export interface ListingsApartment {
   createdAt?: string | null;
 }
 /**
+ * Editable section chrome + master on/off switch for the 'Partners' section on the home page (below FAQ). Toggle 'Show section on the site' to hide the whole section without losing the text or the partner list. Individual partner logos live in the Partners collection.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings-partners".
+ */
+export interface ListingsPartner {
+  id: number;
+  /**
+   * Tick to render the Partners section on the home page. Untick to hide it — all copy and partner logos stay saved and reappear when re-ticked.
+   */
+  isVisible?: boolean | null;
+  eyebrow: string;
+  heading: string;
+  lead: string;
+  /**
+   * Optional internal note (not displayed publicly). Use this space for your own reminders about this section.
+   */
+  note?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "landing-page_select".
  */
@@ -1146,6 +1228,27 @@ export interface ListingsBlogSelect<T extends boolean = true> {
  * via the `definition` "listings-apartments_select".
  */
 export interface ListingsApartmentsSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  lead?: T;
+  note?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings-partners_select".
+ */
+export interface ListingsPartnersSelect<T extends boolean = true> {
+  isVisible?: T;
   eyebrow?: T;
   heading?: T;
   lead?: T;

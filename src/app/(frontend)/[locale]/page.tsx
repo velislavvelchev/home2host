@@ -7,6 +7,7 @@ import { ServicesSection } from "@/components/sections/ServicesSection";
 import { ApartmentsSection } from "@/components/sections/ApartmentsSection";
 import { PricesSection } from "@/components/sections/PricesSection";
 import { FaqSection } from "@/components/sections/FaqSection";
+import { PartnersSection } from "@/components/sections/PartnersSection";
 import { ContactsSection } from "@/components/sections/contacts/ContactsSection";
 import { getPayloadInstance } from "@/lib/payload";
 import type { Locale } from "@/i18n/routing";
@@ -192,6 +193,7 @@ export default async function Home({
       <ApartmentsSection />
       <PricesSection />
       <FaqSection />
+      <PartnersSection />
       <ContactsSection />
     </main>
   );
