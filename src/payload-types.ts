@@ -72,6 +72,7 @@ export interface Config {
     'blog-posts': BlogPost;
     apartments: Apartment;
     partners: Partner;
+    'team-members': TeamMember;
     faqs: Faq;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -85,6 +86,7 @@ export interface Config {
     'blog-posts': BlogPostsSelect<false> | BlogPostsSelect<true>;
     apartments: ApartmentsSelect<false> | ApartmentsSelect<true>;
     partners: PartnersSelect<false> | PartnersSelect<true>;
+    'team-members': TeamMembersSelect<false> | TeamMembersSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -105,6 +107,7 @@ export interface Config {
     'listings-faq': ListingsFaq;
     'listings-blog': ListingsBlog;
     'listings-apartments': ListingsApartment;
+    'listings-team': ListingsTeam;
     'listings-partners': ListingsPartner;
   };
   globalsSelect: {
@@ -117,6 +120,7 @@ export interface Config {
     'listings-faq': ListingsFaqSelect<false> | ListingsFaqSelect<true>;
     'listings-blog': ListingsBlogSelect<false> | ListingsBlogSelect<true>;
     'listings-apartments': ListingsApartmentsSelect<false> | ListingsApartmentsSelect<true>;
+    'listings-team': ListingsTeamSelect<false> | ListingsTeamSelect<true>;
     'listings-partners': ListingsPartnersSelect<false> | ListingsPartnersSelect<true>;
   };
   locale: 'bg' | 'en';
@@ -330,6 +334,71 @@ export interface Partner {
   createdAt: string;
 }
 /**
+ * Staff cards shown in the 'Team' section of the About us page (/about-us/). Add a card per person; each renders as a horizontal row with photo/name/city on one side and the bio on the other. The section chrome (eyebrow / heading / lead) and its master on/off switch live in the 'Listings — Team members' Global.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team-members".
+ */
+export interface TeamMember {
+  id: number;
+  /**
+   * Person's full name as displayed on the card (e.g. 'Daniel Bunardzhiev'). Not localized — real names don't translate.
+   */
+  name: string;
+  /**
+   * Portrait photo. Square or 4:5 works best — the card renders it as a circle, so anything off-center or wider than tall may crop awkwardly.
+   */
+  photo: number | Media;
+  /**
+   * Tick if this person is an Airbnb Superhost — a pink Superhost badge appears over the bottom-right of their photo. Leave unchecked for team members who aren't hosts.
+   */
+  isSuperhost?: boolean | null;
+  /**
+   * Optional public Airbnb host profile URL (e.g. 'https://www.airbnb.com/users/show/12345'). If set, the whole card becomes a clickable link opening the profile in a new tab, plus a subtle hover animation kicks in on desktop. Leave empty for team members who aren't hosts on Airbnb.
+   */
+  airbnbProfileUrl?: string | null;
+  /**
+   * Optional Airbnb guest rating (0–5, e.g. 4.85). Displays under the name as ★ 5.0 with 'guest rating' beneath. Leave empty to hide the rating line entirely — good for new hosts with no rating yet, or team members who aren't hosts.
+   */
+  guestRating?: number | null;
+  /**
+   * Role or title (e.g. 'Съосновател и управител' / 'Co-founder & Manager'). Shown next to the city on the card, separated by a dot. Leave empty to show only the city.
+   */
+  position?: string | null;
+  /**
+   * Where the person is based (e.g. 'София, България' / 'Sofia, Bulgaria'). Shown under the name.
+   */
+  city: string;
+  /**
+   * Long-form introduction. Use the toolbar for bold, italic, links, lists, headings — same editor as blog posts. Each paragraph renders as its own block on the site.
+   */
+  bio: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  };
+  /**
+   * Lower numbers appear first (top of the list).
+   */
+  order?: number | null;
+  /**
+   * Uncheck to hide this specific person from the site without deleting the record. The whole section can also be hidden via 'Show section on the site' on the 'Listings — Team members' Global.
+   */
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "faqs".
  */
@@ -388,6 +457,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'partners';
         value: number | Partner;
+      } | null)
+    | ({
+        relationTo: 'team-members';
+        value: number | TeamMember;
       } | null)
     | ({
         relationTo: 'faqs';
@@ -561,6 +634,24 @@ export interface PartnersSelect<T extends boolean = true> {
   name?: T;
   logo?: T;
   url?: T;
+  order?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "team-members_select".
+ */
+export interface TeamMembersSelect<T extends boolean = true> {
+  name?: T;
+  photo?: T;
+  isSuperhost?: T;
+  airbnbProfileUrl?: T;
+  guestRating?: T;
+  position?: T;
+  city?: T;
+  bio?: T;
   order?: T;
   isActive?: T;
   updatedAt?: T;
@@ -974,6 +1065,39 @@ export interface ListingsApartment {
   createdAt?: string | null;
 }
 /**
+ * Editable section chrome + master on/off switch for the 'Team' section shown on the About us page (/about-us/). Toggle 'Show section on the site' to hide the whole section without losing the text or the team member cards. Individual team member cards live in the Team members collection.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings-team".
+ */
+export interface ListingsTeam {
+  id: number;
+  /**
+   * Tick to render the Team section on the About us page. Untick to hide it — all copy and team member cards stay saved and reappear when re-ticked.
+   */
+  isVisible?: boolean | null;
+  eyebrow: string;
+  heading: string;
+  /**
+   * Optional intro paragraph shown below the heading. Leave empty to render just the eyebrow + heading with no lead text.
+   */
+  lead?: string | null;
+  /**
+   * Optional internal note (not displayed publicly). Use this space for your own reminders about this section.
+   */
+  note?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Editable section chrome + master on/off switch for the 'Partners' section on the home page (below FAQ). Toggle 'Show section on the site' to hide the whole section without losing the text or the partner list. Individual partner logos live in the Partners collection.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1228,6 +1352,27 @@ export interface ListingsBlogSelect<T extends boolean = true> {
  * via the `definition` "listings-apartments_select".
  */
 export interface ListingsApartmentsSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  lead?: T;
+  note?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings-team_select".
+ */
+export interface ListingsTeamSelect<T extends boolean = true> {
+  isVisible?: T;
   eyebrow?: T;
   heading?: T;
   lead?: T;

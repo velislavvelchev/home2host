@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { AboutSection } from "@/components/sections/AboutSection";
+import { TeamSection } from "@/components/sections/TeamSection";
 import { getPayloadInstance } from "@/lib/payload";
 import type { Locale } from "@/i18n/routing";
 
@@ -52,6 +53,12 @@ export default async function AboutUsPage({
   return (
     <main className="flex-1">
       <AboutSection headingLevel="h1" />
+      {/* Team section is /about-us/-only by design — not embedded on the
+          home page, no standalone /team/ route. Renders as null when the
+          `listings-team` Global's isVisible switch is off OR when no
+          active team-members exist, so the page stays clean until the
+          owner turns it on in admin. */}
+      <TeamSection />
     </main>
   );
 }

@@ -59,6 +59,10 @@
     "carouselPrev": "Previous apartments",
     "carouselNext": "Next apartments"
   },
+  "Team": {
+    "guestRating": "guest rating",
+    "viewOnAirbnb": "View Airbnb profile"
+  },
   "Contacts": {
     "phoneHeading": "Phone",
     "emailHeading": "Email",

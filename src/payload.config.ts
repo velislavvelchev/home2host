@@ -355,6 +355,112 @@ export default buildConfig({
       ],
     },
     {
+      slug: "team-members",
+      labels: { singular: "Team member", plural: "Team members" },
+      admin: {
+        useAsTitle: "name",
+        defaultColumns: ["id", "name", "city", "order", "isActive"],
+        description:
+          "Staff cards shown in the 'Team' section of the About us page (/about-us/). Add a card per person; each renders as a horizontal row with photo/name/city on one side and the bio on the other. The section chrome (eyebrow / heading / lead) and its master on/off switch live in the 'Listings — Team members' Global.",
+      },
+      access: { read: () => true },
+      defaultSort: "order",
+      fields: [
+        {
+          name: "name",
+          type: "text",
+          required: true,
+          admin: {
+            description:
+              "Person's full name as displayed on the card (e.g. 'Daniel Bunardzhiev'). Not localized — real names don't translate.",
+          },
+        },
+        {
+          name: "photo",
+          type: "upload",
+          relationTo: "media",
+          required: true,
+          admin: {
+            description:
+              "Portrait photo. Square or 4:5 works best — the card renders it as a circle, so anything off-center or wider than tall may crop awkwardly.",
+          },
+        },
+        {
+          name: "isSuperhost",
+          type: "checkbox",
+          defaultValue: false,
+          label: "Airbnb Superhost",
+          admin: {
+            description:
+              "Tick if this person is an Airbnb Superhost — a pink Superhost badge appears over the bottom-right of their photo. Leave unchecked for team members who aren't hosts.",
+          },
+        },
+        {
+          name: "airbnbProfileUrl",
+          type: "text",
+          admin: {
+            description:
+              "Optional public Airbnb host profile URL (e.g. 'https://www.airbnb.com/users/show/12345'). If set, the whole card becomes a clickable link opening the profile in a new tab, plus a subtle hover animation kicks in on desktop. Leave empty for team members who aren't hosts on Airbnb.",
+          },
+        },
+        {
+          name: "guestRating",
+          type: "number",
+          min: 0,
+          max: 5,
+          admin: {
+            description:
+              "Optional Airbnb guest rating (0–5, e.g. 4.85). Displays under the name as ★ 5.0 with 'guest rating' beneath. Leave empty to hide the rating line entirely — good for new hosts with no rating yet, or team members who aren't hosts.",
+            step: 0.01,
+          },
+        },
+        {
+          name: "position",
+          type: "text",
+          localized: true,
+          admin: {
+            description:
+              "Role or title (e.g. 'Съосновател и управител' / 'Co-founder & Manager'). Shown next to the city on the card, separated by a dot. Leave empty to show only the city.",
+          },
+        },
+        {
+          name: "city",
+          type: "text",
+          localized: true,
+          required: true,
+          admin: {
+            description:
+              "Where the person is based (e.g. 'София, България' / 'Sofia, Bulgaria'). Shown under the name.",
+          },
+        },
+        {
+          name: "bio",
+          type: "richText",
+          localized: true,
+          required: true,
+          admin: {
+            description:
+              "Long-form introduction. Use the toolbar for bold, italic, links, lists, headings — same editor as blog posts. Each paragraph renders as its own block on the site.",
+          },
+        },
+        {
+          name: "order",
+          type: "number",
+          defaultValue: 0,
+          admin: { description: "Lower numbers appear first (top of the list)." },
+        },
+        {
+          name: "isActive",
+          type: "checkbox",
+          defaultValue: true,
+          admin: {
+            description:
+              "Uncheck to hide this specific person from the site without deleting the record. The whole section can also be hidden via 'Show section on the site' on the 'Listings — Team members' Global.",
+          },
+        },
+      ],
+    },
+    {
       slug: "faqs",
       labels: { singular: "FAQ", plural: "FAQs" },
       admin: {
@@ -904,6 +1010,52 @@ export default buildConfig({
       // other listings-* Globals; the SEO fields sit unused until a
       // standalone Partners page ships (if ever), at which point the
       // meta.title/description are ready to consume.
+      slug: "listings-team",
+      label: "Listings — Team members",
+      admin: {
+        group: "Listings",
+        description:
+          "Editable section chrome + master on/off switch for the 'Team' section shown on the About us page (/about-us/). Toggle 'Show section on the site' to hide the whole section without losing the text or the team member cards. Individual team member cards live in the Team members collection.",
+      },
+      access: { read: () => true },
+      fields: [
+        {
+          // Kill switch. Eyebrow + heading are required, so this
+          // checkbox is the only clean way to hide the section without
+          // wiping the copy. Defaults off so a partially-set-up section
+          // can't accidentally publish; owner flips it on when ready.
+          name: "isVisible",
+          type: "checkbox",
+          label: "Show section on the site",
+          defaultValue: false,
+          admin: {
+            description:
+              "Tick to render the Team section on the About us page. Untick to hide it — all copy and team member cards stay saved and reappear when re-ticked.",
+          },
+        },
+        { name: "eyebrow", type: "text", localized: true, required: true },
+        { name: "heading", type: "text", localized: true, required: true },
+        {
+          name: "lead",
+          type: "textarea",
+          localized: true,
+          admin: {
+            description:
+              "Optional intro paragraph shown below the heading. Leave empty to render just the eyebrow + heading with no lead text.",
+          },
+        },
+        {
+          name: "note",
+          type: "textarea",
+          localized: true,
+          admin: {
+            description:
+              "Optional internal note (not displayed publicly). Use this space for your own reminders about this section.",
+          },
+        },
+      ],
+    },
+    {
       slug: "listings-partners",
       label: "Listings — Partners section",
       admin: {
@@ -1023,6 +1175,13 @@ export default buildConfig({
         // and included purely for admin consistency with the other
         // listings-* Globals. See the block comment on the Global itself.
         "listings-partners",
+        // No /team/ page yet either — the Team section is embedded
+        // inside /about-us/, so its SEO fields are covered by the
+        // `about` Global's meta. Included here purely for admin
+        // consistency so all listings-* Globals expose the SEO tab
+        // with the same shape. If a standalone Team route ever ships,
+        // the meta fields are already wired.
+        "listings-team",
       ],
       uploadsCollection: "media",
       tabbedUI: true,
@@ -1113,6 +1272,7 @@ export default buildConfig({
           "listings-blog": { bg: "Блог", en: "Blog" },
           "listings-apartments": { bg: "Апартаменти", en: "Apartments" },
           "listings-partners": { bg: "Партньори", en: "Partners" },
+          "listings-team": { bg: "Екип", en: "Team" },
         };
 
         if (globalSlug && SHORT_NAMES[globalSlug]) {
@@ -1164,6 +1324,10 @@ export default buildConfig({
           "listings-partners": {
             bg: "Работим в партньорство с водещите платформи за краткосрочен наем в света — максимална видимост и повече резервации за вашия имот.",
             en: "We work in partnership with the world's leading short-term rental platforms — maximum visibility and more bookings for your property.",
+          },
+          "listings-team": {
+            bg: "Запознайте се с екипа на Home2Host — хората зад професионалното управление на имоти за краткосрочен наем в Банско и Бургас.",
+            en: "Meet the Home2Host team — the people behind professional short-term rental property management in Bansko and Burgas.",
           },
         };
         if (globalSlug && LISTING_DESCRIPTIONS[globalSlug]) {

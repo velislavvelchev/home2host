@@ -59,6 +59,10 @@
     "carouselPrev": "Предишни апартаменти",
     "carouselNext": "Следващи апартаменти"
   },
+  "Team": {
+    "guestRating": "оценка от гости",
+    "viewOnAirbnb": "Виж профила в Airbnb"
+  },
   "Contacts": {
     "phoneHeading": "Телефон",
     "emailHeading": "Имейл",
