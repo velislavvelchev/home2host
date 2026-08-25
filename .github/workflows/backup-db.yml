@@ -1,0 +1,103 @@
+name: Nightly database backup
+
+# Runs pg_dump against Neon every night and commits the resulting file
+# to a private backup repo. See docs/roadmap.md → Post-launch follow-ups
+# ("Automated Postgres backups / disaster recovery") for context.
+#
+# Two secrets required on this repo (Settings → Secrets and variables →
+# Actions):
+#   NEON_DATABASE_URL — the same postgres:// connection string Payload uses
+#                       locally (from `.env.local`) and in Vercel prod.
+#   BACKUP_REPO_PAT   — fine-grained Personal Access Token with
+#                       "Contents: Read and write" on the backup repo.
+#
+# The backup destination is hardcoded in the `BACKUP_REPO` env var below.
+# If the backup repo ever moves, edit that one line.
+#
+# Restore instructions live in the README of the backup repo itself, so
+# they're right there in a disaster.
+
+on:
+  schedule:
+    # 03:00 UTC daily = ~05:00–06:00 Sofia time depending on DST.
+    # Low-traffic window: after any late-night admin sessions, well
+    # before morning visitors, and past any Vercel deploy noise.
+    - cron: "0 3 * * *"
+  # Allow manual runs from the Actions tab for testing + ad-hoc snapshots
+  # (e.g. right before a risky migration).
+  workflow_dispatch:
+
+# Never run two backups at once — would race on the same commit.
+concurrency:
+  group: db-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      BACKUP_REPO: velislavvelchev/home2host-db-backups
+
+    steps:
+      # Check out the BACKUP repo (not this one) — the workflow writes
+      # the dump directly into its dumps/ folder and pushes from there.
+      # actions/checkout defaults to the current workspace directory,
+      # so subsequent steps operate inside the backup repo's clone.
+      - name: Checkout backup repo
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ env.BACKUP_REPO }}
+          token: ${{ secrets.BACKUP_REPO_PAT }}
+          # Full history so `git log` on the backup repo stays intact
+          # across many years — repo is tiny so no perf cost.
+          fetch-depth: 0
+
+      # GitHub-hosted runners ship with an older postgresql-client.
+      # Install the current major (17) from the official PGDG apt repo
+      # so we stay forward-compatible with whatever Postgres version
+      # Neon is running (they upgrade servers periodically).
+      - name: Install PostgreSQL 17 client
+        run: |
+          set -euo pipefail
+          curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+            | sudo gpg --dearmor -o /usr/share/keyrings/postgresql.gpg
+          echo "deb [signed-by=/usr/share/keyrings/postgresql.gpg] http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" \
+            | sudo tee /etc/apt/sources.list.d/pgdg.list
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client-17
+
+      - name: Take dump
+        env:
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          DATE=$(date -u +%Y-%m-%d)
+          mkdir -p dumps
+          # --format=custom : binary, gzip-compressed inside, restorable
+          #                   with pg_restore. Best all-around choice
+          #                   for backups.
+          # --no-owner       : strip GRANT/OWNER statements tied to the
+          # --no-acl           specific Neon role — makes the dump
+          #                    portable to any fresh Postgres during
+          #                    restore.
+          pg_dump --format=custom --no-owner --no-acl \
+            "$DATABASE_URL" > "dumps/${DATE}.dump"
+          echo "Dump written:"
+          ls -lh "dumps/${DATE}.dump"
+
+      - name: Commit and push
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add dumps/
+          # Skip commit if nothing changed — happens if the same-day
+          # dump already exists (e.g. a manual re-run within the same
+          # UTC day, or if scheduled + manual runs somehow overlap).
+          if git diff --cached --quiet; then
+            echo "No changes to commit — dump for today already exists."
+            exit 0
+          fi
+          git commit -m "Backup $(date -u +%Y-%m-%d)"
+          git push
