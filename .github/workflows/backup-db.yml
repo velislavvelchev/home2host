@@ -72,6 +72,12 @@ jobs:
           DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
         run: |
           set -euo pipefail
+          # Call pg17 by its full binary path. GitHub-hosted runners
+          # come with pg16 pre-installed and Ubuntu's pg_wrapper keeps
+          # `pg_dump` on PATH pointing at that older version even after
+          # we install pg17. pg_dump refuses to dump a server that's a
+          # whole major version ahead, so we bypass the wrapper.
+          PG_DUMP=/usr/lib/postgresql/17/bin/pg_dump
           DATE=$(date -u +%Y-%m-%d)
           mkdir -p dumps
           # --format=custom : binary, gzip-compressed inside, restorable
@@ -81,7 +87,7 @@ jobs:
           # --no-acl           specific Neon role — makes the dump
           #                    portable to any fresh Postgres during
           #                    restore.
-          pg_dump --format=custom --no-owner --no-acl \
+          "$PG_DUMP" --format=custom --no-owner --no-acl \
             "$DATABASE_URL" > "dumps/${DATE}.dump"
           echo "Dump written:"
           ls -lh "dumps/${DATE}.dump"
