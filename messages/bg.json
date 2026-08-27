@@ -59,6 +59,13 @@
     "carouselPrev": "Предишни апартаменти",
     "carouselNext": "Следващи апартаменти"
   },
+  "Reviews": {
+    "reviewLabel": "Отзив от Airbnb",
+    "seeMore": "Виж повече",
+    "seeAll": "Виж всички отзиви",
+    "carouselPrev": "Предишни отзиви",
+    "carouselNext": "Следващи отзиви"
+  },
   "Team": {
     "guestRating": "оценка от гости",
     "viewOnAirbnb": "Виж профила в Airbnb"

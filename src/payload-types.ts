@@ -73,6 +73,7 @@ export interface Config {
     apartments: Apartment;
     partners: Partner;
     'team-members': TeamMember;
+    reviews: Review;
     faqs: Faq;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -87,6 +88,7 @@ export interface Config {
     apartments: ApartmentsSelect<false> | ApartmentsSelect<true>;
     partners: PartnersSelect<false> | PartnersSelect<true>;
     'team-members': TeamMembersSelect<false> | TeamMembersSelect<true>;
+    reviews: ReviewsSelect<false> | ReviewsSelect<true>;
     faqs: FaqsSelect<false> | FaqsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -109,6 +111,7 @@ export interface Config {
     'listings-apartments': ListingsApartment;
     'listings-team': ListingsTeam;
     'listings-partners': ListingsPartner;
+    'listings-reviews': ListingsReview;
   };
   globalsSelect: {
     'landing-page': LandingPageSelect<false> | LandingPageSelect<true>;
@@ -122,6 +125,7 @@ export interface Config {
     'listings-apartments': ListingsApartmentsSelect<false> | ListingsApartmentsSelect<true>;
     'listings-team': ListingsTeamSelect<false> | ListingsTeamSelect<true>;
     'listings-partners': ListingsPartnersSelect<false> | ListingsPartnersSelect<true>;
+    'listings-reviews': ListingsReviewsSelect<false> | ListingsReviewsSelect<true>;
   };
   locale: 'bg' | 'en';
   widgets: {
@@ -399,6 +403,41 @@ export interface TeamMember {
   createdAt: string;
 }
 /**
+ * Guest reviews shown in the 'Reviews' section on the home page (below Apartments). One record per review. Copy them VERBATIM from your Airbnb host profile — they are genuine guest quotes, so don't paraphrase, translate, or edit the wording. The section's copy (eyebrow / heading / lead) and its master on/off switch live in the 'Listings — Reviews' Global. Reviews cannot be auto-fetched from Airbnb (unlike apartments) — they load behind Airbnb's private API, so they're entered by hand.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  /**
+   * The guest's name exactly as it appears on Airbnb (e.g. 'Michael Marcus', 'Наталия Скалецкая'). The first letter becomes the avatar initial. Not localized — real names don't translate.
+   */
+  reviewerName: string;
+  /**
+   * The review text, copied verbatim from Airbnb. NOT localized on purpose — an authentic quote shouldn't be rewritten per language, so the same original text shows on both the Bulgarian and English versions of the site.
+   */
+  reviewText: string;
+  /**
+   * Star rating for this review, 1–5. We only feature high-rated reviews, so this is almost always 5.
+   */
+  rating: number;
+  /**
+   * Optional, free-text (e.g. 'August 2025' / 'Август 2025'). Shown as a small caption under the name. Leave empty to hide it.
+   */
+  reviewDate?: string | null;
+  /**
+   * Lower numbers appear first in the carousel.
+   */
+  order?: number | null;
+  /**
+   * Uncheck to hide this specific review from the site without deleting it. The whole section can also be hidden via 'Show section on the site' on the 'Listings — Reviews' Global.
+   */
+  isActive?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "faqs".
  */
@@ -461,6 +500,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'team-members';
         value: number | TeamMember;
+      } | null)
+    | ({
+        relationTo: 'reviews';
+        value: number | Review;
       } | null)
     | ({
         relationTo: 'faqs';
@@ -652,6 +695,20 @@ export interface TeamMembersSelect<T extends boolean = true> {
   position?: T;
   city?: T;
   bio?: T;
+  order?: T;
+  isActive?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews_select".
+ */
+export interface ReviewsSelect<T extends boolean = true> {
+  reviewerName?: T;
+  reviewText?: T;
+  rating?: T;
+  reviewDate?: T;
   order?: T;
   isActive?: T;
   updatedAt?: T;
@@ -1128,6 +1185,40 @@ export interface ListingsPartner {
   createdAt?: string | null;
 }
 /**
+ * Editable section chrome + master on/off switch for the 'Reviews' section on the home page (below Apartments). Toggle 'Show section on the site' to hide the whole section without losing the text or the reviews. Individual guest reviews live in the Reviews collection.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings-reviews".
+ */
+export interface ListingsReview {
+  id: number;
+  /**
+   * Tick to render the Reviews section on the home page. Untick to hide it — all copy and reviews stay saved and reappear when re-ticked.
+   */
+  isVisible?: boolean | null;
+  eyebrow: string;
+  heading: string;
+  lead: string;
+  /**
+   * Public Airbnb host-profile URL (e.g. 'https://bg.airbnb.com/users/profile/1463777837298491543'). When set, a 'See all reviews' button appears below the reviews and opens this profile in a new tab. Leave empty to hide the button.
+   */
+  airbnbProfileUrl?: string | null;
+  /**
+   * Optional internal note (not displayed publicly). Use this space for your own reminders about this section.
+   */
+  note?: string | null;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "landing-page_select".
  */
@@ -1397,6 +1488,28 @@ export interface ListingsPartnersSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   lead?: T;
+  note?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "listings-reviews_select".
+ */
+export interface ListingsReviewsSelect<T extends boolean = true> {
+  isVisible?: T;
+  eyebrow?: T;
+  heading?: T;
+  lead?: T;
+  airbnbProfileUrl?: T;
   note?: T;
   meta?:
     | T

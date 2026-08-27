@@ -461,6 +461,74 @@ export default buildConfig({
       ],
     },
     {
+      slug: "reviews",
+      labels: { singular: "Review", plural: "Reviews" },
+      admin: {
+        useAsTitle: "reviewerName",
+        defaultColumns: ["id", "reviewerName", "rating", "order", "isActive"],
+        description:
+          "Guest reviews shown in the 'Reviews' section on the home page (below Apartments). One record per review. Copy them VERBATIM from your Airbnb host profile — they are genuine guest quotes, so don't paraphrase, translate, or edit the wording. The section's copy (eyebrow / heading / lead) and its master on/off switch live in the 'Listings — Reviews' Global. Reviews cannot be auto-fetched from Airbnb (unlike apartments) — they load behind Airbnb's private API, so they're entered by hand.",
+      },
+      access: { read: () => true },
+      defaultSort: "order",
+      fields: [
+        {
+          name: "reviewerName",
+          type: "text",
+          required: true,
+          admin: {
+            description:
+              "The guest's name exactly as it appears on Airbnb (e.g. 'Michael Marcus', 'Наталия Скалецкая'). The first letter becomes the avatar initial. Not localized — real names don't translate.",
+          },
+        },
+        {
+          name: "reviewText",
+          type: "textarea",
+          required: true,
+          admin: {
+            description:
+              "The review text, copied verbatim from Airbnb. NOT localized on purpose — an authentic quote shouldn't be rewritten per language, so the same original text shows on both the Bulgarian and English versions of the site.",
+          },
+        },
+        {
+          name: "rating",
+          type: "number",
+          required: true,
+          min: 1,
+          max: 5,
+          defaultValue: 5,
+          admin: {
+            description:
+              "Star rating for this review, 1–5. We only feature high-rated reviews, so this is almost always 5.",
+            step: 1,
+          },
+        },
+        {
+          name: "reviewDate",
+          type: "text",
+          admin: {
+            description:
+              "Optional, free-text (e.g. 'August 2025' / 'Август 2025'). Shown as a small caption under the name. Leave empty to hide it.",
+          },
+        },
+        {
+          name: "order",
+          type: "number",
+          defaultValue: 0,
+          admin: { description: "Lower numbers appear first in the carousel." },
+        },
+        {
+          name: "isActive",
+          type: "checkbox",
+          defaultValue: true,
+          admin: {
+            description:
+              "Uncheck to hide this specific review from the site without deleting it. The whole section can also be hidden via 'Show section on the site' on the 'Listings — Reviews' Global.",
+          },
+        },
+      ],
+    },
+    {
       slug: "faqs",
       labels: { singular: "FAQ", plural: "FAQs" },
       admin: {
@@ -1095,6 +1163,58 @@ export default buildConfig({
         },
       ],
     },
+    {
+      slug: "listings-reviews",
+      label: "Listings — Reviews section",
+      admin: {
+        group: "Listings",
+        description:
+          "Editable section chrome + master on/off switch for the 'Reviews' section on the home page (below Apartments). Toggle 'Show section on the site' to hide the whole section without losing the text or the reviews. Individual guest reviews live in the Reviews collection.",
+      },
+      access: { read: () => true },
+      fields: [
+        {
+          // Kill switch. The three text fields below are `required`, so
+          // the Global cannot be saved with them empty — this checkbox
+          // is the only clean way to hide the section while keeping the
+          // data. Default off so a half-set-up section (no reviews added
+          // yet) doesn't accidentally publish; the owner flips it on when
+          // ready.
+          name: "isVisible",
+          type: "checkbox",
+          label: "Show section on the site",
+          defaultValue: false,
+          admin: {
+            description:
+              "Tick to render the Reviews section on the home page. Untick to hide it — all copy and reviews stay saved and reappear when re-ticked.",
+          },
+        },
+        { name: "eyebrow", type: "text", localized: true, required: true },
+        { name: "heading", type: "text", localized: true, required: true },
+        { name: "lead", type: "textarea", localized: true, required: true },
+        {
+          // Drives the "See all reviews" button shown after the review
+          // cards. Links straight to the real Airbnb host profile — more
+          // trustworthy than a score we type ourselves, since visitors can
+          // read every review at the source.
+          name: "airbnbProfileUrl",
+          type: "text",
+          admin: {
+            description:
+              "Public Airbnb host-profile URL (e.g. 'https://bg.airbnb.com/users/profile/1463777837298491543'). When set, a 'See all reviews' button appears below the reviews and opens this profile in a new tab. Leave empty to hide the button.",
+          },
+        },
+        {
+          name: "note",
+          type: "textarea",
+          localized: true,
+          admin: {
+            description:
+              "Optional internal note (not displayed publicly). Use this space for your own reminders about this section.",
+          },
+        },
+      ],
+    },
   ],
   editor: lexicalEditor(),
   // Email transport for password-reset, account verification, and any
@@ -1182,6 +1302,10 @@ export default buildConfig({
         // with the same shape. If a standalone Team route ever ships,
         // the meta fields are already wired.
         "listings-team",
+        // No /reviews/ page — the Reviews section is home-page only, so
+        // its SEO fields are unused at runtime and included purely for
+        // admin consistency with the other listings-* Globals.
+        "listings-reviews",
       ],
       uploadsCollection: "media",
       tabbedUI: true,
@@ -1273,6 +1397,7 @@ export default buildConfig({
           "listings-apartments": { bg: "Апартаменти", en: "Apartments" },
           "listings-partners": { bg: "Партньори", en: "Partners" },
           "listings-team": { bg: "Екип", en: "Team" },
+          "listings-reviews": { bg: "Отзиви", en: "Reviews" },
         };
 
         if (globalSlug && SHORT_NAMES[globalSlug]) {
@@ -1328,6 +1453,10 @@ export default buildConfig({
           "listings-team": {
             bg: "Запознайте се с екипа на Home2Host — хората зад професионалното управление на имоти за краткосрочен наем в Банско и Бургас.",
             en: "Meet the Home2Host team — the people behind professional short-term rental property management in Bansko and Burgas.",
+          },
+          "listings-reviews": {
+            bg: "Реални отзиви от гости за имотите, които управляваме в Банско и Бургас — комуникация, организация и цялостно изживяване през Airbnb.",
+            en: "Real guest reviews of the properties we manage in Bansko and Burgas — communication, organization, and the overall experience through Airbnb.",
           },
         };
         if (globalSlug && LISTING_DESCRIPTIONS[globalSlug]) {

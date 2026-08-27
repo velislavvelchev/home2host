@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
 import { ApartmentsSection } from "@/components/sections/ApartmentsSection";
+import { ReviewsSection } from "@/components/sections/ReviewsSection";
 import { getPayloadInstance } from "@/lib/payload";
 import { type Locale } from "@/i18n/routing";
 
@@ -45,6 +46,7 @@ export default async function ApartmentsPage({
   return (
     <main className="flex-1">
       <ApartmentsSection headingLevel="h1" />
+      <ReviewsSection />
     </main>
   );
 }

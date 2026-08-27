@@ -59,6 +59,13 @@
     "carouselPrev": "Previous apartments",
     "carouselNext": "Next apartments"
   },
+  "Reviews": {
+    "reviewLabel": "Airbnb Review",
+    "seeMore": "See more",
+    "seeAll": "See all reviews",
+    "carouselPrev": "Previous reviews",
+    "carouselNext": "Next reviews"
+  },
   "Team": {
     "guestRating": "guest rating",
     "viewOnAirbnb": "View Airbnb profile"

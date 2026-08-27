@@ -5,6 +5,7 @@ import { HeroSlideshow, type HeroSlide } from "@/components/HeroSlideshow";
 import { AboutSection } from "@/components/sections/AboutSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { ApartmentsSection } from "@/components/sections/ApartmentsSection";
+import { ReviewsSection } from "@/components/sections/ReviewsSection";
 import { PricesSection } from "@/components/sections/PricesSection";
 import { FaqSection } from "@/components/sections/FaqSection";
 import { PartnersSection } from "@/components/sections/PartnersSection";
@@ -191,6 +192,7 @@ export default async function Home({
       <AboutSection />
       <ServicesSection />
       <ApartmentsSection />
+      <ReviewsSection />
       <PricesSection />
       <FaqSection />
       <PartnersSection />
