@@ -8,11 +8,11 @@ import {
   setRequestLocale,
 } from "next-intl/server";
 import "../../globals.css";
-import { GoogleAnalytics } from "@next/third-parties/google";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FloatingCallButton } from "@/components/FloatingCallButton";
 import { StructuredData } from "@/components/StructuredData";
+import { CookieConsent } from "@/components/CookieConsent";
 import { routing } from "@/i18n/routing";
 
 // Subsets MUST include cyrillic — primary content language is BG and
@@ -129,14 +129,21 @@ export default async function RootLayout({
       <body className="min-h-full flex flex-col bg-background text-foreground">
         {/*
           Apply the saved theme before first paint — no FOUC. Reading the
-          cookie server-side (the previous approach) called `cookies()`,
-          which is a dynamic API and forced EVERY page to render per-request,
-          defeating static/edge caching. Doing it in a tiny blocking inline
-          script keeps the whole marketing site statically cacheable while
-          preserving the no-flash behavior. Same `theme` cookie ThemeToggle
-          writes, so a visitor's choice persists across loads and reloads.
-          `dangerouslySetInnerHTML` (not children) is the React-supported way
-          to inline a script without a dev warning.
+          cookie server-side (the previous approach) called `cookies()`, a
+          dynamic API that forced EVERY page to render per-request and defeated
+          static/edge caching (ADR 0006). This tiny raw <script> runs
+          synchronously as the browser parses the HTML — before paint — so the
+          `dark` class is set before anything renders. Same `theme` cookie
+          ThemeToggle writes, so a visitor's choice persists across loads.
+
+          It MUST be a raw <script>, not `next/script`: `beforeInteractive` in
+          the App Router does NOT inline the script — it queues it via
+          `__next_s` and runs it AFTER first paint, which reintroduces the
+          dark-mode flash. React 19 logs a dev-only warning about inline
+          scripts in the component tree, but that warning is stripped from
+          production builds and the script works correctly (it's emitted into
+          the SSR HTML and the browser executes it on parse). Do not "fix" this
+          back to next/script.
         */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <NextIntlClientProvider messages={messages}>
@@ -146,16 +153,12 @@ export default async function RootLayout({
           <Footer />
           <FloatingCallButton />
           {/*
-            GA4 only renders when the measurement ID is set in the env. Local
-            dev (no `.env.local` value) and Vercel previews without the var
-            configured render nothing — keeps test pageviews out of the
-            production analytics property.
+            Cookie-consent banner + GA gate. GA4 loads only after the visitor
+            accepts (GDPR/ePrivacy), and only when the measurement ID is set in
+            the env — dev / previews without it render nothing. All consent
+            logic is client-side so it can't force dynamic rendering (ADR 0006).
           */}
-          {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID ? (
-            <GoogleAnalytics
-              gaId={process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID}
-            />
-          ) : null}
+          <CookieConsent />
         </NextIntlClientProvider>
       </body>
     </html>

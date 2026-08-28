@@ -40,6 +40,8 @@ const STATIC_ROUTES: StaticRoute[] = [
   { path: "/questions/", priority: 0.6 },
   { path: "/contacts/", priority: 0.6 },
   { path: "/blog/", priority: 0.7 },
+  { path: "/cookie-policy/", priority: 0.3 },
+  { path: "/privacy-policy/", priority: 0.3 },
 ];
 
 // Build the locale-prefixed URL for a path. BG (default) is unprefixed

@@ -40,7 +40,18 @@
     "regionsLabel": "Regions",
     "regionsValue": "Bansko · Burgas",
     "rights": "© {year} Home2Host. All rights reserved.",
-    "location": "Bansko · Burgas, Bulgaria"
+    "location": "Bansko · Burgas, Bulgaria",
+    "legalHeading": "Legal",
+    "cookiePolicy": "Cookie Policy",
+    "privacyPolicy": "Privacy Policy",
+    "manageCookies": "Manage cookies"
+  },
+  "CookieConsent": {
+    "title": "Cookie consent",
+    "message": "We use cookies to analyze site traffic. You can accept or reject. See our ",
+    "policyLinkText": "Cookie Policy",
+    "accept": "Accept",
+    "reject": "Reject"
   },
   "FloatingCall": {
     "ariaLabel": "Call us: {phone}"

@@ -1,6 +1,7 @@
 import { getLocale, getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 import { getPayloadInstance } from "@/lib/payload";
+import { ManageCookiesButton } from "@/components/ManageCookiesButton";
 import type { Locale } from "@/i18n/routing";
 
 // Slugs match the live WordPress URLs (trailing slashes preserved) so
@@ -95,9 +96,29 @@ export async function Footer() {
           </div>
         </div>
 
-        <div className="mt-12 flex flex-col gap-2 border-t border-border pt-6 text-xs text-foreground-muted sm:flex-row sm:items-center sm:justify-between">
-          <p>{t("rights", { year })}</p>
-          <p>{t("location")}</p>
+        <div className="mt-12 border-t border-border pt-6">
+          <nav
+            aria-label={t("legalHeading")}
+            className="flex flex-wrap gap-x-6 gap-y-2 text-xs"
+          >
+            <Link
+              href="/cookie-policy/"
+              className="text-foreground transition-colors duration-base ease-standard hover:text-brand-700 dark:hover:text-brand-300"
+            >
+              {t("cookiePolicy")}
+            </Link>
+            <Link
+              href="/privacy-policy/"
+              className="text-foreground transition-colors duration-base ease-standard hover:text-brand-700 dark:hover:text-brand-300"
+            >
+              {t("privacyPolicy")}
+            </Link>
+            <ManageCookiesButton />
+          </nav>
+          <div className="mt-4 flex flex-col gap-2 text-xs text-foreground-muted sm:flex-row sm:items-center sm:justify-between">
+            <p>{t("rights", { year })}</p>
+            <p>{t("location")}</p>
+          </div>
         </div>
       </div>
     </footer>
