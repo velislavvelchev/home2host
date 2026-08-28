@@ -147,12 +147,12 @@ export async function ReviewsSection({
     <section
       id="reviews"
       aria-labelledby="reviews-heading"
-      // Muted surface + a top hairline so it reads as its own band even
-      // though the Apartments section above also sits on surface-muted.
-      // Cards use `bg-surface` (white / dark navy) so they lift off this
-      // background in both themes — the reference "gray section, white
-      // cards" look.
-      className="border-t border-border bg-surface-muted"
+      // Brand-tinted band (same treatment as the Services section) so it
+      // stands apart from the `surface-muted` Apartments section above and
+      // the `surface-muted` Prices section below — otherwise the three ran
+      // together as one flat gray block with no seam. Cards use `bg-surface`
+      // (white / dark navy), so they lift off the tint in both themes.
+      className="border-y border-border bg-brand-50/60 dark:bg-[#1a2245]"
     >
       <div className="mx-auto max-w-6xl px-gutter py-section">
         <RevealOnScroll>
