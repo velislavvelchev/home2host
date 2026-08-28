@@ -45,9 +45,10 @@ export async function generateMetadata({
   };
 }
 
-// Each post lives in the DB; this page reads fresh on each request.
-// Could move to ISR later if traffic warrants it.
-export const dynamic = "force-dynamic";
+// Statically rendered like the rest of the site; the DB reads run at build
+// / on-demand regeneration, not per request. Payload afterChange hooks call
+// revalidatePath on content edits, so new or edited posts appear without a
+// redeploy (see ADR 0006).
 
 // Eyebrow / heading / lead for the listing page come from the
 // `listings-blog` Global so the owner can edit them in admin (same

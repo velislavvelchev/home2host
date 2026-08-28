@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import {
@@ -27,6 +26,15 @@ const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin", "cyrillic"],
 });
+
+// Runs before first paint (see the <script> in the body). Reads the same
+// `theme` cookie ThemeToggle writes and adds the `dark` class to <html> if
+// set, so the saved theme is applied with no flash — without the server
+// having to read the cookie (which would force dynamic rendering). Kept as
+// a minified IIFE string: it must be tiny and self-contained. Wrapped in
+// try/catch so a blocked-cookie environment can never break the page.
+const THEME_INIT_SCRIPT =
+  "(function(){try{if(/(?:^|; )theme=dark(?:;|$)/.test(document.cookie)){document.documentElement.classList.add('dark')}}catch(e){}})()";
 
 // Per-locale root metadata. Title / description / OG copy resolve from
 // the `SiteMetadata` namespace; everything else (icons, metadataBase, OG
@@ -108,23 +116,29 @@ export default async function RootLayout({
 
   const messages = await getMessages();
 
-  // Read the theme preference from the cookie (set by ThemeToggle).
-  // We render <html class="dark"> directly in the initial SSR output
-  // when the cookie says so — no client-side script needed, no FOUC,
-  // no React 19 / Next.js dev warning about inline <script> tags. The
-  // cookie travels with every request (~10 bytes), which is cheaper
-  // than the localStorage + inline-script alternative.
-  //
-  // Default: no cookie → light (the brand-default for everyone).
-  const themeCookie = (await cookies()).get("theme")?.value;
-  const isDark = themeCookie === "dark";
-
   return (
+    // `suppressHydrationWarning`: the pre-paint script below adds the
+    // `dark` class to <html> before React hydrates, so the client's
+    // className differs from the server's. That's intentional and scoped
+    // to this element — suppress the (otherwise correct) warning.
     <html
       lang={locale}
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased${isDark ? " dark" : ""}`}
+      suppressHydrationWarning
+      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-foreground">
+        {/*
+          Apply the saved theme before first paint — no FOUC. Reading the
+          cookie server-side (the previous approach) called `cookies()`,
+          which is a dynamic API and forced EVERY page to render per-request,
+          defeating static/edge caching. Doing it in a tiny blocking inline
+          script keeps the whole marketing site statically cacheable while
+          preserving the no-flash behavior. Same `theme` cookie ThemeToggle
+          writes, so a visitor's choice persists across loads and reloads.
+          `dangerouslySetInnerHTML` (not children) is the React-supported way
+          to inline a script without a dev warning.
+        */}
+        <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <NextIntlClientProvider messages={messages}>
           <StructuredData />
           <Header />

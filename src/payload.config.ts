@@ -4,7 +4,7 @@ import { seoPlugin } from "@payloadcms/plugin-seo";
 import { lexicalEditor } from "@payloadcms/richtext-lexical";
 import { vercelBlobStorage } from "@payloadcms/storage-vercel-blob";
 import path from "path";
-import { buildConfig } from "payload";
+import { buildConfig, type CollectionConfig, type GlobalConfig } from "payload";
 import { fileURLToPath } from "url";
 import sharp from "sharp";
 
@@ -50,6 +50,66 @@ const serverURL =
   process.env.NEXT_PUBLIC_SERVER_URL ||
   (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "") ||
   "http://localhost:3000";
+
+// After any content create/update/delete in the admin, mark every cached
+// page stale so the owner's change appears on the live site within a request
+// or two — while normal traffic keeps being served from the static cache.
+// This is what lets the whole marketing site render statically (fast, no
+// per-request DB hit) yet still update on edit. See ADR 0006.
+//
+// `revalidatePath('/', 'layout')` invalidates every route under the root
+// layout (both locales, all pages). Dynamic-imported so `next/cache` is only
+// loaded inside the Next runtime, never when this config is loaded by the
+// standalone Payload CLI (`generate:types`). try/catch so a revalidation
+// outside a request context (build / seed script) can never block the actual
+// content save.
+async function revalidateSite(): Promise<void> {
+  try {
+    const { revalidatePath } = await import("next/cache");
+    revalidatePath("/", "layout");
+  } catch {
+    // Not in a request context — nothing to revalidate.
+  }
+}
+
+// Collections whose changes never affect public pages — skip revalidation.
+const NON_CONTENT_COLLECTIONS = new Set(["users"]);
+
+// Attach the revalidation hook to every content collection / global without
+// hand-editing each definition. Preserves any hooks a definition already has.
+function withRevalidate(collections: CollectionConfig[]): CollectionConfig[] {
+  return collections.map((collection) =>
+    NON_CONTENT_COLLECTIONS.has(collection.slug)
+      ? collection
+      : {
+          ...collection,
+          hooks: {
+            ...collection.hooks,
+            afterChange: [
+              ...(collection.hooks?.afterChange ?? []),
+              () => revalidateSite(),
+            ],
+            afterDelete: [
+              ...(collection.hooks?.afterDelete ?? []),
+              () => revalidateSite(),
+            ],
+          },
+        },
+  );
+}
+
+function withRevalidateGlobals(globals: GlobalConfig[]): GlobalConfig[] {
+  return globals.map((global) => ({
+    ...global,
+    hooks: {
+      ...global.hooks,
+      afterChange: [
+        ...(global.hooks?.afterChange ?? []),
+        () => revalidateSite(),
+      ],
+    },
+  }));
+}
 
 export default buildConfig({
   serverURL,
@@ -98,7 +158,7 @@ export default buildConfig({
     defaultLocale: "bg",
     fallback: true,
   },
-  collections: [
+  collections: withRevalidate([
     {
       slug: "users",
       // Brute-force defense: lock the account after 5 failed login
@@ -566,8 +626,8 @@ export default buildConfig({
     // 7th service or 4th plan, which the layout doesn't accept
     // gracefully. Globals + capped arrays match the visual contract.
     // ──────────────────────────────────────────────────────────────
-  ],
-  globals: [
+  ]),
+  globals: withRevalidateGlobals([
     {
       slug: "landing-page",
       label: "Landing page section",
@@ -1215,7 +1275,7 @@ export default buildConfig({
         },
       ],
     },
-  ],
+  ]),
   editor: lexicalEditor(),
   // Email transport for password-reset, account verification, and any
   // future Payload-initiated mail. Reuses the same Hostinger SMTP
