@@ -34,7 +34,15 @@ export function LanguageSwitcher() {
       // pathname here is the LOCALE-LESS pathname (next-intl strips
       // the segment) — the router re-attaches the new locale per
       // `localePrefix: 'as-needed'` (BG omits prefix, EN gets /en).
-      router.replace(pathname, { locale: target });
+      //
+      // `scroll: false` keeps the visitor where they are on the page.
+      // Switching locale navigates to a different URL (/about-us/ →
+      // /en/about-us/), and App Router resets scroll to the top on every
+      // navigation by default — which felt like being yanked back up mid-
+      // read. The layout is identical across locales (same sections, only
+      // the text differs), so preserving the scroll position lands the
+      // visitor on the same spot in the other language.
+      router.replace(pathname, { locale: target, scroll: false });
     });
   }
 
