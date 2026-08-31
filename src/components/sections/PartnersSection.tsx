@@ -63,6 +63,17 @@ const MIN_RENDERED_ITEMS = 16;
 // per-second stays constant across small and large partner counts.
 const SECONDS_PER_COPY = 20;
 
+// Airbnb's and Booking.com's official wordmarks ship with essentially no
+// internal padding — the glyphs fill the whole file canvas — so at the
+// shared logo height they paint more ink and read visually larger than
+// partner logos that carry their own whitespace. Render just those two a
+// notch shorter so the row reads at consistent weight. Keyed on the
+// destination host (stable for these brands) rather than the display name
+// (free-text and localizable).
+const OVERSIZED_LOGO_HOSTS = /(?:airbnb|booking)\./i;
+const LOGO_HEIGHT = "h-14 md:h-[72px] lg:h-20";
+const LOGO_HEIGHT_OVERSIZED = "h-11 md:h-14 lg:h-16";
+
 export async function PartnersSection({
   headingLevel = "h2",
 }: PartnersSectionProps) {
@@ -161,6 +172,9 @@ export async function PartnersSection({
             >
               {loopedItems.map((item, index) => {
                 const isClone = index >= items.length;
+                const logoHeight = OVERSIZED_LOGO_HOSTS.test(item.url)
+                  ? LOGO_HEIGHT_OVERSIZED
+                  : LOGO_HEIGHT;
                 return (
                   <li
                     key={`${item.id}-${index}`}
@@ -182,11 +196,12 @@ export async function PartnersSection({
                         height={item.logo.height ?? undefined}
                         loading="lazy"
                         decoding="async"
-                        // Bigger than the initial design (was h-10 md:h-12).
-                        // Owner feedback: the previous size looked lost
-                        // against the section chrome. 56/72/80 px scales
-                        // well with typical brand-mark aspect ratios.
-                        className="h-14 w-auto object-contain md:h-[72px] lg:h-20"
+                        // Height-normalized; width auto. Default is 56/72/80 px
+                        // (bumped up from the initial h-10/h-12 after the first
+                        // size looked lost against the section chrome). Tight-
+                        // cropped wordmarks (Airbnb, Booking) render a notch
+                        // shorter — see OVERSIZED_LOGO_HOSTS.
+                        className={`${logoHeight} w-auto object-contain`}
                       />
                     </a>
                   </li>
