@@ -110,7 +110,7 @@ export function ReviewsCarousel({ children }: ReviewsCarouselProps) {
     >
       <div
         ref={scrollRef}
-        className="flex snap-x snap-mandatory items-stretch gap-6 overflow-x-auto scroll-px-gutter pb-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+        className="flex snap-x snap-mandatory items-stretch gap-6 overflow-x-auto overflow-y-hidden scroll-px-gutter py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
       >
         {children}
       </div>
