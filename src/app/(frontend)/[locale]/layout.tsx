@@ -13,6 +13,7 @@ import { Footer } from "@/components/Footer";
 import { FloatingCallButton } from "@/components/FloatingCallButton";
 import { StructuredData } from "@/components/StructuredData";
 import { CookieConsent } from "@/components/CookieConsent";
+import { ThemeSync } from "@/components/ThemeSync";
 import { routing } from "@/i18n/routing";
 
 // Subsets MUST include cyrillic — primary content language is BG and
@@ -146,6 +147,12 @@ export default async function RootLayout({
           back to next/script.
         */}
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
+        {/*
+          Re-assert the saved theme after client-side navigations (the
+          inline script above only runs on full page loads). Without this,
+          a locale switch resets a dark page to light — see ThemeSync.
+        */}
+        <ThemeSync />
         <NextIntlClientProvider messages={messages}>
           <StructuredData />
           <Header />
