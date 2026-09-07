@@ -898,7 +898,6 @@ export interface Service {
   eyebrow: string;
   heading: string;
   lead: string;
-  closing: string;
   /**
    * Exactly 6 items. Don't add or remove rows — edit in place.
    */
@@ -1341,7 +1340,6 @@ export interface ServicesSelect<T extends boolean = true> {
   eyebrow?: T;
   heading?: T;
   lead?: T;
-  closing?: T;
   items?:
     | T
     | {

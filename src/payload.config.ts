@@ -829,7 +829,6 @@ export default buildConfig({
         { name: "eyebrow", type: "text", localized: true, required: true },
         { name: "heading", type: "text", localized: true, required: true },
         { name: "lead", type: "textarea", localized: true, required: true },
-        { name: "closing", type: "text", localized: true, required: true },
         {
           name: "items",
           type: "array",

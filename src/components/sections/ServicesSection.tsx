@@ -214,10 +214,6 @@ export async function ServicesSection({ headingLevel = "h2" }: ServicesSectionPr
             );
           })}
         </ol>
-
-        <p className="mt-20 max-w-prose font-display text-2xl font-medium tracking-tight sm:text-3xl">
-          {services.closing}
-        </p>
       </div>
     </section>
   );
