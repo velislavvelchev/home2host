@@ -106,6 +106,7 @@ export interface Config {
     services: Service;
     'pricing-plans': PricingPlan;
     contacts: Contact;
+    booking: Booking;
     'social-links': SocialLink;
     'listings-faq': ListingsFaq;
     'listings-blog': ListingsBlog;
@@ -121,6 +122,7 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     'pricing-plans': PricingPlansSelect<false> | PricingPlansSelect<true>;
     contacts: ContactsSelect<false> | ContactsSelect<true>;
+    booking: BookingSelect<false> | BookingSelect<true>;
     'social-links': SocialLinksSelect<false> | SocialLinksSelect<true>;
     'listings-faq': ListingsFaqSelect<false> | ListingsFaqSelect<true>;
     'listings-blog': ListingsBlogSelect<false> | ListingsBlogSelect<true>;
@@ -1059,6 +1061,32 @@ export interface Contact {
   createdAt?: string | null;
 }
 /**
+ * Editable copy for the standalone Booking page (/booking/) — the direct-booking form that gives guests 10% off. Eyebrow is the small pill above the heading, heading is the H1, lead is the intro paragraph above the form, and 'footerNote' is the short disclaimer shown under the submit button (short-term rental only + 24h response). The form fields, dropdown options and buttons are UI labels edited in code, not here. The Location dropdown fills itself from the cities of your active Apartments.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "booking".
+ */
+export interface Booking {
+  id: number;
+  eyebrow: string;
+  heading: string;
+  lead: string;
+  /**
+   * Short disclaimer shown under the submit button — short-term rental only + the 24h response promise.
+   */
+  footerNote: string;
+  meta?: {
+    title?: string | null;
+    description?: string | null;
+    /**
+     * Maximum upload file size: 12MB. Recommended file size for images is <500KB.
+     */
+    image?: (number | null) | Media;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "social-links".
  */
@@ -1424,6 +1452,26 @@ export interface ContactsSelect<T extends boolean = true> {
   addressMapsUrl?: T;
   workingHours?: T;
   mapEmbedUrl?: T;
+  meta?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "booking_select".
+ */
+export interface BookingSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  lead?: T;
+  footerNote?: T;
   meta?:
     | T
     | {

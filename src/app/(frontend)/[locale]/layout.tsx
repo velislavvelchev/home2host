@@ -11,6 +11,7 @@ import "../../globals.css";
 import { Header } from "@/components/Header";
 import { Footer } from "@/components/Footer";
 import { FloatingCallButton } from "@/components/FloatingCallButton";
+import { FloatingBookButton } from "@/components/FloatingBookButton";
 import { StructuredData } from "@/components/StructuredData";
 import { CookieConsent } from "@/components/CookieConsent";
 import { ThemeSync } from "@/components/ThemeSync";
@@ -159,6 +160,7 @@ export default async function RootLayout({
           {children}
           <Footer />
           <FloatingCallButton />
+          <FloatingBookButton />
           {/*
             Cookie-consent banner + GA gate. GA4 loads only after the visitor
             accepts (GDPR/ePrivacy), and only when the measurement ID is set in

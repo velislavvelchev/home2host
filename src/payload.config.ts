@@ -1069,6 +1069,42 @@ export default buildConfig({
       ],
     },
     {
+      // Standalone /booking/ page — the direct-booking form that gives
+      // guests 10% off. Only the editorial chrome lives here; the form
+      // field labels + dropdown option text + status messages live in
+      // messages/<locale>.json (functional UI copy, same split as the
+      // contact form). Chrome fields are REQUIRED and pre-filled (seeded
+      // in both locales) so the admin experience matches the other page
+      // Globals like About / Contacts — filled fields with a red *. The
+      // frontend keeps a defensive fallback to the i18n JSON copy in case
+      // the Global is ever read before it's been saved. The location
+      // dropdown is NOT configured here — it syncs automatically from the
+      // cities of the active Apartments, so a visitor can only pick a
+      // place we serve.
+      slug: "booking",
+      label: "Booking page section",
+      admin: {
+        description:
+          "Editable copy for the standalone Booking page (/booking/) — the direct-booking form that gives guests 10% off. Eyebrow is the small pill above the heading, heading is the H1, lead is the intro paragraph above the form, and 'footerNote' is the short disclaimer shown under the submit button (short-term rental only + 24h response). The form fields, dropdown options and buttons are UI labels edited in code, not here. The Location dropdown fills itself from the cities of your active Apartments.",
+      },
+      access: { read: () => true },
+      fields: [
+        { name: "eyebrow", type: "text", localized: true, required: true },
+        { name: "heading", type: "text", localized: true, required: true },
+        { name: "lead", type: "textarea", localized: true, required: true },
+        {
+          name: "footerNote",
+          type: "textarea",
+          localized: true,
+          required: true,
+          admin: {
+            description:
+              "Short disclaimer shown under the submit button — short-term rental only + the 24h response promise.",
+          },
+        },
+      ],
+    },
+    {
       slug: "social-links",
       label: "Social links",
       access: { read: () => true },
@@ -1414,6 +1450,10 @@ export default buildConfig({
         "services",
         "pricing-plans",
         "contacts",
+        // Standalone /booking/ page — a real indexable page (its own
+        // canonical, not canonical→/ like the section pages), so it gets
+        // the full SEO tab like About / Services / Contacts.
+        "booking",
         "listings-faq",
         "listings-blog",
         "listings-apartments",
@@ -1515,6 +1555,7 @@ export default buildConfig({
           services: { bg: "Услуги", en: "Services" },
           "pricing-plans": { bg: "Цени", en: "Pricing" },
           contacts: { bg: "Контакти", en: "Contacts" },
+          booking: { bg: "Резервирай", en: "Book" },
           "listings-faq": {
             bg: "Често задавани въпроси",
             en: "Frequently asked questions",

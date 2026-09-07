@@ -147,6 +147,11 @@
      animation is percentage-based (0 → -50% of a duplicated list). */
   --animate-marquee: partners-marquee 40s linear infinite;
 
+  /* Gentle "notice me" breathe for the Booking CTA in the header. Soft
+     opacity + micro-scale so it reads as a subtle blink, never a harsh
+     flash. Pair with `motion-safe:animate-soft-pulse`. */
+  --animate-soft-pulse: soft-pulse 2.2s ease-in-out infinite;
+
   /* Breakpoints — Tailwind's default scale, declared explicitly so this file
      is the single source of truth and future codemods can't silently shift
      them. Mobile-first: utilities with no prefix apply everywhere, prefixed
@@ -196,6 +201,11 @@ body {
 @keyframes ken-burns {
   0%, 100% { transform: scale(1.00); }
   50%      { transform: scale(1.06); }
+}
+
+@keyframes soft-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%      { opacity: 0.82; transform: scale(1.04); }
 }
 
 /* Partners section marquee. The track renders each partner N times
