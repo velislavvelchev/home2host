@@ -104,8 +104,11 @@ export function SeoPreviewWithImage(props: ClientProps) {
   // doc's `url` is what we render. Re-runs when the upload changes.
   useEffect(() => {
     if (metaImageId === null || metaImageId === undefined || metaImageId === "") {
-      setImageUrl(undefined);
-      return;
+      // Deferred one frame rather than a synchronous effect-body update
+      // (same pattern as CountUp) so react-hooks/set-state-in-effect is
+      // satisfied without any behavior change.
+      const raf = requestAnimationFrame(() => setImageUrl(undefined));
+      return () => cancelAnimationFrame(raf);
     }
     void fetch(`${api}/media/${metaImageId}?depth=0`, {
       credentials: "include",
@@ -147,7 +150,11 @@ export function SeoPreviewWithImage(props: ClientProps) {
             </a>
           </div>
           <h4 style={{ margin: 0 }}>
-            <a href="/" style={{ textDecoration: "none" }}>
+            {/* Mock SERP title link — points at the previewed URL (like a
+                real Google result), not the literal "/" the
+                no-html-link-for-pages rule flags. The whole preview box is
+                pointer-events:none, so it's never actually clickable. */}
+            <a href={href} style={{ textDecoration: "none" }}>
               {metaTitle}
             </a>
           </h4>

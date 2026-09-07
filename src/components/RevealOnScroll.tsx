@@ -50,8 +50,13 @@ export function RevealOnScroll({
       "(prefers-reduced-motion: reduce)",
     ).matches;
     if (prefersReducedMotion) {
-      setRevealed(true);
-      return;
+      // Reveal immediately — but defer the state change by one frame rather
+      // than setting it synchronously in the effect body. That avoids the
+      // extra synchronous re-render react-hooks/set-state-in-effect warns
+      // about, with no visible difference (the element mounts below the
+      // fold). Same one-frame-defer pattern as CountUp.
+      const raf = requestAnimationFrame(() => setRevealed(true));
+      return () => cancelAnimationFrame(raf);
     }
 
     const node = ref.current;

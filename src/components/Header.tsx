@@ -84,8 +84,12 @@ export function Header() {
   // "barely scrolled into view".
   useEffect(() => {
     if (pathname !== "/") {
-      setActiveSectionId(null);
-      return;
+      // Clear any active section when off the home page. Deferred one frame
+      // (same pattern as CountUp / RevealOnScroll) so it isn't a synchronous
+      // effect-body state update; the value isn't read off-home anyway, so
+      // there's no visible change.
+      const raf = requestAnimationFrame(() => setActiveSectionId(null));
+      return () => cancelAnimationFrame(raf);
     }
 
     const sections = navItems

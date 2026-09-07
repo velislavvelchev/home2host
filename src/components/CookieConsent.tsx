@@ -48,11 +48,21 @@ export function CookieConsent() {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
-    setConsent(readConsent());
-    setMounted(true);
+    // Read the stored choice on the client and reveal the banner. Deferred
+    // one frame (same pattern as CountUp / RevealOnScroll) so these aren't
+    // synchronous effect-body state updates that react-hooks/set-state-in-
+    // effect flags — the banner just appears one frame later, imperceptibly.
+    // The reopen listener still attaches immediately.
+    const raf = requestAnimationFrame(() => {
+      setConsent(readConsent());
+      setMounted(true);
+    });
     const reopen = () => setConsent(null);
     window.addEventListener(OPEN_COOKIE_SETTINGS_EVENT, reopen);
-    return () => window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, reopen);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener(OPEN_COOKIE_SETTINGS_EVENT, reopen);
+    };
   }, []);
 
   // No analytics configured → there's nothing to consent to.
