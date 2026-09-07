@@ -3,6 +3,7 @@ import { Link } from "@/i18n/navigation";
 import { buttonStyles } from "@/components/Button";
 import { HeroSlideshow, type HeroSlide } from "@/components/HeroSlideshow";
 import { AboutSection } from "@/components/sections/AboutSection";
+import { CountersSection } from "@/components/sections/CountersSection";
 import { ServicesSection } from "@/components/sections/ServicesSection";
 import { ApartmentsSection } from "@/components/sections/ApartmentsSection";
 import { ReviewsSection } from "@/components/sections/ReviewsSection";
@@ -190,6 +191,7 @@ export default async function Home({
       </section>
 
       <AboutSection />
+      <CountersSection />
       <ServicesSection />
       <ApartmentsSection />
       <ReviewsSection />

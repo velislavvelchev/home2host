@@ -102,6 +102,7 @@ export interface Config {
   globals: {
     'landing-page': LandingPage;
     about: About;
+    counters: Counter;
     services: Service;
     'pricing-plans': PricingPlan;
     contacts: Contact;
@@ -116,6 +117,7 @@ export interface Config {
   globalsSelect: {
     'landing-page': LandingPageSelect<false> | LandingPageSelect<true>;
     about: AboutSelect<false> | AboutSelect<true>;
+    counters: CountersSelect<false> | CountersSelect<true>;
     services: ServicesSelect<false> | ServicesSelect<true>;
     'pricing-plans': PricingPlansSelect<false> | PricingPlansSelect<true>;
     contacts: ContactsSelect<false> | ContactsSelect<true>;
@@ -852,6 +854,40 @@ export interface About {
   createdAt?: string | null;
 }
 /**
+ * Editable copy + numbers for the stats band on the home page (between 'About us' and 'Services'). Each number counts up from zero when it scrolls into view. Add between 2 and 4 stats — the grid is built for that range.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "counters".
+ */
+export interface Counter {
+  id: number;
+  eyebrow: string;
+  heading: string;
+  lead: string;
+  /**
+   * Between 2 and 4 stats. Each shows a big number that counts up on scroll, an optional suffix, and a label beneath.
+   */
+  items?:
+    | {
+        /**
+         * The target number the counter animates up to (e.g. 20, 4, 1300). Whole numbers only.
+         */
+        value: number;
+        /**
+         * Optional short symbol shown right after the number, e.g. '+' or '%'. Leave empty for a plain number.
+         */
+        suffix?: string | null;
+        /**
+         * Short caption under the number (e.g. 'апартамента' / 'apartments').
+         */
+        label: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
  * Editable copy for the 'Services' section. Exactly 6 items — the layout is built for that count (6-up overview grid + 6 alternating editorial rows). Use the 'Key' select on each item to pick which icon and fallback photo show; reordering the array reorders the cards visually.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1272,6 +1308,26 @@ export interface AboutSelect<T extends boolean = true> {
         title?: T;
         description?: T;
         image?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "counters_select".
+ */
+export interface CountersSelect<T extends boolean = true> {
+  eyebrow?: T;
+  heading?: T;
+  lead?: T;
+  items?:
+    | T
+    | {
+        value?: T;
+        suffix?: T;
+        label?: T;
+        id?: T;
       };
   updatedAt?: T;
   createdAt?: T;

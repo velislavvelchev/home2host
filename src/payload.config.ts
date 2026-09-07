@@ -751,6 +751,73 @@ export default buildConfig({
       ],
     },
     {
+      // Home-page-only stats band shown between About and Services. No
+      // standalone route (so deliberately NOT in the seoPlugin globals
+      // array — its SEO is covered by the landing-page meta). Same
+      // eyebrow/heading/lead chrome as the other section Globals, plus a
+      // capped `items` array: the grid is built for 2–4 stats, and an
+      // uncapped list would break the layout (same reasoning as Services'
+      // fixed 6 / Pricing's fixed 3). Read at build/regeneration time like
+      // every other section Global (page stays SSG per ADR 0006); the
+      // count-up animation is entirely client-side (CountUp), so nothing
+      // here touches cookies/headers or forces dynamic rendering.
+      slug: "counters",
+      label: "Counter section",
+      admin: {
+        description:
+          "Editable copy + numbers for the stats band on the home page (between 'About us' and 'Services'). Each number counts up from zero when it scrolls into view. Add between 2 and 4 stats — the grid is built for that range.",
+      },
+      access: { read: () => true },
+      fields: [
+        { name: "eyebrow", type: "text", localized: true, required: true },
+        { name: "heading", type: "text", localized: true, required: true },
+        { name: "lead", type: "textarea", localized: true, required: true },
+        {
+          name: "items",
+          type: "array",
+          minRows: 2,
+          maxRows: 4,
+          labels: { singular: "Stat", plural: "Stats" },
+          admin: {
+            description:
+              "Between 2 and 4 stats. Each shows a big number that counts up on scroll, an optional suffix, and a label beneath.",
+          },
+          fields: [
+            {
+              name: "value",
+              type: "number",
+              required: true,
+              min: 0,
+              admin: {
+                description:
+                  "The target number the counter animates up to (e.g. 20, 4, 1300). Whole numbers only.",
+              },
+            },
+            {
+              // Not localized — symbols like "+" or "%" read the same in
+              // every language. A word-style suffix belongs in the label.
+              name: "suffix",
+              type: "text",
+              admin: {
+                description:
+                  "Optional short symbol shown right after the number, e.g. '+' or '%'. Leave empty for a plain number.",
+              },
+            },
+            {
+              name: "label",
+              type: "text",
+              localized: true,
+              required: true,
+              admin: {
+                description:
+                  "Short caption under the number (e.g. 'апартамента' / 'apartments').",
+              },
+            },
+          ],
+        },
+      ],
+    },
+    {
       slug: "services",
       label: "Services section",
       admin: {
